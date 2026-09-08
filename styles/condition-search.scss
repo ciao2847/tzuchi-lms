@@ -1,0 +1,106 @@
+@import './bootstrap/functions';
+@import './bootstrap/variables';
+@import './bootstrap/mixins';
+@import './mixin';
+
+.condition-search-blk {
+	@include media-breakpoint-up(md) {
+		position: relative !important;
+
+		&.show {
+			filter: drop-shadow(0 0 10px rgba(#000, 0.25));
+			overflow: visible !important;
+			padding: 0 !important;
+			z-index: 100 !important;
+
+			.condition-blk {
+				position: absolute;
+				width: 100%;
+				//border: 1px #eee solid;
+
+				&:before {
+					content: '';
+					display: block;
+					position: absolute;
+					z-index: -1;
+					background: white;
+					top: -56px;
+					left: -12px;
+					width: calc(100% + 24px);
+					height: calc(100% + 60px);
+					border-radius: 20px;
+				}
+			}
+
+			.button-blk {
+				position: static !important;
+				bottom: 0 !important;
+			}
+		}
+
+		.condition-scroll-blk {
+			//padding: 8px;
+			max-height: 320px;
+			overflow: hidden;
+			overflow-y: scroll;
+		}
+
+		.close-blk {
+			position: absolute !important;
+		}
+	}
+}
+
+.category-scroll-blk {
+	@include media-breakpoint-up(xl) {
+		.scroll-x-blk {
+			overflow: hidden !important;
+		}
+
+		.button-blk {
+			position: static !important;
+			height: auto !important;
+
+			.btn {
+				border: 1px $gray-200 solid !important;
+			}
+		}
+
+		.pr-2-last:last-child {
+			padding-right: 0 !important;
+		}
+	}
+}
+
+.date-selector-blk {
+	.react-datepicker-wrapper {
+		width: 100%;
+	}
+}
+
+.filter-selector-blk {
+	@include media-breakpoint-up(md) {
+		position: absolute !important;
+		top: 40px;
+		left: 0;
+
+		.overlay {
+			position: fixed !important;
+			background-color: transparent !important;
+		}
+	}
+}
+
+.filter-selector-list {
+	min-height: 320px;
+
+	@include media-breakpoint-up(md) {
+		position: relative !important;
+		left: 50%;
+		margin-left: -200px;
+		width: auto !important;
+		width: 400px !important;
+		min-height: auto;
+		border: 1px $primary solid;
+	}
+}

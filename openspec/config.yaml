@@ -1,0 +1,33 @@
+schema: spec-driven
+
+context: |
+  Tech stack: React 18+, Webpack 5/Vite, TanStack Query / Redux Toolkit, Tailwind CSS v3+ (Tailwind-First).
+  Follow ARCHITECTURE_RULES.md (v2.0 Modern Standards):
+  - Styling: Tailwind-First paradigm. SCSS only for resets/base. No component-level SCSS partials.
+  - API Gateway: Always use unified apiClient (src/lib/apiClient.js) with response.ok verification.
+  - State Separation: Server state (TanStack Query) vs Client state (Redux/Zustand). Never manual Redux cache.
+  - Adapter Pattern: Legacy backend quirks (bitmasks, media shapes) must be mapped in src/adapters/.
+  - Component Pattern: React.memo, BannerTitle -> Filters -> List/Grid, accessible layout (#main-content).
+
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing

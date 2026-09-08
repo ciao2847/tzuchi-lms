@@ -1,0 +1,14 @@
+@import './bootstrap/functions';
+@import './bootstrap/variables';
+@import './bootstrap/mixins';
+@import './mixin';
+@import './public/fonts/pixelated.ttf';
+
+.thumb-frame .thumb.lazyloaded {
+	background-color: #aacfb2;
+}
+.w-md-500 {
+	@include media-breakpoint-up(md) {
+		width: 500px !important;
+	}
+}

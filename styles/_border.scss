@@ -1,0 +1,44 @@
+.border-gray-200 {
+    border-color: $gray-200;
+}
+
+.border-gray-300 {
+    border-color: $gray-300;
+}
+
+.border-gray-400 {
+    border-color: $gray-400;
+}
+
+.border-info-20 {
+    border-color: rgba($info, 0.2);
+}
+
+.border-width-2px {
+    border-width: 2px;
+}
+
+.border-width-4px {
+    border-width: 4px;
+}
+
+.border-transparent {
+    border-color: transparent;
+}
+
+.border-0-last:last-child {
+    border: 0;
+}
+
+.border-cyan {
+    border-color: #2c5a79;
+}
+
+.border-xl-0 {
+    @include media-breakpoint-up(xl) {
+        border: 0;
+    }
+}
+.border-primary-focus-within:focus-within {
+    border-color: $primary;
+}

@@ -1,0 +1,120 @@
+i.icon {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+
+    &:before {
+        line-height: 1 !important;
+        @extend %iconfont-base;
+    }
+}
+
+$list: (
+    'android',
+    'ios',
+    'warn',
+    'square-clock',
+    'square-spot',
+    'path',
+    'sort',
+    'download',
+    'view',
+    'hotel',
+    'muslim',
+    'shop',
+    'transport',
+    'package',
+    'passport',
+    'map-search',
+    'aqi',
+    'uv',
+    'umbrella',
+    'temperature',
+    'facebook-rounded',
+    'instagram-rounded',
+    'youtube-rounded',
+    'global',
+    'link',
+    'store',
+    'location',
+    'calendar',
+    'tile',
+    'bed',
+    'food',
+    'gift',
+    'bulb',
+    'eye',
+    'eye-slash',
+    'reload',
+    'qrcode-scanner',
+    'delete',
+    'triangle',
+    'arrow-left',
+    'arrow-right',
+    'arrow-up',
+    'arrow-down',
+    'arrow-forward',
+    'link-out',
+    'flickr',
+    'blog',
+    'tel',
+    'email',
+    'flickr',
+    'checked',
+    'close',
+    'adv',
+    'facebook',
+    'facebook-circle',
+    'instagram',
+    'line',
+    'twitter',
+    'duplicate',
+    'wechat',
+    'youtube',
+    'weibo',
+    'pixnet',
+    'mail',
+    'photo',
+    'magnifier',
+    'avatar',
+    'category',
+    'grid',
+    'info',
+    'doc',
+    'list',
+    'fruit',
+    'pick',
+    'tree',
+    'souvenirs',
+    'fruit-travel',
+    'wt-01',
+    'sun',
+    'arrow-right',
+    'time',
+    'map',
+    'call',
+    'adv-fill',
+    'search'
+);
+
+@each $var in $list {
+    .icon-#{$var}:before {
+        content: iconfont-char('#{$var}');
+    }
+}
+
+//天氣
+.icon-weather {
+    &:before {
+        content: iconfont-char('wt-01');
+    }
+}
+
+@for $i from 1 through 42 {
+    $num: padding-zero($i);
+
+    .wt-#{$num}:before {
+        content: iconfont-char('wt-#{$num}');
+    }
+}
