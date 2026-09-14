@@ -83,21 +83,21 @@ const FileSelector = forwardRef(
         return (
             <div className={`${className}`}>
                 {!!data?.length && (
-                    <ul className="mb-3 row g-2">
+                    <ul className="mb-3 grid grid-cols-1 md:grid-cols-2 gap-2">
                         {data.map((file, i) => (
-                            <li className="col-12 col-md-6 mb-0-last" key={i}>
-                                <div className="d-flex align-items-center p-1 border rounded bg-white">
+                            <li className="last:mb-0" key={i}>
+                                <div className="flex items-center p-1 border rounded bg-white">
                                     <FilePreviewer
-                                        className="flex-fill"
+                                        className="flex-1"
                                         file={file}
                                     />
                                     <button
-                                        className="btn flex-shrink-0 w-5 h-5"
+                                        className="btn shrink-0 w-5 h-5"
                                         onClick={() => onDelete(i)}
                                         type="button"
                                     >
                                         <i
-                                            className="icon icon-delete text-danger fz-15px"
+                                            className="icon icon-delete text-danger text-[15px]"
                                             aria-hidden="true"
                                         ></i>
                                     </button>
@@ -118,12 +118,12 @@ const FileSelector = forwardRef(
 
                 <label
                     className={`${
-                        !multiple && !!data.length && 'd-none'
+                        !multiple && !!data.length && 'hidden'
                     } btn btn-outline-primary h-5 rounded focus-hint`}
                     htmlFor={`${name}-file-selector-ipt`}
                 >
                     <i
-                        className="icon icon-upload mr-4px fz-13px"
+                        className="icon icon-upload mr-[4px] text-[13px]"
                         aria-hidden="true"
                     ></i>
                     <I18N>{label}</I18N>

@@ -12,28 +12,28 @@ const SubMenuNews = ({ isCurrent, onClose }) => {
 
     return (
         <div
-            className={`nav-sub-list justify-content-start pt-7 pt-xl-0 bg-white ${
+            className={`nav-sub-list justify-start pt-7 xl:pt-0 bg-white ${
                 isCurrent ? 'current-lv' : ''
             }`}
             onClick={onClose}
         >
             {isDesktopLayout && (
-                <div className="flex-shrink-0 w-50 position-relative">
+                <div className="shrink-0 w-1/2 relative">
                     <ThumbFrame
                         src="/assets/images/global/menu-cover-01.jpg"
                         alt={translate('苗栗南庄老街', lang)}
                         className="fill-parent"
                     />
-                    <div className="ml-2 mb-2 px-12px py-4px bg-black-80 text-white absolute-bottom-left rounded">
+                    <div className="ml-2 mb-2 px-[12px] py-[4px] bg-black/80 text-white absolute bottom-0 left-0 rounded">
                         <I18N>苗栗南庄老街</I18N>
                     </div>
                 </div>
             )}
-            <div className="d-xl-flex flex-fill menu-blk">
+            <div className="xl:flex flex-1 menu-blk">
                 <div className="menu-group">
-                    <div className="mb-xl-5 mb-0-last border-bottom border-xl-0">
+                    <div className="xl:mb-5 last:mb-0 border-b xl:border-b-0">
                         <a
-                            className="d-flex align-items-center h-6 h-xl-auto px-2 px-xl-0 text-decoration-none text-primary fz-18px lh-initial hover-secondary trs-all"
+                            className="flex items-center h-6 xl:h-auto px-2 xl:px-0 no-underline text-primary text-[18px] leading-normal hover:text-secondary transition-all duration-300"
                             href={`https://tung.romantichakka.com/home?lang=${BLOSSOM_LANG_MAP[lang]}`}
                             title={`${translate('111年花況', lang)}(${translate(
                                 '另開視窗',
@@ -42,32 +42,32 @@ const SubMenuNews = ({ isCurrent, onClose }) => {
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            <div className="fz-xl-24px font-weight-xl-bold">
+                            <div className="xl:text-[24px] xl:font-bold">
                                 <I18N>111年花況</I18N>
                             </div>
                         </a>
                     </div>
                     {/* {!isJA && ( */}
-                    <div className="mb-xl-5 mb-0-last border-bottom border-xl-0">
+                    <div className="xl:mb-5 last:mb-0 border-b xl:border-b-0">
                         <Link
-                            className="d-flex align-items-center h-6 h-xl-auto px-2 px-xl-0 text-decoration-none text-primary fz-18px lh-initial hover-secondary trs-all"
+                            className="flex items-center h-6 xl:h-auto px-2 xl:px-0 no-underline text-primary text-[18px] leading-normal hover:text-secondary transition-all duration-300"
                             to={`/${lang}/${ROUTES_CONST.NEWS}`}
                             title={`${translate('客家新鮮事', lang)}`}
                         >
-                            <div className="fz-xl-24px font-weight-xl-bold">
+                            <div className="xl:text-[24px] xl:font-bold">
                                 <I18N>客家新鮮事</I18N>
                             </div>
                         </Link>
                     </div>
                     {/* )} */}
                     {isTW && (
-                        <div className="mb-xl-5 mb-0-last border-bottom border-xl-0">
+                        <div className="xl:mb-5 last:mb-0 border-b xl:border-b-0">
                             <Link
-                                className="d-flex align-items-center h-6 h-xl-auto px-2 px-xl-0 text-decoration-none text-primary fz-18px lh-initial hover-secondary trs-all"
+                                className="flex items-center h-6 xl:h-auto px-2 xl:px-0 no-underline text-primary text-[18px] leading-normal hover:text-secondary transition-all duration-300"
                                 to={`/zh-tw/${ROUTES_CONST.SOCIAL_MEDIAS}`}
                                 title="社群講客家"
                             >
-                                <div className="fz-xl-24px font-weight-xl-bold">
+                                <div className="xl:text-[24px] xl:font-bold">
                                     社群講客家
                                 </div>
                             </Link>

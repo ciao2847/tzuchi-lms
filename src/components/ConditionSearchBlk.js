@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import CInput from 'react-composition-input'
-import { filterWithQuery } from 'constants/utils'
-import { makeParams } from 'constants/utils'
-import '/styles/condition-search.scss'
+import { filterWithQuery, makeParams } from 'constants/utils'
 import I18N, { translate } from 'components/I18N'
 
 const DAY_MAP = [
@@ -182,11 +180,11 @@ const ConditionSearchBlk = ({
     return (
         <>
             <form
-                className={`condition-search-blk flex-fill flex-shrink-0 ${
+                className={`condition-search-blk flex-1 shrink-0 ${
                     isExpand
-                        ? 'show fixed-top h-100 z-2000 p-2 pt-7 pb-8 scroll-blk border-[transparent]'
-                        : 'position-relative rounded-pill overflow-hidden'
-                } bg-white border ${className}`}
+                        ? 'show fixed top-0 inset-x-0 h-full z-[2000] p-2 pt-7 pb-8 overflow-y-auto border-transparent md:relative md:overflow-visible md:p-0 md:z-[100] md:[filter:drop-shadow(0_0_10px_rgba(0,0,0,0.25))]'
+                        : 'relative rounded-full overflow-hidden'
+                } bg-white border ${className || ''}`}
                 onSubmit={(e) => {
                     e.preventDefault()
                     onSearch()
@@ -194,14 +192,14 @@ const ConditionSearchBlk = ({
                 ref={scrollRef}
             >
                 {isExpand && (
-                    <div className="d-md-none mb-1 font-weight-bold">
+                    <div className="md:hidden mb-1 font-bold">
                         關鍵字
                     </div>
                 )}
-                <div className="d-flex overflow-hidden trs-all">
+                <div className="flex overflow-hidden transition-all duration-300">
                     <div
-                        className={`d-flex flex-fill position-relative focus-within:bg-[#f4f8f9] rounded-pill ${
-                            isExpand ? 'mr-md-6' : ''
+                        className={`flex flex-1 relative focus-within:bg-[#f4f8f9] rounded-full ${
+                            isExpand ? 'md:mr-6' : ''
                         }`}
                     >
                         <label className="sr-only" htmlFor="keyword">
@@ -210,8 +208,8 @@ const ConditionSearchBlk = ({
                         <CInput
                             type="search"
                             className={`${
-                                !isExpand && ' border-[transparent]'
-                            } ipt ipt-keyword px-3 rounded-pill focus:bg-[transparent]`}
+                                !isExpand ? 'border-transparent' : 'border-gray-200'
+                            } peer w-full min-h-[48px] px-3 rounded-full focus:bg-transparent outline-none text-[16px] leading-[48px] bg-white`}
                             placeholder={translate('請輸入關鍵字', lang)}
                             value={keyword}
                             maxLength="50"
@@ -240,7 +238,7 @@ const ConditionSearchBlk = ({
                             id="keyword"
                         />
                         <div
-                            className={`ipt-focus-show d-flex align-items-center h-100 pr-20px absolute-top-right pointer-events-none text-info fz-13px trs-all mr-3`}
+                            className="ipt-focus-show flex items-center h-full pr-[20px] absolute top-0 right-0 pointer-events-none text-info text-[13px] transition-all duration-300 mr-3 opacity-0 peer-focus:opacity-100"
                         >
                             <I18N params={[preQueryData.length]}>
                                 {!!preQueryData.length
@@ -250,9 +248,9 @@ const ConditionSearchBlk = ({
                         </div>
                     </div>
                     {isExpand && (
-                        <div className="fixed top-0 right-0 d-flex d-md-block justify-content-end p-2 p-md-0 pointer-events-none">
+                        <div className="fixed top-0 right-0 flex md:block justify-end p-2 md:p-0 pointer-events-none">
                             <button
-                                className="btn btn-ghost w-5 h-5 rounded pointer-events-auto rounded-circle"
+                                className="btn btn-ghost w-5 h-5 pointer-events-auto rounded-full"
                                 type="button"
                                 onClick={() => {
                                     /* setPreQueryKeyword(keyword)
@@ -264,7 +262,7 @@ const ConditionSearchBlk = ({
                                 }}
                             >
                                 <i
-                                    className="icon icon-close fz-24px fz-md-16px"
+                                    className="icon icon-close text-[24px] md:text-[16px]"
                                     aria-hidden="true"
                                 ></i>
                                 <span className="sr-only">關閉</span>
@@ -272,22 +270,22 @@ const ConditionSearchBlk = ({
                         </div>
                     )}
                     {options.noAdvance && (
-                        <button className="btn btn-secondary d-none d-md-flex h-5 px-20px ml-1 rounded-pill">
+                        <button className="btn btn-secondary hidden md:flex h-5 px-[20px] ml-1 rounded-full">
                             <I18N>查詢</I18N>
                         </button>
                     )}
                     {!options.noAdvance && (
                         <button
                             className={`${
-                                isExpand && 'op-0 pointer-events-none d-none'
-                            } btn btn-secondary flex-shrink-0 h-5 px-20px ml-1 rounded-pill trs-all position-relative`}
+                                isExpand ? 'opacity-0 pointer-events-none hidden' : ''
+                            } btn btn-secondary shrink-0 h-5 px-[20px] ml-1 rounded-full transition-all duration-300 relative`}
                             type="button"
                             onClick={() => {
                                 toggleExpand(true)
                             }}
                         >
                             <i className="icon icon-adv" aria-hidden="true"></i>
-                            <span className="d-none d-md-block pl-1">
+                            <span className="hidden md:block pl-1">
                                 <I18N>進階搜尋</I18N>
                             </span>
                             {(!!category.length ||
@@ -296,7 +294,7 @@ const ConditionSearchBlk = ({
                                 !!transport.length ||
                                 !!days.length ||
                                 !!brand.length) && (
-                                <div className="w-6px h-6px mt-1 mr-10px bg-danger absolute-top-right rounded-circle"></div>
+                                <div className="w-[6px] h-[6px] mt-1 mr-[10px] bg-danger absolute top-0 right-0 rounded-full"></div>
                             )}
                         </button>
                     )}
@@ -320,22 +318,22 @@ const ConditionSearchBlk = ({
                                 <span className="sr-only">關閉</span>
                             </button>
                         </div>*/}
-                        <div className="condition-blk d-xl-flex flex-column bg-white">
-                            <div className="condition-scroll-blk pt-2 pb-md-1 px-md-1">
+                        <div className="condition-blk md:absolute md:w-full md:top-full md:left-0 flex xl:flex flex-col bg-white md:before:content-[''] md:before:block md:before:absolute md:before:-z-10 md:before:bg-white md:before:-top-[56px] md:before:-left-[12px] md:before:w-[calc(100%+24px)] md:before:h-[calc(100%+60px)] md:before:rounded-[20px]">
+                            <div className="condition-scroll-blk pt-2 pb-0 md:pb-1 px-0 md:px-1 md:max-h-[320px] md:overflow-y-auto">
                                 {options.category && !!categoryData?.length && (
-                                    <div className="position-relative mb-3 mb-0-last">
-                                        <div className="mb-12px font-weight-bold">
+                                    <div className="relative mb-3 last:mb-0">
+                                        <div className="mb-[12px] font-bold">
                                             <I18N>類型</I18N>
                                         </div>
-                                        <ul className="d-flex flex-wrap">
+                                        <ul className="flex flex-wrap">
                                             {categoryData.map((cate) => (
                                                 <li
-                                                    className="mr-12px mb-12px"
+                                                    className="mr-[12px] mb-[12px]"
                                                     key={cate.id}
                                                 >
                                                     <button
                                                         type="button"
-                                                        className={`btn h-5 px-20px fz-15px ${
+                                                        className={`btn h-5 px-[20px] text-[15px] ${
                                                             category.includes(
                                                                 cate.id
                                                             )
@@ -356,19 +354,19 @@ const ConditionSearchBlk = ({
                                     </div>
                                 )}
                                 {options.county && !!countyData?.length && (
-                                    <div className="position-relative mb-3 mb-0-last">
-                                        <div className="mb-12px font-weight-bold">
+                                    <div className="relative mb-3 last:mb-0">
+                                        <div className="mb-[12px] font-bold">
                                             <I18N>縣市</I18N>
                                         </div>
-                                        <ul className="d-flex flex-wrap">
+                                        <ul className="flex flex-wrap">
                                             {countyData.map((c) => (
                                                 <li
-                                                    className="mr-12px mb-12px"
+                                                    className="mr-[12px] mb-[12px]"
                                                     key={c.id}
                                                 >
                                                     <button
                                                         type="button"
-                                                        className={`btn h-5 px-20px fz-15px ${
+                                                        className={`btn h-5 px-[20px] text-[15px] ${
                                                             county.includes(
                                                                 c.id
                                                             )
@@ -390,20 +388,20 @@ const ConditionSearchBlk = ({
                                 )}
                                 {options.brand &&
                                     !!tourismBrandData?.length && (
-                                        <div className="position-relative mb-3 mb-0-last">
-                                            <div className="mb-12px font-weight-bold">
+                                        <div className="relative mb-3 last:mb-0">
+                                            <div className="mb-[12px] font-bold">
                                                 <I18N>觀光圈分類</I18N>
                                             </div>
-                                            <ul className="d-flex flex-wrap">
+                                            <ul className="flex flex-wrap">
                                                 {tourismBrandData.map(
                                                     (cate) => (
                                                         <li
-                                                            className="mr-12px mb-12px"
+                                                            className="mr-[12px] mb-[12px]"
                                                             key={cate.id}
                                                         >
                                                             <button
                                                                 type="button"
-                                                                className={`btn h-5 px-20px fz-15px ${
+                                                                className={`btn h-5 px-[20px] text-[15px] ${
                                                                     brand.includes(
                                                                         cate.tourismBrandTag
                                                                     )
@@ -426,19 +424,19 @@ const ConditionSearchBlk = ({
                                     )}
 
                                 {options.days && (
-                                    <div className="position-relative mb-3 mb-0-last">
-                                        <div className="mb-12px font-weight-bold">
+                                    <div className="relative mb-3 last:mb-0">
+                                        <div className="mb-[12px] font-bold">
                                             旅遊天數
                                         </div>
-                                        <ul className="d-flex flex-wrap">
+                                        <ul className="flex flex-wrap">
                                             {DAY_MAP.map((d) => (
                                                 <li
-                                                    className="mr-12px mb-12px"
+                                                    className="mr-[12px] mb-[12px]"
                                                     key={d.value}
                                                 >
                                                     <button
                                                         type="button"
-                                                        className={`btn h-5 px-20px fz-15px ${
+                                                        className={`btn h-5 px-[20px] text-[15px] ${
                                                             days.includes(
                                                                 d.value
                                                             )
@@ -460,19 +458,19 @@ const ConditionSearchBlk = ({
                                 )}
                                 {options.transport &&
                                     !!transportData?.length && (
-                                        <div className="position-relative mb-3 mb-0-last">
-                                            <div className="mb-12px font-weight-bold">
+                                        <div className="relative mb-3 last:mb-0">
+                                            <div className="mb-[12px] font-bold">
                                                 <I18N>交通工具</I18N>
                                             </div>
-                                            <ul className="d-flex flex-wrap">
+                                            <ul className="flex flex-wrap">
                                                 {transportData.map((tran) => (
                                                     <li
-                                                        className="mr-12px mb-12px"
+                                                        className="mr-[12px] mb-[12px]"
                                                         key={tran.id}
                                                     >
                                                         <button
                                                             type="button"
-                                                            className={`btn h-5 px-20px fz-15px ${
+                                                            className={`btn h-5 px-[20px] text-[15px] ${
                                                                 transport.includes(
                                                                     tran.id
                                                                 )
@@ -493,31 +491,31 @@ const ConditionSearchBlk = ({
                                         </div>
                                     )}
                                 {options.zipcode && zipcodeData && (
-                                    <div className="position-relative mb-3 mb-0-last">
-                                        <div className="mb-12px font-weight-bold">
+                                    <div className="relative mb-3 last:mb-0">
+                                        <div className="mb-[12px] font-bold">
                                             <I18N>行政區</I18N>
                                         </div>
-                                        <ul className="d-flex flex-wrap">
+                                        <ul className="flex flex-wrap">
                                             {zipcodeData.map((region) => (
                                                 <li
-                                                    className="mr-12px mb-12px"
+                                                    className="mr-[12px] mb-[12px]"
                                                     key={region.zipcode}
                                                 >
                                                     <button
                                                         type="button"
-                                                        className={`btn h-6 px-20px fz-15px rounded ${
+                                                        className={`btn h-6 px-[20px] text-[15px] rounded ${
                                                             zipcode.includes(
                                                                 region.zipcode *
                                                                     1
-                                                            )
-                                                                ? 'btn-secondary'
-                                                                : ''
+                                                                )
+                                                                    ? 'btn-secondary'
+                                                                    : ''
                                                         }`}
                                                         onClick={() => {
                                                             preQueryWithZipcode(
                                                                 region.zipcode *
                                                                     1
-                                                            )
+                                                                )
                                                         }}
                                                     >
                                                         {region.name}
@@ -528,11 +526,11 @@ const ConditionSearchBlk = ({
                                     </div>
                                 )}
                             </div>
-                            <div className="button-blk fixed-bottom w-100 p-2 border-top bg-white z-100">
-                                <div className="d-flex justify-content-between pb-safe-area">
+                            <div className="button-blk fixed bottom-0 left-0 right-0 w-full p-2 border-t bg-white z-[100] md:static md:bottom-auto">
+                                <div className="flex justify-between pb-safe-area">
                                     <button
                                         type="button"
-                                        className="btn btn-ghost px-2 rounded fz-xl-16px text-info"
+                                        className="btn btn-ghost px-2 rounded xl:text-[16px] text-info"
                                         onClick={() => {
                                             setKeyword('')
                                             setCategory([])
@@ -545,7 +543,7 @@ const ConditionSearchBlk = ({
                                     >
                                         <I18N>清除</I18N>
                                     </button>
-                                    <button className="btn btn-secondary w-240px px-2 py-1 rounded">
+                                    <button className="btn btn-secondary w-[240px] px-2 py-1 rounded">
                                         <I18N params={[preQueryData.length]}>
                                             {!!preQueryData.length
                                                 ? `共有 {0} 個結果`
@@ -560,7 +558,7 @@ const ConditionSearchBlk = ({
             </form>
             {isExpand && (
                 <div
-                    className="d-none d-md-block fixed-top z-10 w-100 h-100 bg-white-50"
+                    className="hidden md:block fixed inset-0 z-10 w-full h-full bg-white/50"
                     onClick={() => {
                         resetToDefault()
                         toggleExpand(false)

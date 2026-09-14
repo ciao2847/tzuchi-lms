@@ -3,11 +3,11 @@ import React from 'react'
 const BlockTitle = ({ title, className = '', color = '#FBCE4C' }) => {
     return (
         <div
-            className={`block font-weight-bold fz-md-36px fz-28px text-center mb-6 ${className}`}
+            className={`block font-bold md:text-[36px] text-[28px] text-center mb-6 ${className}`}
         >
             <I18N>{title}</I18N>
             <svg
-                className="mx-auto mt-12px"
+                className="mx-auto mt-[12px]"
                 xmlns="http://www.w3.org/2000/svg"
                 width="192"
                 height="12"

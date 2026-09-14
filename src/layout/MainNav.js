@@ -4,7 +4,7 @@ import { useLocation, useParams } from 'react-router-dom'
 import I18N from 'components/I18N'
 import Link from 'components/Link'
 import BtnMenu from 'components/BtnMenu'
-import { MENU_CONFIG, SOCIAL_LINKS_CONFIG, FRIEND_SITE_CONFIG } from 'constants'
+import { MENU_CONFIG, SOCIAL_LINKS_CONFIG, OTHER_CONFIG } from 'constants'
 import AutoSwitchLink from 'components/AutoSwitchLink'
 import { translate } from 'components/I18N'
 
@@ -18,33 +18,38 @@ const MainNav = ({}) => {
     const isTW = lang === 'zh-tw'
 
     useEffect(() => {
-        document.addEventListener('keyup', (e) => {
+        const closeMenuOnEscape = (e) => {
             const _charCode = e.which ? e.which : e.keyCode
             if (_charCode === 27) {
                 toggleMenu(false)
             }
-        })
+        }
+        document.addEventListener('keyup', closeMenuOnEscape)
+        return () => document.removeEventListener('keyup', closeMenuOnEscape)
     }, [])
 
     return (
         <>
             <BtnMenu
-                className="d-xl-none absolute-top-right mt-4px mr-1 z-2000"
+                className="xl:hidden absolute top-[4px] right-2 z-[2000]"
                 isOpen={isMenuOpen}
                 toggle={toggleMenu}
             />
-            <div className="position-relative d-flex flex-row-reverse">
+            <div className="relative flex flex-row-reverse">
                 {/*!isLayoutXL && (
                 <LanguageSelector className="z-1000 text-secondary" />
             )*/}
                 <div
                     className={`${
-                        isMenuOpen && 'is-open'
-                    } main-nav-wrapper justify-content-end ml-xl-auto`}
+                        isMenuOpen
+                            ? 'is-open max-xl:visible max-xl:translate-x-0'
+                            : 'max-xl:invisible max-xl:-translate-x-full'
+                    } main-nav-wrapper fixed inset-x-0 top-[56px] bottom-0 z-[1000] bg-white transition-[transform,visibility] duration-300 xl:static xl:ml-auto`}
+                    aria-hidden={!isLayoutXL && !isMenuOpen}
                 >
-                    <div className={`mobile-scroll-wrapper`}>
-                        <nav className="main-nav d-flex flex-column flex-xl-row justify-content-start justify-content-xl-start pt-3 pt-xl-0">
-                            <ul className="main-nav-title-list d-xl-flex gap-10 align-items-start-center position-relative">
+                    <div className="mobile-scroll-wrapper h-full w-full overflow-hidden xl:h-auto xl:w-auto xl:overflow-visible">
+                        <nav className="main-nav flex h-full w-full flex-col justify-start overflow-y-auto overscroll-contain pt-6 pb-8 xl:h-auto xl:w-auto xl:flex-row xl:overflow-visible xl:overscroll-auto xl:py-0">
+                            <ul className="main-nav-title-list xl:flex gap-10 items-center relative">
                                 {MENU_CONFIG.filter(
                                     (item) => IS_STAGING || !item.stagOnly
                                 )
@@ -76,14 +81,14 @@ const MainNav = ({}) => {
                                                 )
                                             return (
                                                 <li
-                                                    className={`grid justify-center items-center mb-xl-0 mb-0-last h-8 menu-title border-bottom border-[#f0f0f0] xl:border-none ${
+                                                    className={`grid justify-center items-center xl:mb-0 last:mb-0 h-16 xl:h-8 menu-title border-b border-[#f0f0f0] xl:border-none ${
                                                         index === 0
-                                                            ? 'border-top xl:border-none'
+                                                            ? 'border-t xl:border-none'
                                                             : ''
                                                     }`}
                                                     key={id}
                                                 >
-                                                    <div className="w-100 group position-relative ">
+                                                    <div className="w-full group relative">
                                                         <Link
                                                             className={`${
                                                                 isCurrent
@@ -91,9 +96,9 @@ const MainNav = ({}) => {
                                                                     : 'text-default'
                                                             } ${
                                                                 isTW
-                                                                    ? 'fz-xl-20px'
-                                                                    : 'xl:max-w-[200px] fz-xl-20px lg:leading-[100%] lg:text-center'
-                                                            } flex gap-1 align-items-center h-5 fz-24px font-weight-bold trs-all`}
+                                                                    ? 'xl:text-[20px]'
+                                                                    : 'xl:max-w-[200px] xl:text-[20px] lg:leading-[100%] lg:text-center'
+                                                            } flex gap-2 xl:gap-1 items-center h-10 xl:h-5 text-[24px] font-bold transition-all duration-300`}
                                                             href={url.replace(
                                                                 'zh-tw',
                                                                 lang
@@ -104,8 +109,8 @@ const MainNav = ({}) => {
                                                                 )
                                                             }}
                                                         >
-                                                            <i
-                                                                className={`icon w-5 h-5 ml-4px`}
+                                                            {/* <i
+                                                                className="icon w-10 h-10 shrink-0 xl:w-5 xl:h-5 ml-[4px]"
                                                                 aria-hidden="true"
                                                                 style={{
                                                                     backgroundImage: `url(/images/icon/${icon})`,
@@ -116,7 +121,7 @@ const MainNav = ({}) => {
                                                                     backgroundRepeat:
                                                                         'no-repeat'
                                                                 }}
-                                                            ></i>
+                                                            ></i> */}
 
                                                             <I18N>{title}</I18N>
                                                         </Link>
@@ -133,7 +138,7 @@ const MainNav = ({}) => {
                                 max-xl:mt-[293px] 
                                 xl:hidden
                                  justify-center
-                                 fz-28px gap-12
+                                 text-[28px] gap-12
                             "
                             >
                                 {SOCIAL_LINKS_CONFIG.map((item, i) => (
@@ -144,44 +149,39 @@ const MainNav = ({}) => {
                                             isLinkOut={item.isLinkOut}
                                         >
                                             <i
-                                                className={`icon icon-${item.icon}  group-hover:text-[#82be66] trs-all`}
+                                                className={`icon icon-${item.icon}  group-hover:text-[#82be66] transition-all duration-300`}
                                                 aria-hidden="true"
                                             ></i>
                                         </AutoSwitchLink>
                                     </li>
                                 ))}
                             </ul>
-                            {/* 友站連結 */}
-                            <ul
-                                className="
-                                max-xl:flex max-xl:flex-wrap
-                                max-xl:mt-[28px]
-                                xl:hidden
-                                 justify-center
-                            "
-                            >
-                                {FRIEND_SITE_CONFIG[1] && (
-                                    <li className="block group">
-                                        <AutoSwitchLink
-                                            className="block group-hover:opacity-50 trs-all"
-                                            href={FRIEND_SITE_CONFIG[1].url}
-                                            title={translate(
-                                                FRIEND_SITE_CONFIG[1].title,
-                                                lang
-                                            )}
-                                            isLinkOut={
-                                                FRIEND_SITE_CONFIG[1].isLinkOut
-                                            }
-                                        >
-                                            <img
-                                                src={`${process.env.BASE_PATH}/images/global/${FRIEND_SITE_CONFIG[1].img}`}
-                                                className="h-[40px]"
-                                                alt=""
-                                                aria-hidden="true"
-                                            />
-                                        </AutoSwitchLink>
+                            {/* 其他連結 */}
+                            <ul className="mt-7 flex flex-wrap justify-center gap-6 px-4 xl:hidden">
+                                {OTHER_CONFIG.map((group) => (
+                                    <li
+                                        className="flex flex-col items-center gap-4"
+                                        key={group.title}
+                                    >
+                                        <h2 className="text-primary font-bold">
+                                            <I18N>{group.title}</I18N>
+                                        </h2>
+                                        <ul className="flex flex-col items-center gap-3">
+                                            {group.links.map((link) => (
+                                                <li key={link.id}>
+                                                    <AutoSwitchLink
+                                                        className="block hover:text-secondary transition-colors duration-300"
+                                                        href={link.url}
+                                                        title={translate(link.title, lang)}
+                                                        isLinkOut={link.isLinkOut}
+                                                    >
+                                                        <I18N>{link.title}</I18N>
+                                                    </AutoSwitchLink>
+                                                </li>
+                                            ))}
+                                        </ul>
                                     </li>
-                                )}
+                                ))}
                             </ul>
                         </nav>
                     </div>

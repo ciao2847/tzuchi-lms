@@ -1,102 +1,55 @@
-﻿import React from 'react'
+import React from 'react'
 import { useLocale } from 'hooks'
-import useMedia from 'hooks/useMedia'
 import I18N, { translate } from 'components/I18N'
-import Link from 'components/Link'
 import AutoSwitchLink from 'components/AutoSwitchLink'
-import { FRIEND_SITE_CONFIG, MENU_CONFIG, SOCIAL_LINKS_CONFIG } from 'constants'
+import { OTHER_CONFIG } from 'constants'
 
 const Footer = () => {
     const lang = useLocale()
 
     return (
-        <footer className="position-relative z-1">
-            <div className="w-100 border border-[0px] border-t-[2px] lg:pt-[64px] lg:pb-[200px] pt-[48px] pb-[160px]">
-                <ul className="flex flex-wrap justify-center lg:gap-[5rem] gap-8">
-                    {FRIEND_SITE_CONFIG.map((item, i) => (
-                        <li key={i} className="block group">
-                            <AutoSwitchLink
-                                className="block group-hover:opacity-50 trs-all"
-                                href={item.url}
-                                title={translate(item.title, lang)}
-                                isLinkOut={item.isLinkOut}
-                            >
-                                <img
-                                    src={`${process.env.BASE_PATH}/images/global/${item.img}`}
-                                    className={`lg:h-[64px] h-[48px]`}
-                                    alt=""
-                                    aria-hidden="true"
-                                />
-                            </AutoSwitchLink>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <div className="relative">
-                <img
-                    src={`${process.env.BASE_PATH}/images/global/bear.png`}
-                    className="absolute inset-x-1/2 -translate-x-1/2 bottom-[-100%] md:bottom-[-25%] lg:bottom-[5%] xl:bottom-[20%] md:w-[35%] lg:w-[20%] max-w-[200px] lg:max-w-[280px]"
-                    alt=""
-                    aria-hidden="true"
-                ></img>
-                <img
-                    src={`${process.env.BASE_PATH}/images/global/footer-wave.svg`}
-                    className="w-100"
-                    alt=""
-                    aria-hidden="true"
-                ></img>
-            </div>
-            <div className="flex flex-col items-center bg-[#FBCE4C] text-center pt-5 pb-3 px-3 px-md-0 gap-12">
-                <div className="flex lg:flex-row flex-col lg:justify-between items-center lg:gap-[5rem] gap-12">
-                    <Link
-                        href="/"
-                        title={translate('台灣水果旅行', lang)}
-                        className={`w-[256px] h-[64px] hover:opacity-40 trs-all`}
-                        style={{
-                            backgroundImage: `url('${process.env.BASE_PATH}/images/global/logo-white.svg')`,
-                            backgroundSize: 'contain',
-                            backgroundPosition: 'center',
-                            backgroundRepeat: 'no-repeat'
-                        }}
-                    ></Link>
-                    <ul className="flex flex-wrap justify-center gap-6 md:gap-12">
-                        {MENU_CONFIG.map((item, i) => (
+        <footer className="relative z-[1] bg-white w-full">
+            <div className="flex flex-col items-center justify-center mx-auto max-w-[1200px] text-center py-4 px-4 md:px-6 xl:px-10 gap-12">
+                <div className="flex flex-col items-center gap-4 w-full">
+                    <h2 className="flex w-full items-center gap-4 text-primary text-[20px] md:text-[24px] font-bold">
+                        <span className="h-px flex-1 bg-primary opacity-40" aria-hidden="true" />
+                        <span className="shrink-0">
+                            <I18N>其他連結</I18N>
+                        </span>
+                        <span className="h-px flex-1 bg-primary opacity-40" aria-hidden="true" />
+                    </h2>
+                    <ul className="mx-auto flex flex-wrap justify-center w-full  gap-y-6 md:grid md:grid-flow-col md:auto-cols-fr">
+                        {OTHER_CONFIG.map(({title,links}) => (
                             <li
-                                className="inline-block align-self-center hover:text-[#82BE66]"
-                                key={i}
+                                className="flex flex-col items-center gap-2 w-1/3 min-w-0 md:px-2 md:w-auto max-md:[&:nth-child(n+4)]:w-1/2 border-r border-solid border-gray-200 last:border-r-0 max-md:[&:nth-child(3n)]:border-r-0"
+                                key={title}
                             >
-                                <Link
-                                    href={item.url}
-                                    title={translate(item.title, lang)}
-                                >
-                                    {item.title}
-                                </Link>
+                                <h3 className="text-primary text-[16px] md:text-[18px] font-bold">
+                                    <I18N>{title}</I18N>
+                                </h3>
+                                <ul className="flex flex-col flex-wrap justify-center gap-2">
+                                    {links?.map(({id,url,isLinkOut,title}) => (
+                                        <li key={id}>
+                                            <AutoSwitchLink
+                                                className="block text-primary hover:text-main  text-[12px] md:text-[16px] transition-colors duration-300"
+                                                href={url}
+                                                title={translate(title, lang)}
+                                                isLinkOut={isLinkOut}
+                                            >
+                                                <I18N>{title}</I18N>
+                                            </AutoSwitchLink>
+                                        </li>
+                                    ))}
+                                </ul>
                             </li>
                         ))}
                     </ul>
                 </div>
-                <ul className="flex fz-32px gap-6">
-                    {SOCIAL_LINKS_CONFIG.map((item, i) => (
-                        <li key={i} className="inline-block group">
-                            <AutoSwitchLink
-                                href={item.url}
-                                title={translate(item.title, lang)}
-                                isLinkOut={item.isLinkOut}
-                            >
-                                <i
-                                    className={`icon icon-${item.icon} ${item.color} group-hover:text-[#82BE66] trs-all`}
-                                    aria-hidden="true"
-                                ></i>
-                            </AutoSwitchLink>
-                        </li>
-                    ))}
-                </ul>
-
-                <div>
-                    <I18N>農業易遊網</I18N> © {new Date().getFullYear()} All
+            </div>
+              <div className='bg-primary text-white text-center py-3 px-3 md:px-0'>
+                    <I18N>大林慈濟</I18N> © {new Date().getFullYear()} All
                     rights reserved.
                 </div>
-            </div>
         </footer>
     )
 }

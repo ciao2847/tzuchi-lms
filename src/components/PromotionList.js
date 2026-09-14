@@ -2,13 +2,13 @@ import React from 'react'
 import Card from './Card'
 const PromotionList = ({ data, currentIdx, className }) => {
     return (
-        <ul className="row gy-2 gy-md-3 g-xl-2">
+        <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 md:gap-y-3 xl:gap-2">
             {data
                 .filter((item, idx) => idx < currentIdx)
                 .map((item) => {
                     return (
                         <li
-                            className="d-flex col-12 col-md-6 col-xl-3"
+                            className="flex"
                             key={item.id}
                         >
                             <Card data={item} />

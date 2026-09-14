@@ -63,7 +63,7 @@ const Layout = ({ children }) => {
                 <main
                     className={`${!isProd ? 'staging-site' : ''} ${
                         isEmbed ? 'pt-2' : 'pt-0'
-                    } min-h-[80vh] mx-auto position-relative`}
+                    } min-h-[80vh] mx-auto relative`}
                 >
                     {children}
                 </main>

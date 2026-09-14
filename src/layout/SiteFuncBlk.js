@@ -7,18 +7,18 @@ import MainNav from './MainNav'
 
 const SiteFuncBlk = () => {
     return (
-        <div className="d-flex align-items-center">
-            <ul className="d-flex justify-content-center align-items-center">
+        <div className="flex items-center">
+            <ul className="flex justify-center items-center">
                 {SOCIAL_LINKS_CONFIG.map(
                     ({ id, title, url, icon, isLinkOut, color }) => (
                         <li key={id}>
                             <AutoSwitchLink
-                                className="d-block p-1 text-secondary hover-primary trs-all"
+                                className="block p-1 text-secondary hover:text-primary transition-all duration-300"
                                 href={url}
                                 isLinkOut={isLinkOut}
                             >
                                 <i
-                                    className={`icon icon-${icon} fz-24px ${color}`}
+                                    className={`icon icon-${icon} text-[24px] ${color}`}
                                     aria-hidden="true"
                                     // style={{ color }}
                                 ></i>

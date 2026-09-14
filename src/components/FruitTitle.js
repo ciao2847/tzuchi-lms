@@ -11,12 +11,12 @@ const FruitTitle = ({ data }) => {
                         data={[{ title: '四季水果' }, { title: categoryName }]}
                     />
                 </div>
-                <div className="px-md-[16px]">
+                <div className="md:px-[16px]">
                     <div className="mx-auto px-[16px] md:px-0 py-[24px] md:py-[40px] max-w-[880px] text-center ">
                         <h1 className="pt-[16px] pb-[8px] text-[40px] md:text-[56px] font-bold">
                             {categoryName}
                         </h1>
-                        <p className="fz-16px text-justify text-md-center">
+                        <p className="text-[16px] text-justify md:text-center">
                             {duration}
                         </p>
                     </div>

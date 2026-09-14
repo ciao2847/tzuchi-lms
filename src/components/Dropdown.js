@@ -9,9 +9,9 @@ const Dropdown = ({ label, children, className }) => {
         })
     }, [])
     return (
-        <div className={`d-flex z-100 position-relative ${className}`}>
+        <div className={`flex z-[100] relative ${className || ''}`}>
             <button
-                className="js-dropdown btn justify-content-center w-100 h-5 px-1 fz-16px lh-initial border rounded pointer-events-auto"
+                className="js-dropdown btn justify-center w-full h-5 px-1 text-[16px] leading-normal border rounded pointer-events-auto"
                 type="button"
                 onClick={() => {
                     toggleShow(!isShow)
@@ -19,16 +19,16 @@ const Dropdown = ({ label, children, className }) => {
             >
                 {label}
                 <i
-                    className="icon icon-triangle fz-13px text-secondary"
+                    className="icon icon-triangle text-[13px] text-secondary"
                     aria-hidden="true"
                 ></i>
             </button>
             <div
                 className={`${
-                    isShow ? '' : 'op-0 pointer-events-none'
-                } trs-all mt-7 absolute-top-right drop-shadow-black-50 triangle-deco`}
+                    isShow ? '' : 'opacity-0 pointer-events-none'
+                } transition-all duration-300 mt-7 absolute top-0 right-0 drop-shadow-[0_0_4px_rgba(0,0,0,0.5)]`}
             >
-                <div className="scroll-blk w-320px h-100 p-2 mah-480px rounded bg-white">
+                <div className="overflow-y-auto w-[320px] h-full p-2 max-h-[480px] rounded bg-white">
                     {children}
                 </div>
             </div>

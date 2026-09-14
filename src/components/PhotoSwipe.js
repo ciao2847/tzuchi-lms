@@ -76,7 +76,7 @@ const PhotoSwipeReact = ({ data, index }) => {
                             <span className="sr-only">分享</span>
                         </button>
                         <button
-                            className="d-none pswp__button pswp__button--fs"
+                            className="hidden pswp__button pswp__button--fs"
                             title="Toggle fullscreen"
                         >
                             <span className="sr-only">切換全螢幕</span>
@@ -88,7 +88,7 @@ const PhotoSwipeReact = ({ data, index }) => {
                             <span className="sr-only">放大/縮小</span>
                         </button>
                         <button
-                            className="d-none pswp__button btn-slideshow pswp__button--slideshow"
+                            className="hidden pswp__button btn-slideshow pswp__button--slideshow"
                             title="slideshow"
                             id="pswp-btn-slideshow"
                         >

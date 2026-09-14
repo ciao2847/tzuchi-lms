@@ -9,22 +9,22 @@ const BasePrevAndNextBlk = ({ prevURL, nextURL, listURL, className }) => {
 
     return (
         <section className={`${className}`}>
-            <div className="button-group d-flex justify-content-center w-100 text-default">
+            <div className="button-group flex justify-center w-full text-default">
                 {prevURL ? (
                     <PrevNextLink
-                        className="flex-fill"
+                        className="flex-1"
                         url={prevURL}
                         title={`${translate(`上一則`, lang)}`}
                         label="上一則"
                         isPrev={true}
                     />
                 ) : (
-                    <div className="btn flex-fill px-2 fz-16px h-6 text-info pointer-events-none bg-light">
+                    <div className="btn flex-1 px-2 text-[16px] h-6 text-info pointer-events-none bg-light">
                         <I18N>上一則</I18N>
                     </div>
                 )}
                 <Link
-                    className="btn flex-fill px-2 fz-16px h-6"
+                    className="btn flex-1 px-2 text-[16px] h-6"
                     href={listURL}
                     title={`${translate('回列表', lang)}`}
                 >
@@ -38,7 +38,7 @@ const BasePrevAndNextBlk = ({ prevURL, nextURL, listURL, className }) => {
                         isNext={true}
                     />
                 ) : (
-                    <div className="btn flex-fill px-2 fz-16px h-6 text-info pointer-events-none bg-light">
+                    <div className="btn flex-1 px-2 text-[16px] h-6 text-info pointer-events-none bg-light">
                         <I18N>下一則</I18N>
                     </div>
                 )}

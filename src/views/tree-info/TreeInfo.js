@@ -31,10 +31,10 @@ const TreeInfo = ({ data }) => {
                                 return (
                                     <div
                                         key={index}
-                                        className="md:[32px] pb-[16px] md:pb-[16px] text-left fz-20px text-[#2d7316] font-bold"
+                                        className="pb-[16px] text-left text-[20px] text-[#2d7316] font-bold"
                                         dangerouslySetInnerHTML={{
                                             __html: part
-                                        }}
+                                         }}
                                     ></div>
                                 )
                             } else {
@@ -42,7 +42,7 @@ const TreeInfo = ({ data }) => {
                                 return (
                                     <p
                                         key={index}
-                                        className="text-justify fz-18px text-[#3c3c3c]"
+                                        className="text-justify text-[18px] text-[#3c3c3c]"
                                         dangerouslySetInnerHTML={{
                                             __html: part
                                         }}
@@ -60,7 +60,7 @@ const TreeInfo = ({ data }) => {
                         className="mb-[24px] md:mb-[32px]"
                     />
                     <div className="px-[24px] md:px-[40px] mt-[16px] xl:mt-[24px]">
-                        <p className="text-justify fz-18px text-[#3c3c3c]">
+                        <p className="text-justify text-[18px] text-[#3c3c3c]">
                             {units}
                         </p>
                     </div>
@@ -77,7 +77,7 @@ const TreeInfo = ({ data }) => {
                             {contactInfoList.map((item, index) => (
                                 <li
                                     key={index}
-                                    className=" text-justify fz-18px text-[#3c3c3c]"
+                                    className="text-justify text-[18px] text-[#3c3c3c]"
                                     dangerouslySetInnerHTML={{
                                         __html: item
                                     }}

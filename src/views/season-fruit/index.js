@@ -18,7 +18,7 @@ const Page = () => {
 
     if (!data) {
         return (
-            <div className="d-flex justify-content-center p-10">
+            <div className="flex justify-center p-10">
                 <Spinner size={18} color={'black'} />
             </div>
         )
@@ -29,7 +29,7 @@ const Page = () => {
     const firstParagraph = description?.split(/<br\s*\/?>|\n{2,}/)[0] ///\n{2,}/ 用於分隔雙換行,<br\s*\/?> 用於分隔 HTML 的 <br />
 
     return (
-        <div className="w-100">
+        <div className="w-full">
             <section className="m-auto">
                 <div className="pt-[56px] xl:pt-[104px]">
                     <div className="pb-0 md:pb-[80px] bg-gradient-to-br from-[#fff] to-[#fff5d9] h-screen w-full ">
@@ -47,13 +47,13 @@ const Page = () => {
                                 ]}
                             />
                         </div>
-                        <div className="px-md-[16px]">
+                        <div className="md:px-[16px]">
                             <div className="mx-auto px-[16px] md:px-0 py-[24px] md:py-[40px] max-w-[768px] ">
                                 <h1 className="pt-[16px] pb-[8px] text-[40px] md:text-[56px] font-bold text-center">
                                     {title}
                                 </h1>
                                 <p
-                                    className="fz-18px font-bold text-md-center text-justify text-[#3c3c3c]"
+                                    className="text-[18px] font-bold md:text-center text-justify text-[#3c3c3c]"
                                     dangerouslySetInnerHTML={{
                                         __html: firstParagraph
                                     }}

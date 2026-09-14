@@ -15,7 +15,7 @@ const AnchorFix = ({
 
     return (
         <a
-            className={`d-block w-0 h-0 absolute-top-left text-hide pointer-events-none ${className}`}
+            className={`block w-0 h-0 absolute top-0 left-0 indent-[-9999px] overflow-hidden pointer-events-none ${className || ''}`}
             title={text}
             tabIndex="-1"
             id={id}

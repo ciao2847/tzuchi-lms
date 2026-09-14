@@ -4,16 +4,16 @@ import ThumbFrame from 'components/ThumbFrame'
 const PhotoSelect = ({ data, isSelected, className, onClick }) => {
 	const { id, title, src, photographer } = data
 	return (
-		<button className="w-100 position-relative" onClick={onClick}>
+		<button className="w-full relative" onClick={onClick}>
 			<ThumbFrame src={src} alt="圖說" ratio="1by1" isRounded={true} />
-			<div className={`w-5 h-5 absolute-top-right trs-all ${className}`}>
+			<div className={`w-5 h-5 absolute top-0 right-0 transition-all ${className || ''}`}>
 				<div
-					className={`absolute-center w-3 h-3 rounded-circle shadow bg-gray-300 hover-bg-primary-20 trs-all overflow-hidden`}
+					className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full shadow bg-gray-300 hover:bg-primary/20 transition-all overflow-hidden`}
 				>
 					<i
 						className={`${
-							isSelected ? '' : 'op-0'
-						} icon icon-checked fill-parent bg-primary text-white trs-all fz-13px`}
+							isSelected ? '' : 'opacity-0'
+						} icon icon-checked flex items-center justify-center w-full h-full bg-primary text-white transition-all text-[13px]`}
 						aria-hidden="true"
 					></i>
 				</div>

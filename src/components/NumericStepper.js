@@ -4,7 +4,7 @@ const NumericStepper = forwardRef(
     ({ value = '', onChange, max = 10, min = 0, className }, ref) => {
         return (
             <div
-                className={`d-flex border rounded overflow-hidden disable-dbl-tap-zoom ${className}`}
+                className={`flex border rounded overflow-hidden disable-dbl-tap-zoom ${className}`}
             >
                 <button
                     className="btn w-6 h-6 border-0"
@@ -15,7 +15,7 @@ const NumericStepper = forwardRef(
                     disabled={value <= min}
                 >
                     <i
-                        className="icon icon-minus fz-24px"
+                        className="icon icon-minus text-[24px]"
                         aria-hidden="true"
                     ></i>
                     <div className="sr-only">減少</div>
@@ -24,7 +24,7 @@ const NumericStepper = forwardRef(
                     type="number"
                     pattern="[0-9]"
                     inputMode="numeric"
-                    className="ipt w-8 h-6 px-0 border-top-0 border-bottom-0 text-center fz-20px font-weight-bold"
+                    className="ipt w-8 h-6 px-0 border-t-0 border-b-0 text-center text-[20px] font-bold outline-none"
                     value={value}
                     onChange={(e) => {
                         let v = e.target.value
@@ -49,13 +49,12 @@ const NumericStepper = forwardRef(
                     onClick={() => {
                         if (!value && value != 0) {
                             onChange(min)
-                            return
                         }
                         onChange(value * 1 + 1)
                     }}
                     disabled={value >= max}
                 >
-                    <i className="icon icon-add fz-24px" aria-hidden="true"></i>
+                    <i className="icon icon-add text-[24px]" aria-hidden="true"></i>
                     <div className="sr-only">增加</div>
                 </button>
             </div>

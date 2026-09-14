@@ -65,7 +65,7 @@ const Page = () => {
             })
     }, [])
     return (
-        <div className="w-100">
+        <div className="w-full">
             <div className="">
                 <BannerTitle
                     title={'共同分享採收的樂趣'}

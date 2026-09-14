@@ -79,7 +79,7 @@ const Routes = () => {
     return (
         <Suspense
             fallback={
-                <div className="fill-parent d-flex justify-content-center align-items-center">
+                <div className="absolute inset-0 flex justify-center items-center">
                     <Spinner size={20} />
                 </div>
             }

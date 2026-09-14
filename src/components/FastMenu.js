@@ -19,7 +19,7 @@ const FastMenu = ({ data, className }) => {
     useClickOutside(ref, onClickOutside)
     return (
         <nav
-            className={`d-flex justify-content-end position-sticky px-5 z-200 pointer-events-none ${className}`}
+            className={`flex justify-end sticky px-5 z-[200] pointer-events-none ${className}`}
             style={{ top: 100 }}
             ref={ref}
         >
@@ -33,19 +33,19 @@ const FastMenu = ({ data, className }) => {
             </button>
             <div
                 className={`${
-                    visible ? 'pointer-events-auto' : 'op-0'
-                } p-2 mt-8 mr-5 absolute-top-right bg-secondary-20 bg-blur-20 rounded`}
+                    visible ? 'pointer-events-auto' : 'opacity-0'
+                } p-2 mt-8 mr-5 absolute top-0 right-0 bg-secondary/20 backdrop-blur rounded`}
                 style={{ width: LANG_WIDTH_MAP[lang] }}
             >
                 <i
-                    className="icon icon-triangle mt-n12px mr-4 absolute-top-right rotate-180 text-secondary-20"
+                    className="icon icon-triangle -mt-[12px] mr-4 absolute top-0 right-0 rotate-180 text-secondary/20"
                     aria-hidden="true"
                 ></i>
-                <ul className={`row g-2`}>
+                <ul className="grid grid-cols-2 gap-2">
                     {data.map((item) => (
-                        <li className="d-flex col-6" key={item.id}>
+                        <li className="flex" key={item.id}>
                             <button
-                                className={`btn w-100 bg-primary text-dark border-secondary`}
+                                className={`btn w-full bg-primary text-dark border-secondary`}
                                 style={{ minHeight: 48 }}
                                 onClick={() => {
                                     toggle(false)

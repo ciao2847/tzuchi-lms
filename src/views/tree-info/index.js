@@ -30,13 +30,13 @@ const Page = () => {
     }, [])
     if (!data) {
         return (
-            <div className="d-flex justify-content-center p-10">
+            <div className="flex justify-center p-10">
                 <Spinner size={18} color={'black'} />
             </div>
         )
     }
     return (
-        <div className="w-100">
+        <div className="w-full">
             {!!data && <FruitTitle data={data} />}
             {!!data && <TreeInfo data={data} />}
         </div>

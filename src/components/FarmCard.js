@@ -7,17 +7,17 @@ const FarmCard = ({ data }) => {
 
     return (
         <AutoSwitchLink
-            className="flex-grow relative rounded-[16px] md:rounded-[32px] border-solid border-[1px] border-[#f0f0f0] trs-all xl:hover:ring-[1px] xl:hover:border-[#82be66] xl:hover:ring-[#82be66] group"
+            className="flex-grow relative rounded-[16px] md:rounded-[32px] border-solid border-[1px] border-[#f0f0f0] transition-all duration-300 xl:hover:ring-[1px] xl:hover:border-[#82be66] xl:hover:ring-[#82be66] group"
             href={url}
             title={name}
             isLinkOut={true}
             target="_blank"
         >
             <div
-                className="flex justify-center items-center absolute top-0 right-0 w-[40px] md:w-[52px] md:h-[52px] aspect-square bg-[#82be66] trs-all xl:bg-[transparent] xl:group-hover:bg-[#82be66] rounded-tr-[16px] rounded-bl-[16px]  md:rounded-tr-[30px] md:rounded-bl-[30px]"
+                className="flex justify-center items-center absolute top-0 right-0 w-[40px] md:w-[52px] md:h-[52px] aspect-square bg-[#82be66] transition-all duration-300 xl:bg-transparent xl:group-hover:bg-[#82be66] rounded-tr-[16px] rounded-bl-[16px]  md:rounded-tr-[30px] md:rounded-bl-[30px]"
                 href="#"
             >
-                <i className="icon icon-link-out text-[#fff] xl:text-[#c4c4c4] w-[20px] h-[20px] trs-all group-hover:text-[#fff]"></i>
+                <i className="icon icon-link-out text-[#fff] xl:text-[#c4c4c4] w-[20px] h-[20px] transition-all duration-300 group-hover:text-[#fff]"></i>
             </div>
             <div className="md:flex">
                 {!!cover > length && (
@@ -53,20 +53,20 @@ const FarmCard = ({ data }) => {
                         </div> */}
 
                     <div className="flex flex-col">
-                        <div className="flex justify-left items-center">
-                            <div className="flex justify-center items-center flex-shrink-0 w-[20px] h-[20px]">
+                        <div className="flex justify-start items-center">
+                            <div className="flex justify-center items-center shrink-0 w-[20px] h-[20px]">
                                 <i className="icon icon-tel text-[#82be66]"></i>
                             </div>
-                            <div className="flex-fill ml-[4px] text-[14px] md:text-[18px] text-[#3c3c3c]">
+                            <div className="flex-1 ml-[4px] text-[14px] md:text-[18px] text-[#3c3c3c]">
                                 {tel}
                             </div>
                         </div>
 
-                        <div className="flex justify-left items-start mt-[4px]">
-                            <div className="flex justify-center items-center flex-shrink-0  w-[20px] h-[20px]">
+                        <div className="flex justify-start items-start mt-[4px]">
+                            <div className="flex justify-center items-center shrink-0  w-[20px] h-[20px]">
                                 <i className="icon icon-location text-[#82be66]"></i>
                             </div>
-                            <div className="flex-fill ml-[4px] text-[14px] md:text-[18px] text-[#3c3c3c]">
+                            <div className="flex-1 ml-[4px] text-[14px] md:text-[18px] text-[#3c3c3c]">
                                 {address}
                             </div>
                         </div>

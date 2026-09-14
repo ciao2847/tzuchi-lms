@@ -2,13 +2,13 @@ import React from 'react'
 import SocialMediaCard from './SocialMediaCard'
 const SocialMediaList = ({ data, currentIdx }) => {
     return (
-        <ul className="row g-4px">
+        <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-1">
             {data
                 .filter((item, idx) => idx < currentIdx)
                 .map((item) => {
                     return (
                         <li
-                            className="d-flex col-12 col-md-6 col-xl-3"
+                            className="flex"
                             key={item.id}
                         >
                             <SocialMediaCard data={item} />

@@ -68,7 +68,7 @@ const Page = () => {
     }
 
     return (
-        <div className="w-100">
+        <div className="w-full">
             <BannerTitle
                 title={'品嚐最鮮美的原味'}
                 sub={`四季水果`}
@@ -76,9 +76,9 @@ const Page = () => {
                 img={`season-fruit.jpg`}
             />
             <section>
-                <SeasonNav className="py-5 py-xl-10 max-w-[768px] mx-auto" />
+                <SeasonNav className="py-5 xl:py-10 max-w-[768px] mx-auto" />
                 {!filteredData ? (
-                    <div className="d-flex justify-content-center p-10">
+                    <div className="flex justify-center p-10">
                         <Spinner size={18} color={'black'} />
                     </div>
                 ) : (

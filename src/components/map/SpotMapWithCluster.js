@@ -79,7 +79,7 @@ const SpotMap = ({ data, currentSpotIdx, nearInfoData, onItemClick }) => {
 	}, [currentSpotIdx])
 
 	return (
-		<div className="google-map-wrapper w-100 flex-fill position-relative pointer-events-auto">
+		<div className="google-map-wrapper w-full flex-1 relative pointer-events-auto">
 			<GoogleMapReact
 				bootstrapURLKeys={{
 					key: process.env.GOOGLE_MAP_KEY,
@@ -132,7 +132,7 @@ const SpotMap = ({ data, currentSpotIdx, nearInfoData, onItemClick }) => {
 										pointCount >= 100
 											? 'w-6 h-6'
 											: 'w-5 h-5'
-									} d-flex justify-content-center align-items-center bg-primary rounded-circle text-white font-weight-bold border border-white border-width-2px fz-15px`}
+									} flex justify-center items-center bg-primary rounded-full text-white font-bold border-2 border-white text-[15px]`}
 									onClick={() => {
 										const expansionZoom = Math.min(
 											supercluster.getClusterExpansionZoom(
@@ -168,7 +168,7 @@ const SpotMap = ({ data, currentSpotIdx, nearInfoData, onItemClick }) => {
 								}}
 							>
 								<img
-									className="d-block w-4"
+									className="block w-4"
 									src="/images/content/spot-marker.png"
 									alt=""
 								/>
@@ -186,9 +186,9 @@ const SpotMap = ({ data, currentSpotIdx, nearInfoData, onItemClick }) => {
 							const { lat, lng } = spot
 							return (
 								<Marker lat={lat} lng={lng} key={spot.id}>
-									<div className="w-5 h-5 translate-n50-n100">
+									<div className="w-5 h-5 -translate-x-1/2 -translate-y-full">
 										<img
-											className="d-block w-5"
+											className="block w-5"
 											src="/images/content/spot-marker-current.png"
 											alt=""
 										/>
@@ -210,23 +210,23 @@ const SpotMap = ({ data, currentSpotIdx, nearInfoData, onItemClick }) => {
 						return (
 							<Marker key={i} lat={lat} lng={lng}>
 								<button
-									className="position-relative w-0 h-0"
+									className="relative w-0 h-0"
 									onClick={() => {
 										const contentElement = document.createElement(
 											`div`
 										)
 										ReactDOM.render(
-											<div className="d-flex align-items-center bg-white rounded">
+											<div className="flex items-center bg-white rounded">
 												<i
-													className={`icon icon-${type} w-5 h-5 flex-shrink-0 bg-primary text-white fz-22px rounded-circle`}
+													className={`icon icon-${type} w-5 h-5 shrink-0 bg-primary text-white text-[22px] rounded-full`}
 													aria-hidden="true"
 												></i>
-												<div className="pl-1 font-weight-bold">
-													<div className="d-flex align-items-center h-20px mb-2px fz-16px">
+												<div className="pl-1 font-bold">
+													<div className="flex items-center h-[20px] mb-[2px] text-[16px]">
 														{name}
 													</div>
 													{extra_info?.total_lots && (
-														<div className="d-flex align-items-center h-20px fz-14px text-main">
+														<div className="flex items-center h-[20px] text-[14px] text-main">
 															總車位數：
 															{
 																extra_info.total_lots
@@ -234,7 +234,7 @@ const SpotMap = ({ data, currentSpotIdx, nearInfoData, onItemClick }) => {
 														</div>
 													)}
 													{current_business_hours && (
-														<div className="d-flex align-items-center h-20px fz-14px text-success">
+														<div className="flex items-center h-[20px] text-[14px] text-success">
 															{
 																current_business_hours
 															}
@@ -243,7 +243,7 @@ const SpotMap = ({ data, currentSpotIdx, nearInfoData, onItemClick }) => {
 												</div>
 
 												<a
-													className="btn w-5 h-5 rounded text-decoration-none ml-1 font-weight-bold text-primary fz-15px"
+													className="btn w-5 h-5 rounded no-underline ml-1 font-bold text-primary text-[15px]"
 													href={`http://maps.google.com/maps?daddr=${lat},${lng}&amp;hl=zh-tw`}
 													title="導航(另開視窗)"
 													target="_blank"
@@ -273,7 +273,7 @@ const SpotMap = ({ data, currentSpotIdx, nearInfoData, onItemClick }) => {
 									}}
 								>
 									<i
-										className={`icon icon-${type} w-4 h-4 bg-primary text-white absolute-center rounded-circle`}
+										className={`icon icon-${type} w-4 h-4 bg-primary text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full`}
 										aria-hidden="true"
 									></i>
 									<div className="sr-only">{name}</div>

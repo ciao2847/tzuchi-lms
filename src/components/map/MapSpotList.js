@@ -22,7 +22,7 @@ const MapSpotList = forwardRef(({ data, onItemClick }, ref) => {
 							const spot = data[index]
 							return (
 								<div
-									className="border-bottom"
+									className="border-b"
 									style={style}
 									key={spot.id}
 								>
@@ -50,7 +50,7 @@ const MapSpotList = forwardRef(({ data, onItemClick }, ref) => {
 							if (!spot) return null
 							return (
 								<div
-									className="border-right"
+									className="border-r"
 									style={style}
 									key={spot.id}
 								>

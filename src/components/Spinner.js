@@ -4,9 +4,9 @@ const Spinner = ({ size, color, className }) => {
     size = size || 8
     color = color || '#767676'
     return (
-        <div className={`d-inline-flex align-items-center ${className}`}>
+        <div className={`inline-flex items-center ${className}`}>
             <div
-                className="loading-animate rounded-pill flex-shrink-0"
+                className="loading-animate rounded-full shrink-0"
                 style={{
                     width: `${size}px`,
                     height: `${size}px`,
@@ -16,7 +16,7 @@ const Spinner = ({ size, color, className }) => {
                 }}
             ></div>
             <div
-                className="loading-animate rounded-pill flex-shrink-0"
+                className="loading-animate rounded-full shrink-0"
                 style={{
                     width: `${size}px`,
                     height: `${size}px`,
@@ -26,7 +26,7 @@ const Spinner = ({ size, color, className }) => {
                 }}
             ></div>
             <div
-                className="loading-animate rounded-pill flex-shrink-0"
+                className="loading-animate rounded-full shrink-0"
                 style={{
                     width: `${size}px`,
                     height: `${size}px`,

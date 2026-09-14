@@ -25,7 +25,7 @@ const OptionItem = ({
     register,
     watch
 }) => (
-    <div className="d-flex position-relative">
+    <div className="flex relative">
         <input
             className="hide-switch"
             type={type === FORM_COLUMN_TYPE_MAP.RADIO ? 'radio' : 'checkbox'}
@@ -40,7 +40,7 @@ const OptionItem = ({
             })}
         />
         <label
-            className={`option d-flex pl-12px pr-2 py-1 border rounded bg-white trs-all focus-hint ${
+            className={`option flex pl-[12px] pr-2 py-1 border rounded bg-white transition-all focus-hint ${
                 type === FORM_COLUMN_TYPE_MAP.RADIO ? 'radio' : ''
             }`}
             htmlFor={`${name}-${idx}`}
@@ -49,7 +49,7 @@ const OptionItem = ({
             {needComment && (
                 <>
                     <input
-                        className="ml-1 border-top-0 border-left-0 border-right-0 border-bottom"
+                        className="ml-1 border-t-0 border-l-0 border-r-0 border-b outline-none"
                         type="text"
                         {...register(`${name}_comment`, {
                             required:
@@ -126,7 +126,7 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                     }
                     if (type === FORM_COLUMN_TYPE_MAP.ACCEPT) {
                         return (
-                            <div className="d-block pb-3" key={i}>
+                            <div className="block pb-3" key={i}>
                                 <input
                                     className="hide-switch"
                                     type="checkbox"
@@ -136,13 +136,13 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                     {...register(name, options || {})}
                                 />
                                 <label
-                                    className="option d-flex flex"
+                                    className="option flex"
                                     htmlFor={name}
                                 >
                                     <div>
                                         我已詳閱「
                                         <a
-                                            className="d-inline-block text-primary"
+                                            className="inline-block text-primary"
                                             href="/zh-tw/privacy"
                                             target="_blank"
                                             rel="noopener noreferrer"
@@ -154,7 +154,7 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                     </div>
                                 </label>
                                 {errors[name] && (
-                                    <div className="mt-4px text-danger fz-13px">
+                                    <div className="mt-[4px] text-danger text-[13px]">
                                         {errors[name].message}
                                     </div>
                                 )}
@@ -163,22 +163,22 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                     }
 
                     return (
-                        <div className="d-block pb-3" key={i}>
+                        <div className="block pb-3" key={i}>
                             <WrapComp>
                                 <TitleComp
-                                    className={`d-inline-flex align-items-baseline mb-1 fz-18px fz-xl-20px font-weight-bold`}
+                                    className={`inline-flex items-baseline mb-1 text-[18px] xl:text-[20px] font-bold`}
                                     {...(!isSelectType
                                         ? { htmlFor: name }
                                         : null)}
                                 >
                                     <I18N>{title}</I18N>
                                     {/*!!options?.required && (
-                                        <div className="ml-2 text-primary fz-15px font-weight-bold">
+                                        <div className="ml-2 text-primary text-[15px] font-bold">
                                             (<I18N>必填</I18N>)
                                         </div>
                                     )*/}
                                     {/*!options?.required && (
-                                        <div className="ml-2 text-info fz-15px font-weight-normal">
+                                        <div className="ml-2 text-info text-[15px] font-normal">
                                             (<I18N>非必填</I18N>)
                                         </div>
                                     )*/}
@@ -216,8 +216,8 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                     <>
                                         <input
                                             type="text"
-                                            className={`ipt d-block px-1 rounded fz-16px ${
-                                                errors[name] && 'border-danger'
+                                            className={`ipt block px-1 rounded text-[16px] ${
+                                                errors[name] ? '!border-danger' : ''
                                             }`}
                                             name={name}
                                             id={name}
@@ -227,11 +227,11 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                     </>
                                 )}
                                 {type === FORM_COLUMN_TYPE_MAP.COORDINATE && (
-                                    <div className="d-flex">
+                                    <div className="flex">
                                         <input
                                             type="text"
-                                            className={`ipt d-block px-1 rounded fz-16px ${
-                                                errors[name] && 'border-danger'
+                                            className={`ipt block px-1 rounded text-[16px] ${
+                                                errors[name] ? '!border-danger' : ''
                                             }`}
                                             name={name}
                                             id={name}
@@ -240,7 +240,7 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                             style={{ maxWidth: 400 }}
                                         />
                                         <button
-                                            className="btn btn-outline-primary flex-shrink-0 ml-1 rounded text-primary"
+                                            className="btn btn-outline-primary shrink-0 ml-1 rounded text-primary"
                                             type="button"
                                             onClick={() => {
                                                 getUserGeolocation().then(
@@ -254,7 +254,7 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                             }}
                                         >
                                             <i
-                                                className="icon icon-location mr-4px"
+                                                className="icon icon-location mr-[4px]"
                                                 aria-hidden="true"
                                             ></i>
                                             取得當前座標
@@ -264,8 +264,8 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                 {type === FORM_COLUMN_TYPE_MAP.TEXTAREA && (
                                     <textarea
                                         type="text"
-                                        className={`ipt d-block h-12 p-1 rounded fz-16px ${
-                                            errors[name] && 'border-danger'
+                                        className={`ipt block h-12 p-1 rounded text-[16px] ${
+                                            errors[name] ? '!border-danger' : ''
                                         }`}
                                         name={name}
                                         id={name}
@@ -294,13 +294,13 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                                 }, [])
                                                 .map((item, i) => (
                                                     <div
-                                                        className="mb-2 mb-0-last"
+                                                        className="mb-2 last:mb-0"
                                                         key={i}
                                                     >
-                                                        <div className="font-weight-bold fz-md-18px text-primary">
+                                                        <div className="font-bold md:text-[18px] text-primary">
                                                             {item}
                                                         </div>
-                                                        <ul className="d-flex flex-wrap mt-2">
+                                                        <ul className="flex flex-wrap mt-2">
                                                             {items
                                                                 ?.filter(
                                                                     ({
@@ -345,7 +345,7 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                                 ))}
                                         </div>
                                     ) : (
-                                        <ul className="d-flex flex-wrap">
+                                        <ul className="flex flex-wrap">
                                             {items?.map(
                                                 (
                                                     { title, id, needComment },
@@ -385,7 +385,7 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                             field: { onChange, value, ref }
                                         }) => {
                                             return (
-                                                <div className="d-flex">
+                                                <div className="flex">
                                                     <TimeRangePicker
                                                         value={value}
                                                         onChange={(v) => {
@@ -412,7 +412,7 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                             field: { onChange, value, ref }
                                         }) => {
                                             return (
-                                                <div className="w-100">
+                                                <div className="w-full">
                                                     <AddressInputBlk
                                                         onChange={onChange}
                                                         noAddress={!!noAddress}
@@ -438,7 +438,7 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                             formState: { errors }
                                         }) => (
                                             <div
-                                                className="position-relative"
+                                                className="relative"
                                                 style={{ maxWidth: 180 }}
                                             >
                                                 <DatePicker
@@ -452,9 +452,8 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                                     dropdownMode="select"
                                                     placeholderText={`範例：2023-01-01`}
                                                     className={`${
-                                                        errors[name] &&
-                                                        'border-danger'
-                                                    } ipt d-block flex-fill px-1 rounded fz-16px`}
+                                                        errors[name] ? '!border-danger ' : ''
+                                                    }ipt block flex-1 px-1 rounded text-[16px]`}
                                                     ref={(elem) => {
                                                         elem && ref(elem.input)
                                                     }}
@@ -470,7 +469,7 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                                         : null)}
                                                 />
                                                 <i
-                                                    className="icon icon-calendar h-5 w-5 text-info absolute-top-right pointer-events-none fz-20px"
+                                                    className="icon icon-calendar h-5 w-5 text-info absolute top-2 right-2 pointer-events-none text-[20px]"
                                                     aria-hidden="true"
                                                 ></i>
                                             </div>
@@ -491,7 +490,7 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                             field: { onChange, value, ref }
                                         }) => {
                                             return (
-                                                <div className="d-flex">
+                                                <div className="flex">
                                                     <NumericStepper
                                                         value={value}
                                                         onChange={(v) => {
@@ -513,7 +512,7 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                                 <div
                                                     className={
                                                         hintClassName ||
-                                                        'mt-4px text-secondary fz-13px'
+                                                        'mt-[4px] text-secondary text-[13px]'
                                                     }
                                                     key={i}
                                                 >
@@ -524,7 +523,7 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                             <div
                                                 className={
                                                     hintClassName ||
-                                                    'mt-4px text-secondary fz-13px'
+                                                    'mt-[4px] text-secondary text-[13px]'
                                                 }
                                             >
                                                 <I18N>{hint}</I18N>
@@ -533,12 +532,12 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                     </>
                                 )}
                                 {errors[name] && (
-                                    <div className="mt-4px text-danger fz-13px">
+                                    <div className="mt-[4px] text-danger text-[13px]">
                                         <I18N>{errors[name].message}</I18N>
                                     </div>
                                 )}
                                 {errors[`${name}_comment`] && (
-                                    <div className="mt-4px text-danger fz-13px">
+                                    <div className="mt-[4px] text-danger text-[13px]">
                                         {errors[`${name}_comment`].message}
                                     </div>
                                 )}
@@ -547,18 +546,18 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                     )
                 }
             )}
-            <div className="py-3 border-bottom">
+            <div className="py-3 border-b">
                 <label
-                    className={`d-inline-flex mb-1 fz-18px fz-xl-20px font-weight-bold`}
+                    className={`inline-flex mb-1 text-[18px] xl:text-[20px] font-bold`}
                     htmlFor="ipt-captcha"
                 >
                     <I18N>驗證碼</I18N>
                 </label>
-                <div className="d-flex align-items-center">
+                <div className="flex items-center">
                     <input
                         type="text"
-                        className={`ipt d-block px-1 rounded fz-16px ${
-                            errors.captcha && 'border-danger'
+                        className={`ipt block px-1 rounded text-[16px] ${
+                            errors.captcha ? '!border-danger' : ''
                         }`}
                         name="Captcha"
                         id="ipt-captcha"
@@ -571,7 +570,7 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                     <Captcha className="ml-1" ref={captchaRef} />
                     {/*<BtnCaptchaVoice className="ml-1" />*/}
                     <button
-                        className="btn flex-shrink-0 ml-1 rounded"
+                        className="btn shrink-0 ml-1 rounded"
                         type="button"
                         style={{ width: 42, height: 42 }}
                         onClick={() => {
@@ -583,7 +582,7 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                     </button>
                 </div>
                 {errors.captcha && (
-                    <div className="mt-4px text-danger fz-12px">
+                    <div className="mt-[4px] text-danger text-[12px]">
                         <I18N>{errors.captcha.message}</I18N>
                     </div>
                 )}

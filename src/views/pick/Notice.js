@@ -12,18 +12,18 @@ const rule = [
 const Notice = () => {
     return (
         <section
-            className={`py-xl-10 pt-md-5 pb-md-10 pt-4 py-8 bg-gradient-to-t from-[#FFF6DE] px-2`}
+            className="xl:py-10 md:pt-5 md:pb-10 pt-4 pb-8 bg-gradient-to-t from-[#FFF6DE] px-2"
         >
             <BlockTitle title="採果注意事項" className="mx-auto" />
-            <div className="w-100 max-w-[900px] mx-auto bg-[#fff] md:rounded-[32px] rounded-[16px] p-3 p-md-6">
+            <div className="w-full max-w-[900px] mx-auto bg-white md:rounded-[32px] rounded-[16px] p-3 md:p-6">
                 <ul className="list">
                     {rule.map((rule, i) => (
                         <li
                             key={i}
-                            className="fz-18px fz-lx-20px mb-3 last:mb-[0] flex md:flex-row flex-col md:justify-start justify-center md:items-start items-center"
+                            className="text-[18px] xl:text-[20px] mb-3 last:mb-0 flex md:flex-row flex-col md:justify-start justify-center md:items-start items-center"
                         >
                             <i
-                                className="md:mr-[8px] d-inline-block w-[28px] h-[28px] align-middle mb-[16px] md:mb-[0] shrink-[0]"
+                                className="md:mr-[8px] inline-block w-[28px] h-[28px] align-middle mb-[16px] md:mb-0 shrink-0"
                                 aria-hidden="true"
                                 style={{
                                     backgroundImage: `url(/images/global/tip.png)`,

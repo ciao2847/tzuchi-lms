@@ -7,7 +7,7 @@ const PageTitle = ({ title, className }) => {
 	if (isEmbed) return null
 	return (
 		<h2
-			className={`pt-3 pb-5 pt-xl-5 pb-xl-7 fz-40px fz-xl-50px font-weight-bold ${className}`}
+			className={`pt-3 pb-5 xl:pt-5 xl:pb-7 text-[40px] xl:text-[50px] font-bold ${className}`}
 		>
 			<I18N>{title}</I18N>
 		</h2>

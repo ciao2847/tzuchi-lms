@@ -20,15 +20,15 @@ const ObserverVideo = ({
         }
     }, [])
     return (
-        <div className={`position-relative ${className}`}>
+        <div className={`relative ${className || ''}`}>
             <HlsVideo
-                className="fill-parent fit-cover"
+                className="w-full h-full object-cover"
                 isPlaying={isPlaying}
                 {...props}
             />
 
             <div
-                className="w-0 h-0 position-absolute z-10 pointer-events-none"
+                className="w-0 h-0 absolute z-10 pointer-events-none"
                 style={sensorStyle}
                 ref={seonsorRef}
             ></div>

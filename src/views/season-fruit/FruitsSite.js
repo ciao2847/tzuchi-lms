@@ -11,7 +11,7 @@ const FruitsSite = () => {
 
     if (!data) {
         return (
-            <div className="d-flex justify-content-center p-10">
+            <div className="flex justify-center p-10">
                 <Spinner size={18} color={'black'} />
             </div>
         )

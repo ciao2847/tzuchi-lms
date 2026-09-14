@@ -33,21 +33,21 @@ const MapSpotDetail = ({ data, nearInfoData, onClose }) => {
     }, [data])
 
     return (
-        <div className="absolute-top-left w-100 w-md-320px px-3 p-md-0 z-100 mt-3 mt-md-5 ml-md-5">
+        <div className="absolute top-0 left-0 w-full md:w-[320px] px-3 md:p-0 z-[100] mt-3 md:mt-5 md:ml-5">
             <div
                 className={`${
                     isMiniMode ? 'h-8' : ''
-                } w-100 p-2 bg-white rounded-lg shadow position-relative overflow-hidden`}
+                } w-full p-2 bg-white rounded-lg shadow relative overflow-hidden`}
             >
                 <div
                     className={`${
                         isMiniMode ? 'mb-2' : ''
-                    } d-flex align-items-center justify-content-between`}
+                    } flex items-center justify-between`}
                 >
-                    <div className="font-weight-bold fz-18px text-truncate">
+                    <div className="font-bold text-[18px] truncate">
                         {name || title}
                     </div>
-                    <div className="d-flex">
+                    <div className="flex">
                         <button
                             className="btn w-4 h-4 border-0 rounded"
                             onClick={onClose}
@@ -60,22 +60,22 @@ const MapSpotDetail = ({ data, nearInfoData, onClose }) => {
                         </button>
                     </div>
                 </div>
-                <div className="mt-1 mx-n2">
+                <div className="mt-1 -mx-2">
                     <ThumbFrame
                         src={cover.replace('150x150', '480x360')}
                         alt={name}
                         ratio="4by3"
-                        className="d-none d-md-block"
+                        className="hidden md:block"
                     />
                 </div>
                 <div className="pt-1">
                     {!!categoryNames?.length && (
                         <div
-                            className={`d-flex flex-wrap mt-md-1 fz-14px fz-xl-15px lh-initial text-info`}
+                            className="flex flex-wrap md:mt-1 text-[14px] xl:text-[15px] leading-normal text-info"
                         >
                             {categoryNames.map((cate, i) => (
                                 <div
-                                    className="mr-1 mr-0-last px-4px py-2px bg-primary-10 rounded"
+                                    className="mr-1 last:mr-0 px-[4px] py-[2px] bg-primary/10 rounded"
                                     key={i}
                                 >
                                     {cate}
@@ -84,26 +84,26 @@ const MapSpotDetail = ({ data, nearInfoData, onClose }) => {
                         </div>
                     )}
                     {shop && (
-                        <div className="d-flex align-items-center mt-12px fz-13px lh-initial text-info">
+                        <div className="flex items-center mt-[12px] text-[13px] leading-normal text-info">
                             <i
-                                className="icon icon-store w-2 fz-15px mr-1 text-primary"
+                                className="icon icon-store w-2 text-[15px] mr-1 text-primary"
                                 aria-hidden="true"
                             ></i>
-                            <div className="text-truncate">{shop}</div>
+                            <div className="truncate">{shop}</div>
                         </div>
                     )}
                     {shop_address && (
-                        <div className="d-flex align-items-center mt-12px fz-13px lh-initial text-info">
+                        <div className="flex items-center mt-[12px] text-[13px] leading-normal text-info">
                             <i
-                                className="icon icon-location w-2 fz-15px mr-1 text-primary"
+                                className="icon icon-location w-2 text-[15px] mr-1 text-primary"
                                 aria-hidden="true"
                             ></i>
-                            <div className="text-truncate">{shop_address}</div>
+                            <div className="truncate">{shop_address}</div>
                         </div>
                     )}
 
                     {shop_tel && (
-                        <div className="d-flex align-items-center mt-12px fz-13px text-info">
+                        <div className="flex items-center mt-[12px] text-[13px] text-info">
                             <i
                                 className="icon icon-tel w-2 mr-1 text-primary"
                                 aria-hidden="true"
@@ -111,44 +111,44 @@ const MapSpotDetail = ({ data, nearInfoData, onClose }) => {
                             {shop_tel}
                         </div>
                     )}
-                    <div className="row g-1 pt-2">
-                        {order_link && (
-                            <div className="col-auto flex-fill">
-                                <a
-                                    className="btn btn-secondary w-100 h-5 font-weight-bold fz-18px"
-                                    href={order_link}
-                                    title="立即訂購 (另開視窗)"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    立即訂購
-                                    <i
-                                        className="icon icon-arrow-forward ml-1 fz-15px"
-                                        aria-hidden="true"
-                                    ></i>
-                                </a>
+                    <div className="pt-2 space-y-1">
+                        {(order_link || shop_website) && (
+                            <div className="flex gap-1">
+                                {order_link && (
+                                    <a
+                                        className="btn btn-secondary flex-1 h-5 font-bold text-[18px]"
+                                        href={order_link}
+                                        title="立即訂購 (另開視窗)"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        立即訂購
+                                        <i
+                                            className="icon icon-arrow-forward ml-1 text-[15px]"
+                                            aria-hidden="true"
+                                        ></i>
+                                    </a>
+                                )}
+                                {shop_website && (
+                                    <a
+                                        className="btn btn-secondary flex-1 h-5 font-bold text-[18px]"
+                                        href={shop_website}
+                                        title="官方網站 (另開視窗)"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        官方網站
+                                        <i
+                                            className="icon icon-arrow-forward ml-1 text-[15px]"
+                                            aria-hidden="true"
+                                        ></i>
+                                    </a>
+                                )}
                             </div>
                         )}
-                        {shop_website && (
-                            <div className="col-auto flex-fill">
-                                <a
-                                    className="btn btn-secondary w-100 h-5 font-weight-bold fz-18px"
-                                    href={shop_website}
-                                    title="官方網站 (另開視窗)"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    官方網站
-                                    <i
-                                        className="icon icon-arrow-forward ml-1 fz-15px"
-                                        aria-hidden="true"
-                                    ></i>
-                                </a>
-                            </div>
-                        )}
-                        <div className="col-12">
+                        <div>
                             <Link
-                                className="btn btn-outline-secondary w-100 h-5 font-weight-bold fz-18px"
+                                className="btn btn-outline-secondary w-full h-5 font-bold text-[18px]"
                                 href={url}
                                 title="查看更多 (另開視窗)"
                                 target="_blank"
@@ -156,7 +156,7 @@ const MapSpotDetail = ({ data, nearInfoData, onClose }) => {
                             >
                                 查看更多
                                 <i
-                                    className="icon icon-arrow-forward ml-1 fz-15px"
+                                    className="icon icon-arrow-forward ml-1 text-[15px]"
                                     aria-hidden="true"
                                 ></i>
                             </Link>

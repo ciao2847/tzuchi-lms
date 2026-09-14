@@ -2,3 +2,101 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        text-decoration: none;
+        border: 1px solid theme('colors.info');
+        color: theme('colors.default');
+        background-color: theme('colors.white');
+        transition: transform 0.3s, opacity 0.3s, background-color 0.3s, color 0.3s;
+        cursor: pointer;
+    }
+    .btn:hover, .btn:focus-visible {
+        background-color: theme('colors.gray.100');
+        color: theme('colors.default');
+    }
+    .btn:disabled, .btn.disabled {
+        background: theme('colors.gray.200') !important;
+        color: theme('colors.gray.400');
+        pointer-events: none;
+        cursor: not-allowed;
+        opacity: 0.3;
+    }
+    .btn-primary {
+        color: theme('colors.white');
+        background-color: theme('colors.primary.DEFAULT');
+        border-color: transparent;
+    }
+    .btn-primary:hover, .btn-primary:focus-visible {
+        background-color: theme('colors.primary.light');
+        color: theme('colors.white');
+    }
+    .btn-secondary {
+        color: theme('colors.white');
+        background-color: theme('colors.secondary');
+        border-color: transparent;
+    }
+    .btn-secondary:hover, .btn-secondary:focus-visible {
+        background-color: theme('colors.secondary');
+        color: theme('colors.white');
+        opacity: 0.9;
+    }
+    .btn-outline-primary {
+        color: theme('colors.primary.DEFAULT');
+        border-color: theme('colors.primary.DEFAULT');
+        background-color: transparent;
+    }
+    .btn-outline-primary:hover, .btn-outline-primary.act {
+        color: theme('colors.white') !important;
+        background-color: theme('colors.primary.DEFAULT');
+    }
+    .btn-outline-secondary {
+        color: theme('colors.secondary');
+        border-color: theme('colors.secondary');
+        background-color: transparent;
+    }
+    .btn-outline-secondary:hover, .btn-outline-secondary.act {
+        color: theme('colors.white') !important;
+        background-color: theme('colors.secondary');
+    }
+    .btn-white {
+        background-color: theme('colors.white');
+        color: theme('colors.default');
+        border-color: transparent;
+    }
+    .btn-white:hover {
+        color: theme('colors.primary.DEFAULT');
+        background-color: theme('colors.white');
+    }
+    .btn-light {
+        background-color: theme('colors.light');
+        border-color: transparent;
+        color: theme('colors.default');
+    }
+    .btn-light:hover {
+        background-color: theme('colors.primary.DEFAULT');
+        color: theme('colors.white');
+    }
+    .btn-outline-white {
+        color: theme('colors.white');
+        border-color: theme('colors.white');
+        background-color: transparent;
+    }
+    .btn-outline-white:hover {
+        color: theme('colors.default');
+        background-color: theme('colors.white');
+    }
+    .btn-ghost {
+        background-color: transparent;
+        border-color: transparent;
+    }
+    .btn-ghost:hover {
+        background-color: theme('colors.white');
+    }
+}

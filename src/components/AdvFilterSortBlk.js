@@ -30,15 +30,15 @@ const AdvFilterSortBlk = ({ options, onSort, className }) => {
     }, [])
     return (
         <>
-            <div className={`d-flex align-items-center mb-3`}>
-                <div className="d-flex align-items-center text-info px-12px fz-15px flex-shrink-0">
-                    <i className="icon icon-sort mr-4px" aria-hidden="true"></i>
+            <div className={`flex items-center mb-3 ${className || ''}`}>
+                <div className="flex items-center text-info px-[12px] text-[15px] shrink-0">
+                    <i className="icon icon-sort mr-[4px]" aria-hidden="true"></i>
                     <I18N>排序</I18N>
                 </div>
-                <div className="button-group d-flex flex-shrink-0">
+                <div className="button-group flex shrink-0">
                     {options.hits && (
                         <button
-                            className={`btn h-5 miw-64px miw-md-120px px-2 fz-15px rounded-16px ${
+                            className={`btn h-5 min-w-[64px] md:min-w-[120px] px-2 text-[15px] rounded-[16px] ${
                                 sortby?.toLowerCase() === 'hits'
                                     ? 'btn-primary'
                                     : ''
@@ -66,7 +66,7 @@ const AdvFilterSortBlk = ({ options, onSort, className }) => {
                     )*/}
                     {options.new && (
                         <button
-                            className={`btn h-5 miw-64px miw-md-120px px-2 fz-15px rounded-16px ${
+                            className={`btn h-5 min-w-[64px] md:min-w-[120px] px-2 text-[15px] rounded-[16px] ${
                                 sortby?.toLowerCase() === 'new'
                                     ? 'btn-primary'
                                     : ''
@@ -81,7 +81,7 @@ const AdvFilterSortBlk = ({ options, onSort, className }) => {
 
                     {options.old && (
                         <button
-                            className={`btn h-5 miw-64px miw-md-120px px-2 fz-15px rounded-16px ${
+                            className={`btn h-5 min-w-[64px] md:min-w-[120px] px-2 text-[15px] rounded-[16px] ${
                                 sortby?.toLowerCase() === 'old'
                                     ? 'btn-primary'
                                     : ''
@@ -95,7 +95,7 @@ const AdvFilterSortBlk = ({ options, onSort, className }) => {
                     )}
                     {options.price && (
                         <button
-                            className={`btn h-5 miw-64px miw-md-120px px-2 fz-15px rounded-16px ${
+                            className={`btn h-5 min-w-[64px] md:min-w-[120px] px-2 text-[15px] rounded-[16px] ${
                                 sortby?.toLowerCase() === 'price'
                                     ? 'btn-primary'
                                     : ''
@@ -112,17 +112,17 @@ const AdvFilterSortBlk = ({ options, onSort, className }) => {
                             {sortby?.toLowerCase() === 'price' && (
                                 <i
                                     className={`${
-                                        sortValue === 'asc' && 'rotate-180'
-                                    } icon icon-sorting ml-1 fz-13px`}
+                                        sortValue === 'asc' ? 'rotate-180' : ''
+                                    } icon icon-sorting ml-1 text-[13px]`}
                                     aria-hidden="true"
                                 ></i>
                             )}
                         </button>
                     )}
                     {options.mrt && (
-                        <div className={`item position-relative ml-n1px`}>
+                        <div className="item relative -ml-[1px]">
                             <button
-                                className={`btn h-5 miw-64px miw-md-120px px-2 fz-15px rounded-16px ${
+                                className={`btn h-5 min-w-[64px] md:min-w-[120px] px-2 text-[15px] rounded-[16px] ${
                                     sortby?.toLowerCase() === 'near-mrt'
                                         ? 'btn-primary'
                                         : ''
@@ -138,19 +138,19 @@ const AdvFilterSortBlk = ({ options, onSort, className }) => {
                                     <I18N>鄰近捷運站</I18N>
                                 )}
                                 <i
-                                    className="icon icon-arrow-down w-2 h-2 ml-4px fz-13px"
+                                    className="icon icon-arrow-down w-2 h-2 ml-[4px] text-[13px]"
                                     aria-hidden="true"
                                 ></i>
                             </button>
                             <div
-                                className={`filter-selector-blk d-none d-md-block ${
+                                className={`hidden md:block md:absolute md:top-[40px] md:left-0 z-[1000] ${
                                     isShowAdv && advType === 3
                                         ? ''
-                                        : 'op-0 pointer-events-none visibility-hidden'
-                                } fixed-top w-100 h-100 z-1000`}
+                                        : 'opacity-0 pointer-events-none invisible'
+                                }`}
                             >
                                 <div
-                                    className="filter-selector-list d-flex flex-wrap align-content-start bg-white z-100 p-2 border border-primary border-width-2px rounded"
+                                    className="flex flex-wrap content-start bg-white z-[100] p-2 border border-primary border-2 rounded relative md:left-1/2 md:-ml-[200px]"
                                     style={{
                                         minWidth: 560,
                                         transform: isLayoutXXL
@@ -170,7 +170,7 @@ const AdvFilterSortBlk = ({ options, onSort, className }) => {
                                     />
                                 </div>
                                 <div
-                                    className="overlay fill-parent bg-black-50"
+                                    className="fixed inset-0 bg-transparent"
                                     onClick={() => toggleAdv(false)}
                                 ></div>
                             </div>
@@ -298,13 +298,13 @@ const AdvFilterSortBlk = ({ options, onSort, className }) => {
             </div>
             {options.mrt && (
                 <div
-                    className={`d-md-none ${
+                    className={`md:hidden ${
                         isShowAdv && advType === 3
                             ? ''
-                            : 'op-0 pointer-events-none visibility-hidden'
-                    } fixed-top w-100 h-100 z-1000`}
+                            : 'opacity-0 pointer-events-none invisible'
+                    } fixed inset-0 w-full h-full z-[1000]`}
                 >
-                    <div className="filter-selector-list d-flex flex-wrap align-content-start absolute-bottom-left w-100 bg-white z-100">
+                    <div className="flex flex-wrap content-start absolute bottom-0 left-0 w-full bg-white z-[100] min-h-[320px]">
                         <MrtStationPanel
                             currentStationId={currentMrtStationId}
                             onChange={(id) => {
@@ -317,7 +317,7 @@ const AdvFilterSortBlk = ({ options, onSort, className }) => {
                         />
                     </div>
                     <div
-                        className="overlay fill-parent bg-black-50"
+                        className="fixed inset-0 bg-black/50"
                         onClick={() => toggleAdv(false)}
                     ></div>
                 </div>

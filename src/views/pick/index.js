@@ -20,7 +20,7 @@ const Page = () => {
 
     return (
         <div>
-            <div className="w-100">
+            <div className="w-full">
                 <BannerTitle
                     title={'走吧！來趟水果之旅'}
                     sub={`採果何處去`}
@@ -30,11 +30,11 @@ const Page = () => {
             </div>
             <Introduction />
             <Notice />
-            <section className="py-5 py-xl-10">
+            <section className="py-5 xl:py-10">
                 <BlockTitle title="請選擇採果區域" />
                 <div className="flex justify-center">
                     <ConditionSearchBlk
-                        className="mb-[32px] md:mb-[64px]  md:mx-auto max-w-[800px]"
+                        className="mb-[32px] md:mb-[64px] md:mx-auto max-w-[800px]"
                         data={data}
                         query={query}
                         countyData={county}

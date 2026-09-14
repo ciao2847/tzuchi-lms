@@ -41,26 +41,26 @@ const SubMenuGuide = ({ isCurrent, onClose }) => {
     ]
     return (
         <div
-            className={`nav-sub-list justify-content-start pt-7 pt-xl-0 bg-white ${
+            className={`nav-sub-list justify-start pt-7 xl:pt-0 bg-white ${
                 isCurrent ? 'current-lv' : ''
             }`}
             onClick={onClose}
         >
             {isDesktopLayout && (
-                <div className="flex-shrink-0 w-50 position-relative">
+                <div className="shrink-0 w-1/2 relative">
                     <ThumbFrame
                         src="/assets/images/global/menu-cover-05.jpg"
                         alt={translate('苗栗銅鑼臺灣客家文化館', lang)}
                         className="fill-parent"
                     />
-                    <div className="ml-2 mb-2 px-12px py-4px bg-black-80 text-white absolute-bottom-left rounded">
+                    <div className="ml-2 mb-2 px-[12px] py-[4px] bg-black/80 text-white absolute bottom-0 left-0 rounded">
                         <I18N>苗栗銅鑼臺灣客家文化館</I18N>
                     </div>
                 </div>
             )}
-            <div className="d-xl-flex flex-fill menu-blk">
-                <div className="d-xl-flex flex-wrap w-100 maw-xl-480px">
-                    <div className="w-xl-50">
+            <div className="xl:flex flex-1 menu-blk">
+                <div className="xl:flex flex-wrap w-full xl:max-w-[480px]">
+                    <div className="xl:w-1/2">
                         {MENU_SECTION_01.filter((config) =>
                             isProd ? !config.hideAtProd : true
                         )
@@ -69,13 +69,13 @@ const SubMenuGuide = ({ isCurrent, onClose }) => {
                             )
                             .map((config, i) => (
                                 <div
-                                    className="mb-xl-5 mb-0-last border-bottom border-xl-0"
+                                    className="xl:mb-5 last:mb-0 border-b xl:border-b-0"
                                     key={i}
                                 >
                                     {config.isLinkOut ? (
                                         <a
                                             href={config.url}
-                                            className="d-flex align-items-center h-6 h-xl-auto px-2 px-xl-0 text-decoration-none text-primary fz-18px lh-initial hover-secondary trs-all"
+                                            className="flex items-center h-6 xl:h-auto px-2 xl:px-0 no-underline text-primary text-[18px] leading-normal hover:text-secondary transition-all duration-300"
                                             title={`${translate(
                                                 config.title,
                                                 lang
@@ -83,24 +83,24 @@ const SubMenuGuide = ({ isCurrent, onClose }) => {
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
-                                            <div className="fz-xl-24px font-weight-xl-bold">
+                                            <div className="xl:text-[24px] xl:font-bold">
                                                 <I18N>{config.title}</I18N>
                                             </div>
                                             <i
-                                                className="icon icon-link-out ml-1 text-info fz-13px lh-initial"
+                                                className="icon icon-link-out ml-1 text-info text-[13px] leading-normal"
                                                 aria-hidden="true"
                                             ></i>
                                         </a>
                                     ) : (
                                         <Link
                                             to={config.url}
-                                            className="d-flex align-items-center h-6 h-xl-auto px-2 px-xl-0 text-decoration-none text-primary fz-18px lh-initial hover-secondary trs-all"
+                                            className="flex items-center h-6 xl:h-auto px-2 xl:px-0 no-underline text-primary text-[18px] leading-normal hover:text-secondary transition-all duration-300"
                                             title={translate(
                                                 config.title,
                                                 lang
                                             )}
                                         >
-                                            <div className="fz-xl-24px font-weight-xl-bold">
+                                            <div className="xl:text-[24px] xl:font-bold">
                                                 <I18N>{config.title}</I18N>
                                             </div>
                                         </Link>

@@ -15,14 +15,14 @@ const PublicationCard = ({ data, isInIndex = false }) => {
     return (
         <div className="p-1 bg-white rounded">
             <div
-                className={`d-md-flex align-items-stretch w-100 ${
+                className={`md:flex items-stretch w-full ${
                     isInIndex ? 'text-white' : 'text-dark'
                 }`}
             >
-                <div className="w-100 md:w-[200px] xl:w-[240px] flex-shrink-0 position-relative">
+                <div className="w-full md:w-[200px] xl:w-[240px] shrink-0 relative">
                     {!!tag && (
                         <div
-                            className={`${clx[0]} m-1 py-2px px-4px rounded-[4px] absolute-top-left z-10 fz-12px lh-initial text-white`}
+                            className={`${clx[0]} m-1 py-[2px] px-[4px] rounded-[4px] absolute top-0 left-0 z-10 text-[12px] leading-normal text-white`}
                         >
                             {tag.title}
                         </div>
@@ -35,37 +35,37 @@ const PublicationCard = ({ data, isInIndex = false }) => {
                         alt=""
                         ratio="4by3"
                         isRounded={true}
-                        className={`w-100`}
+                        className="w-full"
                     />
                 </div>
 
                 <div
-                    className={`d-flex flex-column mt-2 mt-md-0 py-md-1 px-md-2 px-xl-20px flex-fill miw-0`}
+                    className="flex flex-col mt-2 md:mt-0 md:py-1 md:px-2 xl:px-[20px] flex-1 min-w-0"
                 >
                     <div
-                        className={`fz-18px fz-xl-20px line-clamp-2 font-weight-bold lh-initial`}
+                        className="text-[18px] xl:text-[20px] line-clamp-2 font-bold leading-normal"
                     >
                         {name || title}
                     </div>
                     {press && (
-                        <div className="d-flex align-items-center mt-12px fz-15px text-info lh-initial">
+                        <div className="flex items-center mt-[12px] text-[15px] text-info leading-normal">
                             <I18N>發行</I18N>：{press}
                         </div>
                     )}
                     {/*!!categoryNames?.length && (
-                        <div className="d-flex align-items-center mt-12px fz-15px text-info lh-initial">
+                        <div className="flex items-center mt-[12px] text-[15px] text-info leading-normal">
                             <I18N>類別</I18N>：{categoryNames.join('、')}
                         </div>
                     )*/}
                     {!!locationNames?.length && (
-                        <ul className="d-flex flex-wrap align-items-center mt-12px mb-n1 fz-15px text-info lh-initial">
+                        <ul className="flex flex-wrap items-center mt-[12px] -mb-1 text-[15px] text-info leading-normal">
                             {locationNames.map((name, i) => (
                                 <li
-                                    className="d-flex align-items-center mr-2 mb-1"
+                                    className="flex items-center mr-2 mb-1"
                                     key={i}
                                 >
                                     <i
-                                        className="icon icon-location mr-4px text-primary"
+                                        className="icon icon-location mr-[4px] text-primary"
                                         aria-hidden="true"
                                     ></i>
                                     {name}
@@ -75,7 +75,7 @@ const PublicationCard = ({ data, isInIndex = false }) => {
                     )}
 
                     {!!files?.length && (
-                        <RelatedFiles className="mt-1 fz-15px" data={files} />
+                        <RelatedFiles className="mt-1 text-[15px]" data={files} />
                     )}
                 </div>
             </div>

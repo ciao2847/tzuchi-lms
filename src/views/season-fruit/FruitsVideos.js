@@ -13,7 +13,7 @@ const FruitsVideos = () => {
                             src="https://www.youtube.com/embed/lz8R3EJ4fZc"
                             title="YouTube video player"
                             allowFullScreen
-                            className="w-100 h-100 "
+                            className="w-full h-full"
                         ></iframe>
                     </div>
                 </div>

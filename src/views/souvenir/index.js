@@ -40,13 +40,13 @@ const Page = () => {
     const { cover, name, tel, spot_name, size, during } = data
     if (!data) {
         return (
-            <div className="d-flex justify-content-center p-10">
+            <div className="flex justify-center p-10">
                 <Spinner size={18} color={'black'} />
             </div>
         )
     }
     return (
-        <div className="w-100">
+        <div className="w-full">
             <section className="m-auto">
                 <div className="pt-[56px] xl:pt-[104px]">
                     <div className="pb-0 md:pb-[80px] ">
@@ -68,7 +68,7 @@ const Page = () => {
                                     />
                                 </div>
 
-                                <div className="flex-fill mt-[24px] md:mt-[56px] xl:mt-[32px] px-[16px] xl:pl-[56px]">
+                                <div className="flex-1 mt-[24px] md:mt-[56px] xl:mt-[32px] px-[16px] xl:pl-[56px]">
                                     <div>
                                         <svg
                                             className="text-justify"
@@ -133,7 +133,7 @@ const Page = () => {
                                                 </p>
                                                 <Link
                                                     href={`tel:${tel}`}
-                                                    className="md:hidden flex justify-center items-center py-[12px] px-[24px] w-fit font-bold  border-[#106fa2] border-[2px] border-solid rounded-pill trs-all hover:bg-[#e7f7ff]"
+                                                    className="md:hidden flex justify-center items-center py-[12px] px-[24px] w-fit font-bold border-[#106fa2] border-[2px] border-solid rounded-full transition-all duration-300 hover:bg-[#e7f7ff]"
                                                 >
                                                     <div className=" text-[#106fa2]">
                                                         來電洽詢

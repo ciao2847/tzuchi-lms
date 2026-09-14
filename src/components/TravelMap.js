@@ -25,7 +25,7 @@ const TravelMap = ({
             <img
                 src={defaultSrc}
                 alt={alt}
-                className="thumb embed-responsive-item position-absolute inset-0 z-0"
+                className="thumb embed-responsive-item absolute inset-0 z-0"
                 style={{ opacity: 1 }}
             />
         )}

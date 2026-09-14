@@ -15,7 +15,7 @@ const Page = () => {
     })
     console.log(data)
     return (
-        <div className="w-100">
+        <div className="w-full">
             <BannerTitle
                 title={'甜蜜滋味傳遞世界'}
                 sub={`出境伴手禮`}

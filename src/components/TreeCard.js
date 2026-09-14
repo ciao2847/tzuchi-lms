@@ -11,7 +11,7 @@ const TreeCard = ({ data, config }) => {
     return (
         <Link
             href={`/tree-info/${id}`}
-            className={`${cardClassName} flex justify-between py-[16px] px-[24px] border-[1px] border-solid border-[#f0f0f0] rounded-[16px] md:rounded-[32px]  hover:ring-[1px] trs-all`}
+            className={`${cardClassName} flex justify-between py-[16px] px-[24px] border border-solid border-[#f0f0f0] rounded-[16px] md:rounded-[32px] hover:ring-[1px] transition-all duration-300`}
         >
             <div>
                 <div className="flex justify-start items-center">

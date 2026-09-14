@@ -8,11 +8,11 @@ const SocialShareBlk = ({ title, className }) => {
     const [hasDuplicated, toggleDuplicated] = useState(false)
     return (
         <ul
-            className={`d-flex fz-24px justify-content-center align-content-center ${className} `}
+            className={`flex text-[24px] justify-center content-center ${className} `}
         >
-            <li className="mr-1 mr-0-last">
+            <li className="mr-1 last:mr-0">
                 <a
-                    className="btn btn-light w-5 h-5 fz-24px rounded"
+                    className="btn btn-light w-5 h-5 text-[24px] rounded"
                     href={`https://www.facebook.com/sharer/sharer.php?u=${url}`}
                     title={`${translate('分享到 facebook', lang)}(${translate(
                         '另開視窗',
@@ -25,9 +25,9 @@ const SocialShareBlk = ({ title, className }) => {
                     <div className="sr-only">分享到 facebook</div>
                 </a>
             </li>
-            <li className="mr-1 mr-0-last">
+            <li className="mr-1 last:mr-0">
                 <a
-                    className="btn btn-light w-5 h-5 fz-24px rounded"
+                    className="btn btn-light w-5 h-5 text-[24px] rounded"
                     href={`http://line.naver.jp/R/msg/text/?${title}%20${url}`}
                     title={`${translate('分享到 line', lang)}(${translate(
                         '另開視窗',
@@ -40,9 +40,9 @@ const SocialShareBlk = ({ title, className }) => {
                     <div className="sr-only">分享到 line</div>
                 </a>
             </li>
-            <li className="mr-1 mr-0-last">
+            <li className="mr-1 last:mr-0">
                 <a
-                    className="btn btn-light w-5 h-5 fz-24px rounded"
+                    className="btn btn-light w-5 h-5 text-[24px] rounded"
                     href={`https://twitter.com/home/?status=${title}%20${url}`}
                     title={`${translate('分享到 twitter', lang)}(${translate(
                         '另開視窗',
@@ -55,25 +55,9 @@ const SocialShareBlk = ({ title, className }) => {
                     <div className="sr-only">分享到 twitter</div>
                 </a>
             </li>
-            {/*
-            <li className="mr-1 mr-0-last">
-                <a
-                    className="btn btn-light w-5 h-5 fz-24px rounded"
-                    href={`http://service.weibo.com/share/share.php?url=${url}&amp;title=${title}&amp;language=zh_tw`}
-                    title={`${translate('分享到微博', lang)}(${translate(
-                        '另開視窗',
-                        lang
-                    )})`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <i className="icon icon-webio"></i>
-                    <div className="sr-only">分享到微博</div>
-                </a>
-            </li>*/}
-            <li className="mr-1 mr-0-last">
+            <li className="mr-1 last:mr-0">
                 <button
-                    className="btn btn-light w-5 h-5 fz-24px position-relative overflow-hidden rounded"
+                    className="btn btn-light w-5 h-5 text-[24px] relative overflow-hidden rounded"
                     onClick={() => {
                         navigator.clipboard?.writeText(url).then(() => {
                             toggleDuplicated(true)
@@ -85,7 +69,7 @@ const SocialShareBlk = ({ title, className }) => {
                     <div
                         className={`${
                             hasDuplicated ? '' : 'translate-y-[100%]'
-                        } d-flex justify-content-center align-items-center px-2 bg-white text-primary border rounded fill-parent trs-all`}
+                        } flex justify-center items-center px-2 bg-white text-primary border rounded absolute inset-0 transition-all duration-300`}
                         onTransitionEnd={() => {
                             setTimeout(() => {
                                 toggleDuplicated(false)

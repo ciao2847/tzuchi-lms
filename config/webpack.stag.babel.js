@@ -4,7 +4,6 @@ import common from './webpack.common.babel.js'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
-import TerserPlugin from 'terser-webpack-plugin'
 import DotEnv from 'dotenv-webpack'
 require('dotenv').config({
     path: `./.env.${process.env.NODE_ENV}`
@@ -35,7 +34,7 @@ export default merge(common, {
     },
     optimization: {
         minimize: true,
-        minimizer: [`...`, new TerserPlugin(), new CssMinimizerPlugin()],
+        minimizer: [`...`, new CssMinimizerPlugin()],
         splitChunks: {
             cacheGroups: {
                 styles: {

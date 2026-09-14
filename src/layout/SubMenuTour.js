@@ -24,20 +24,20 @@ const SubMenuTour = ({ isCurrent, onClose }) => {
     }, [toursData, isCurrent])
     return (
         <div
-            className={`nav-sub-list justify-content-start pt-7 pt-xl-0 bg-white ${
+            className={`nav-sub-list justify-start pt-7 xl:pt-0 bg-white ${
                 isCurrent ? 'current-lv' : ''
             }`}
             onClick={onClose}
         >
             {isDesktopLayout && (
-                <div className="flex-shrink-0 w-50 position-relative">
+                <div className="shrink-0 w-1/2 relative">
                     <ThumbFrame
                         src="/assets/images/global/menu-cover-04.jpg"
                         alt={isTW ? translate('苗栗三義龍騰斷橋', lang) : ''}
                         className="fill-parent"
                     />
                     {isTW && (
-                        <div className="ml-2 mb-2 px-12px py-4px bg-black-80 text-white absolute-bottom-left rounded">
+                        <div className="ml-2 mb-2 px-[12px] py-[4px] bg-black/80 text-white absolute bottom-0 left-0 rounded">
                             <I18N>苗栗三義龍騰斷橋</I18N>
                         </div>
                     )}
@@ -45,23 +45,23 @@ const SubMenuTour = ({ isCurrent, onClose }) => {
             )}
             <div
                 className={`${
-                    is1920Layout && isProd ? 'd-xl-flex' : ''
-                } flex-fill menu-blk`}
+                    is1920Layout && isProd ? 'xl:flex' : ''
+                } flex-1 menu-blk`}
             >
                 {isTW && (
-                    <div className="maw-320px menu-group flex-shrink-0 mb-xl-5 mb-0-last border-bottom border-xl-0">
+                    <div className="max-w-[320px] menu-group shrink-0 xl:mb-5 last:mb-0 border-b xl:border-b-0">
                         <Link
-                            className="d-inline-flex align-items-center h-6 h-xl-auto px-2 px-xl-0 text-decoration-none text-primary fz-18px lh-initial hover-secondary trs-all"
+                            className="inline-flex items-center h-6 xl:h-auto px-2 xl:px-0 no-underline text-primary text-[18px] leading-normal hover:text-secondary transition-all duration-300"
                             to={`/zh-tw/${ROUTES_CONST.TOURS}`}
                             title={translate('客庄小旅行', lang)}
                         >
-                            <div className="fz-xl-24px font-weight-xl-bold">
+                            <div className="xl:text-[24px] xl:font-bold">
                                 <I18N>在地小旅行</I18N>
                             </div>
                         </Link>
 
                         {isDesktopLayout && toursData && (
-                            <ul className="pb-1 pl-3 p-xl-0 mt-xl-2">
+                            <ul className="pb-1 pl-3 xl:p-0 xl:mt-2">
                                 {[...toursData]
                                     .filter(
                                         (tour) =>
@@ -71,12 +71,12 @@ const SubMenuTour = ({ isCurrent, onClose }) => {
                                     .slice(0, 3)
                                     .map((item, i) => (
                                         <li
-                                            className="mb-1 mb-xl-12px"
+                                            className="mb-1 xl:mb-[12px]"
                                             key={item.id}
                                         >
                                             <Link
                                                 to={`/zh-tw/${ROUTES_CONST.TOUR}/${item.id}`}
-                                                className="d-block maw-300px text-decoration-none text-primary hover-secondary trs-all fz-16px fz-xl-18px line-clamp-2"
+                                                className="block max-w-[300px] no-underline text-primary hover:text-secondary transition-all duration-300 text-[16px] xl:text-[18px] line-clamp-2"
                                             >
                                                 {item.name}
                                             </Link>
@@ -87,19 +87,19 @@ const SubMenuTour = ({ isCurrent, onClose }) => {
                     </div>
                 )}
 
-                <div className="maw-320px menu-group flex-shrink-0 mb-xl-5 mb-0-last border-bottom border-xl-0">
+                <div className="max-w-[320px] menu-group shrink-0 xl:mb-5 last:mb-0 border-b xl:border-b-0">
                     <Link
-                        className="d-inline-flex align-items-center h-6 h-xl-auto px-2 px-xl-0 text-decoration-none text-primary fz-18px lh-initial hover-secondary trs-all"
+                        className="inline-flex items-center h-6 xl:h-auto px-2 xl:px-0 no-underline text-primary text-[18px] leading-normal hover:text-secondary transition-all duration-300"
                         to={`/${lang}/${ROUTES_CONST.TOURCATEGORYS}`}
                         title="111年桐花小旅行"
                     >
-                        <div className="fz-xl-24px font-weight-xl-bold">
+                        <div className="xl:text-[24px] xl:font-bold">
                             <I18N>111年桐花小旅行</I18N>
                         </div>
                     </Link>
 
                     {isTW && isDesktopLayout && toursData && (
-                        <ul className="pb-1 pl-3 p-xl-0 mt-xl-2">
+                        <ul className="pb-1 pl-3 xl:p-0 xl:mt-2">
                             {[...toursData]
                                 .filter((tour) =>
                                     tour.categories.includes(1027)
@@ -108,12 +108,12 @@ const SubMenuTour = ({ isCurrent, onClose }) => {
                                 .slice(0, 3)
                                 .map((item, i) => (
                                     <li
-                                        className="mb-1 mb-xl-12px"
+                                        className="mb-1 xl:mb-[12px]"
                                         key={item.id}
                                     >
                                         <Link
                                             to={`/zh-tw/${ROUTES_CONST.TOUR}/${item.id}`}
-                                            className="d-block maw-300px text-decoration-none text-primary hover-secondary trs-all fz-16px fz-xl-18px line-clamp-2"
+                                            className="block max-w-[300px] no-underline text-primary hover:text-secondary transition-all duration-300 text-[16px] xl:text-[18px] line-clamp-2"
                                         >
                                             {item.name}
                                         </Link>
@@ -123,13 +123,13 @@ const SubMenuTour = ({ isCurrent, onClose }) => {
                     )}
                 </div>
                 {isTW && (
-                    <div className="maw-320px menu-group flex-shrink-0 mb-xl-5 mb-0-last border-bottom border-xl-0">
+                    <div className="max-w-[320px] menu-group shrink-0 xl:mb-5 last:mb-0 border-b xl:border-b-0">
                         <Link
-                            className="d-inline-flex align-items-center h-6 h-xl-auto px-2 px-xl-0 text-decoration-none text-primary fz-18px lh-initial hover-secondary trs-all"
+                            className="inline-flex items-center h-6 xl:h-auto px-2 xl:px-0 no-underline text-primary text-[18px] leading-normal hover:text-secondary transition-all duration-300"
                             to={`/zh-tw/${ROUTES_CONST.TOUROTHERCATEGORYS}`}
                             title="其他推薦行程"
                         >
-                            <div className="fz-xl-24px font-weight-xl-bold">
+                            <div className="xl:text-[24px] xl:font-bold">
                                 其他推薦行程
                             </div>
                         </Link>

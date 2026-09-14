@@ -45,9 +45,9 @@ const MemberFuncBlk = () => {
             .catch(console.error)
     }
     return (
-        <div className="position-relative">
+        <div className="relative">
             <button
-                className="d-flex align-items-center border-0 fz-15px text-white hover-primary trs-all"
+                className="flex items-center border-0 text-[15px] text-white hover:text-primary transition-all duration-300"
                 onClick={() => {
                     toggle(!isOpen)
                 }}
@@ -58,25 +58,25 @@ const MemberFuncBlk = () => {
             </button>
             <div
                 className={`${
-                    !isOpen && 'op-0 pointer-events-none'
-                } mt-5 absolute-top-center trs-all`}
+                    !isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'
+                } mt-5 absolute top-0 left-1/2 -translate-x-1/2 transition-all duration-300`}
             >
                 <div
-                    className={`w-160px p-2 position-relative rounded bg-white trs-all drop-shadow-black-50`}
+                    className={`w-[160px] p-2 relative rounded bg-white transition-all duration-300 shadow-lg`}
                     style={{
                         transform: `translateY(${isOpen ? 0 : '-20px'})`
                     }}
                     ref={ref}
                 >
                     <i
-                        className="icon icon-triangle ml-n1 mt-n12px text-white rotate-180 absolute-top-center"
+                        className="icon icon-triangle -ml-1 -mt-[12px] text-white rotate-180 absolute top-0 left-1/2 -translate-x-1/2"
                         aria-hidden="true"
                     ></i>
                     <ul>
                         {MEMBER_FUNC_CONFIG.map(({ id, label, url }) => (
-                            <li className="mb-1 mb-0-last" key={id}>
+                            <li className="mb-1 last:mb-0" key={id}>
                                 <Link
-                                    className="d-block w-100 text-default hover-primary trs-all"
+                                    className="block w-full text-default hover:text-primary transition-all duration-300"
                                     to={url}
                                     onClick={() => {
                                         toggle(false)
@@ -86,9 +86,9 @@ const MemberFuncBlk = () => {
                                 </Link>
                             </li>
                         ))}
-                        <li className="mb-1 mb-0-last">
+                        <li className="mb-1 last:mb-0">
                             <button
-                                className="d-block w-100 text-left"
+                                className="block w-full text-left text-default hover:text-primary transition-all duration-300"
                                 onClick={logout}
                             >
                                 登出

@@ -119,8 +119,8 @@ const InfinityScrollList = ({
         <div className={className}>
             {!!dataDisplay?.length && (
                 <>
-                    <div className="mt-20px pb-1 mb-2 mb-md-20px text-info border-bottom">
-                        <p className="fz-14px">
+                    <div className="mt-[20px] pb-1 mb-2 md:mb-[20px] text-info border-b">
+                        <p className="text-[14px]">
                             <I18N
                                 params={[dataDisplay.length]}
                             >{`共有 {0} 個結果`}</I18N>
@@ -142,7 +142,7 @@ const InfinityScrollList = ({
                 </>
             )}
             {dataDisplay && !dataDisplay.length && (
-                <div className="py-10 text-info text-center fz-18px">
+                <div className="py-10 text-info text-center text-[18px]">
                     <I18N>暫無資料</I18N>
                 </div>
             )}
@@ -150,7 +150,7 @@ const InfinityScrollList = ({
                 /*needInfinityScroll &&*/
                 data && currentIdx < dataDisplay?.length && (
                     <div
-                        className={`d-flex justify-content-center mt-5`}
+                        className={`flex justify-center mt-5`}
                         ref={loadingRef}
                     >
                         <Spinner size={16} />

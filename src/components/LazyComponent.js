@@ -40,9 +40,9 @@ const LazyComponent = ({
 	}, [isLoaded])
 
 	return (
-		<div className="position-relative">
+		<div className="relative">
 			<div
-				className="z-2000 w-0 absolute-bottom-left pointer-events-none"
+				className="z-[2000] w-0 absolute bottom-0 left-0 pointer-events-none"
 				ref={sensorEl}
 				style={{ height: `calc(${offsetTop} + 100%)` }}
 			></div>

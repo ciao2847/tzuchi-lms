@@ -1,4 +1,4 @@
-﻿import React from 'react'
+import React from 'react'
 import { Link, useParams } from 'react-router-dom'
 import I18N, { translate } from 'components/I18N'
 import { ROUTES_CONST, BLOSSOM_LANG_MAP } from 'constants/'
@@ -191,8 +191,8 @@ const FatFooter = () => {
         }
     ]
     return (
-        <div className="d-none d-xl-block border-bottom border-white py-7 mb-5 mx-n3">
-            <div className="d-flex justify-content-between maw-920px mx-auto">
+        <div className="hidden xl:block border-b border-white py-7 mb-5 -mx-3">
+            <div className="flex justify-between max-w-[920px] mx-auto">
                 {LINKS_CONFIG.filter((config) =>
                     isForeign ? !config.hideAtForeign : true
                 )
@@ -201,14 +201,14 @@ const FatFooter = () => {
                         const isTwoColumns = config.columns === 2
                         return (
                             <div key={config.id}>
-                                <div className="text-primary fz-18px font-weight-bold">
+                                <div className="text-primary text-[18px] font-bold">
                                     <I18N>{config.title}</I18N>
                                 </div>
                                 <ul
                                     className={`${
-                                        isTwoColumns && 'row maw-224px'
+                                        isTwoColumns && 'grid grid-cols-2 max-w-[224px] gap-x-2'
                                     }
-                                    ${isEN ? 'fz-16px mr-2 ' : ''}
+                                    ${isEN ? 'text-[16px] mr-2 ' : ''}
                                     mt-2 
                                 `}
                                 >
@@ -226,14 +226,12 @@ const FatFooter = () => {
                                         )
                                         .map((link, i) => (
                                             <li
-                                                className={`${
-                                                    isTwoColumns && 'col-6'
-                                                } mb-1 mb-0-last`}
+                                                className="mb-1 last:mb-0"
                                                 key={i}
                                             >
                                                 {link.isLinkOut ? (
                                                     <a
-                                                        className="text-default hover-link"
+                                                        className="text-default hover:underline"
                                                         href={link.url}
                                                         title={`${translate(
                                                             link.title,
@@ -251,7 +249,7 @@ const FatFooter = () => {
                                                     </a>
                                                 ) : (
                                                     <Link
-                                                        className="text-default hover-link"
+                                                        className="text-default hover:underline"
                                                         to={link.url}
                                                         title={translate(
                                                             link.title,

@@ -9,7 +9,7 @@ const CONFIG = [
         actClassName:
             'text-[#d12727] border-[#ff8a8a] border-[2px] ring-[1px] ring-[#ff8a8a]',
         hoverClassName:
-            'hover:text-[#d12727] hover:border-[#ff8a8a] hover:border-[2px] hover:ring-[1px] hover:ring-[ff8a8a]',
+            'hover:text-[#d12727] hover:border-[#ff8a8a] hover:border-[2px] hover:ring-[1px] hover:ring-[#ff8a8a]',
         url: 'spring'
     },
     {
@@ -18,7 +18,7 @@ const CONFIG = [
         actClassName:
             'text-[#2d7316] border-[#82be66] border-[2px] ring-[1px] ring-[#82be66]',
         hoverClassName:
-            'hover:text-[#2d7316] hover:border-[#82be66] hover:border-[2px] hover:ring-[1px] hover:ring-[82be66]',
+            'hover:text-[#2d7316] hover:border-[#82be66] hover:border-[2px] hover:ring-[1px] hover:ring-[#82be66]',
         url: 'summer'
     },
     {
@@ -64,7 +64,7 @@ const SeasonNav = ({ className }) => {
     const activeSeason = season || 'all' //確保預設情況下 "all" 被選中
     return (
         <div className={`px-[24px] ${className}`}>
-            <ul className="flex items-center md:justify-center gap-[16px] mx-n3 pl-[4px] overflow-x-auto md:overflow-visible">
+            <ul className="flex items-center md:justify-center gap-[16px] -mx-3 pl-[4px] overflow-x-auto md:overflow-visible">
                 {CONFIG.map((item, i) => (
                     <li key={i}>
                         <Link
@@ -72,9 +72,9 @@ const SeasonNav = ({ className }) => {
                             href={`/season-fruits/${item.url}`}
                             className={`${
                                 item.url === activeSeason //連結等於預設的all
-                                    ? item.actClassName
-                                    : `border-[2px] border-[#c4c4c4] trs-all ${item.hoverClassName}`
-                            } flex flex-col flex-shrink-0 justify-center items-center py-[12px] px-[16px] w-[104px] h-[88px] space-y-2 rounded-[16px] md:rounded-[24px] border-solid trs-all`}
+                                     ? item.actClassName
+                                     : `border-[2px] border-[#c4c4c4] transition-all duration-300 ${item.hoverClassName}`
+                            } flex flex-col flex-shrink-0 justify-center items-center py-[12px] px-[16px] w-[104px] h-[88px] space-y-2 rounded-[16px] md:rounded-[24px] border-solid transition-all duration-300`}
                             onClick={() =>
                                 //瀏覽器的 history API，允許改變瀏覽歷史，而不會真的重新整理頁面
                                 window.history.pushState(
@@ -84,10 +84,10 @@ const SeasonNav = ({ className }) => {
                                 )
                             }
                         >
-                            <div className="fz-22px font-bold">
+                            <div className="text-[22px] font-bold">
                                 {item.title}
                             </div>
-                            <div className="fz-16px text-[#767676] font-normal">
+                            <div className="text-[16px] text-[#767676] font-normal">
                                 {item.month}
                             </div>
                         </Link>

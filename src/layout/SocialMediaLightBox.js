@@ -41,8 +41,8 @@ const SocialMediaLightBox = () => {
     return (
         <div
             className={`${
-                socialMediasData.isShow ? '' : 'op-0 pointer-events-none'
-            } d-flex justify-content-center align-items-center w-100 h-100 fixed-top bg-black-50 trs-all`}
+                socialMediasData.isShow ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            } flex justify-center items-center w-full h-full fixed inset-0 z-50 bg-black/50 transition-all duration-300`}
         >
             <SocialMediaDetail
                 data={detailData}
@@ -50,7 +50,7 @@ const SocialMediaLightBox = () => {
             />
 
             <div
-                className="fill-parent"
+                className="absolute inset-0 -z-10 w-full h-full"
                 onClick={() => {
                     dispatch(closeDetail())
                     if (location.href.includes('social-media')) {

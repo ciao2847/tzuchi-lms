@@ -67,28 +67,28 @@ const StickyNav = ({ data, className }) => {
 
     return (
         <nav
-            className={`sticky-nav position-sticky z-200 ${
+            className={`sticky-nav sticky z-[200] ${
                 isSticky ? 'bg-white/50 backdrop-blur ' : ''
-            } ${className}`}
+            } ${className || ''}`}
         >
             <div
-                className="z-2000 w-0 h-0 -mt-[58px] xl:-mt-[82px] absolute-top-left pointer-events-none"
+                className="z-[2000] w-0 h-0 -mt-[58px] xl:-mt-[82px] absolute top-0 left-0 pointer-events-none"
                 ref={sensorRef}
             ></div>
             <ul
-                className={`scroll-x-blk d-flex justify-content-start align-content-center mx-auto px-1`}
+                className={`scroll-x-blk flex justify-start content-center mx-auto px-1`}
                 ref={scrollRef}
             >
                 {data.map((item) => (
                     <li
                         key={item.id}
-                        className="flex-shrink-0 fz-15px fz-md-16px mr-2 mr-0-last"
+                        className="shrink-0 text-[15px] md:text-[16px] mr-2 last:mr-0"
                     >
                         <button
-                            className={`py-1 px-2 px-xl-3 fz-20px fz-24px btn-minecraft text-[#53170E] cursor-pointer font-weight-bold ${
+                            className={`py-1 px-2 xl:px-3 text-[20px] xl:text-[24px] btn-minecraft text-[#53170E] cursor-pointer font-bold ${
                                 currentId === item.id
                                     ? 'text-secondary'
-                                    : 'hover-secondary '
+                                    : 'hover:text-secondary '
                             }`}
                             onClick={() => {
                                 document

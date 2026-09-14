@@ -26,7 +26,7 @@ const LoginProvider = ({ children }) => {
     return (
         <LoginContext.Provider value={defaultValue}>
             {isLogin === null ? (
-                <div className="d-flex justify-content-center align-items-center fill-parent">
+                <div className="absolute inset-0 flex justify-center items-center">
                     <Spinner size={20} color="#fff" />
                 </div>
             ) : (

@@ -11,34 +11,34 @@ const Breadcrumbs = ({ data, className }) => {
     if (isEmbed) return null
 
     return (
-        <div className={`breadcrumbs py-2 full-width ${className}`}>
-            <div className="d-flex align-items-center maw-1400px h-4 mx-auto fz-14px">
+        <div className={`breadcrumbs py-2 w-full ${className || ''}`}>
+            <div className="flex items-center max-w-[1400px] h-4 mx-auto text-[14px]">
                 <a
                     accessKey="C"
                     href="#"
                     title="中間定位點(C)"
-                    className="d-none d-xl-block w-2 ml-n2 text-inherit"
+                    className="hidden xl:block w-2 -ml-2 text-inherit"
                     onClick={(e) => {
                         e.preventDefault()
                     }}
                 >
                     :::
                 </a>
-                <ul className="d-flex">
-                    <li className="d-flex crumb">
+                <ul className="flex items-center">
+                    <li className="flex crumb items-center">
                         <Link
                             href={`/${lang}`}
-                            className={`text-inherit hover-primary`}
+                            className={`text-inherit hover:text-primary`}
                         >
                             <I18N>首頁</I18N>
                         </Link>
                     </li>
                     {!!data?.length &&
                         data.map(({ title, url }, i) => (
-                            <li className="d-flex crumb" key={i}>
+                            <li className="flex crumb items-center" key={i}>
                                 {!!url ? (
                                     <Link
-                                        className={`text-inherit hover-primary`}
+                                        className={`text-inherit hover:text-primary`}
                                         href={url}
                                     >
                                         <I18N>{title}</I18N>

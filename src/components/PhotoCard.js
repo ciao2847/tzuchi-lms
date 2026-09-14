@@ -19,9 +19,9 @@ const PhotoCard = ({ data }) => {
 	}
 
 	return (
-		<div className="w-100 position-relative">
+		<div className="w-full relative">
 			<Link
-				className="d-block w-100 position-relative hover-shadow rounded trs-all"
+				className="block w-full relative hover:shadow-lg rounded transition-all duration-300"
 				to={`${urlPrefix}${id}`}
 			>
 				<ThumbFrame
@@ -31,7 +31,7 @@ const PhotoCard = ({ data }) => {
 					isRounded={true}
 				/>
 			</Link>
-			<BtnCollection className="m-4px absolute-top-right" data={id} />
+			<BtnCollection className="m-[4px] absolute top-0 right-0" data={id} />
 		</div>
 	)
 }

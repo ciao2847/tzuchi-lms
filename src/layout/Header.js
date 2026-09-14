@@ -42,46 +42,52 @@ const Header = () => {
     return (
         <>
             <header
-                className={`header-wrapper fixed-top w-100 border-bottom bg-white trs-all`}
+                className={`header-wrapper fixed top-0 left-0 right-0 z-50 w-full border-b bg-white transition-all duration-300`}
             >
-                <div className="header d-flex justify-between align-items-center w-100 h-7 h-xl-13 max-w-[1920px] px-2 px-xl-3 mx-md-auto">
-                    <MainComp className={`mr-auto z-100 position-relative`}>
-                        <Link className="main-logo d-block" to={`/`}>
+                <div className="header flex justify-between items-center w-full h-[56px] xl:h-[80px] max-w-[1920px] px-2 xl:px-4 md:mx-auto">
+                    <MainComp className="mr-auto z-10 relative shrink-0">
+                        <Link
+                            className="main-logo block h-12 w-[176px] bg-contain bg-center bg-no-repeat xl:h-16 xl:w-[235px]"
+                            href="/"
+                            style={{
+                                backgroundImage: `url('${process.env.BASE_PATH}/images/global/main-logo.png')`
+                            }}
+                        >
                             <div className="sr-only">
-                                <I18N>台灣水果旅行</I18N>
+                                <I18N>慈濟醫療志業學習網</I18N>
                             </div>
                         </Link>
                     </MainComp>
 
                     <div className="flex flex-col items-end gap-2">
-                        {isLayoutXL && (
-                            <ul className="text-[#767676] fz-15px flex gap-4">
-                                <li>
-                                    <Link
-                                        href="#"
-                                        title={translate('農遊易遊網', lang)}
-                                        target="_blank"
-                                    >
-                                        <I18N>農遊易遊網</I18N>
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        href="#"
-                                        title="Leaflet Download"
-                                        target="_blank"
-                                    >
-                                        Leaflet Download
-                                    </Link>
-                                </li>
-                            </ul>
-                        )}
+                            {/* {isLayoutXL && (
+                                <ul className="text-[#767676] text-[15px] flex gap-4">
+                                    <li>
+                                        <Link
+                                            href="#"
+                                            title={translate('農遊易遊網', lang)}
+                                            target="_blank"
+                                        >
+                                            <I18N>農遊易遊網</I18N>
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            href="#"
+                                            title="Leaflet Download"
+                                            target="_blank"
+                                        >
+                                            Leaflet Download
+                                        </Link>
+                                    </li>
+                                </ul>
+                            )} */}
                         <MainNav />
                     </div>
                 </div>
             </header>
             <div
-                className="absolute-top-left w-1 h-1 z-99999 mt-0 mt-xl-10 pointer-events-none"
+                className="absolute top-0 left-0 w-1 h-1 z-[99999] mt-0 xl:mt-10 pointer-events-none"
                 ref={seonsorRef}
             ></div>
         </>

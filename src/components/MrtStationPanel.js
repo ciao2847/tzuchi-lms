@@ -12,15 +12,15 @@ const MrtStationPanel = ({ currentStationId, onChange }) => {
         )
     }, [currentStationId])
     return (
-        <div className="w-100">
+        <div className="w-full">
             <nav
-                className={`border-mrt-${currentLine.toLowerCase()} border-bottom border-width-4px`}
+                className={`border-mrt-${currentLine.toLowerCase()} border-b-4`}
             >
-                <ul className="d-flex">
+                <ul className="flex">
                     {MRT_LINE_DATA.map(({ id, title }) => (
-                        <li className="flex-fill" key={id}>
+                        <li className="flex-1" key={id}>
                             <button
-                                className={`w-100 py-1 fz-14px fz-md-16px text-white bg-mrt-${id.toLowerCase()}`}
+                                className={`w-full py-1 text-[14px] md:text-[16px] text-white bg-mrt-${id.toLowerCase()}`}
                                 onClick={() => {
                                     setCurrentLine(id)
                                 }}
@@ -35,16 +35,16 @@ const MrtStationPanel = ({ currentStationId, onChange }) => {
                 className="p-2"
                 style={!isLayoutMD ? { minHeight: 456 } : null}
             >
-                <ul className="row g-1">
+                <ul className="grid grid-cols-3 gap-1">
                     {MRT_STATION_DATA.filter(
                         (station) => station.line === currentLine
                     ).map(({ id, name }) => (
-                        <li className="col-4" key={id}>
+                        <li key={id}>
                             <button
                                 className={`${
                                     currentStationId === id &&
                                     `bg-mrt-${currentLine.toLowerCase()} text-white`
-                                } border-mrt-${currentLine.toLowerCase()} btn w-100 h-5 fz-15px`}
+                                } border-mrt-${currentLine.toLowerCase()} btn w-full h-5 text-[15px]`}
                                 onClick={() => onChange(id)}
                             >
                                 {name}

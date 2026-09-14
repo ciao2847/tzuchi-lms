@@ -40,12 +40,11 @@ const TreeNav = ({ className }) => {
             <ul className="grid grid-cols-2 md:grid-cols-4 justify-center items-center flex-wrap gap-[16px] md:gap-[24px]">
                 {CONFIG_TREE.map((item, i) => (
                     <li
-                        className={`${item.Color} ${item.actClassName} py-[8px] text-center text-[22px] font-bold border-[2px] rounded-pill border-solid trs-all`}
+                        className={`${item.Color} ${item.actClassName} py-[8px] text-center text-[22px] font-bold border-2 rounded-full border-solid transition-all duration-300`}
                         key={i}
                     >
                         <button
                             onClick={() => {
-                                className = 'd-block md:w-[100%] w-[100px]'
                                 const target = document.querySelector(
                                     //查找符合指定 CSS 選擇器的第一個元素
                                     `#anchor-${item.area}`

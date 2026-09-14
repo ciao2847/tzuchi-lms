@@ -14,15 +14,15 @@ const SubMenuBlk = ({ data, visible, onClose }) => {
     return (
         <div
             className={`${
-                isLayoutMD && (visible ? '' : 'op-0 pointer-events-none')
-            } sub-menu-blk p-2 mt-n12px trs-all`}
+                isLayoutMD && (visible ? '' : 'opacity-0 pointer-events-none')
+            } sub-menu-blk p-2 -mt-[12px] transition-all duration-300`}
             ref={ref}
         >
-            <ul className="row g-1">
+            <ul className="grid grid-cols-2 gap-1">
                 {data.map(({ id, name }) => (
-                    <li className="col-6" key={id}>
+                    <li key={id}>
                         <Link
-                            className="btn w-100 h-5 border-0 rounded fz-13px font-weight-bold"
+                            className="btn w-full h-5 border-0 rounded text-[13px] font-bold"
                             to={`/zh-tw/explore/c:${id}/`}
                             onClick={() => {
                                 onClose()

@@ -7,7 +7,7 @@ const SocialMediaCard = ({ data }) => {
 
     return (
         <AutoSwitchLink
-            className="d-block w-100 position-relative hover-thumb-scale"
+            className="block w-full relative hover-thumb-scale"
             href={url}
             title={title}
             isLinkOut={true}
@@ -16,7 +16,7 @@ const SocialMediaCard = ({ data }) => {
             <i
                 className={`icon icon-${
                     type === 1 ? 'instagram' : 'facebook-rounded'
-                } m-1 absolute-bottom-right text-white drop-shadow-black-50 fz-24px fz-md-32px fz-xl-40px`}
+                } m-1 absolute bottom-0 right-0 text-white drop-shadow-black-50 text-[24px] md:text-[32px] xl:text-[40px]`}
                 aria-hidden="true"
             ></i>
             <div className="sr-only">{title}</div>

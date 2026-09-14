@@ -5,14 +5,14 @@ const SouvenirsNav = ({ fruit, setSelectedFruit }) => {
         <div className="px-[24px] ">
             {/* className接收外面傳進來的樣式 */}
             {!!fruit > length && (
-                <ul className="flex items-center md:justify-center gap-[16px] mx-n3 pl-[16px] md:pl-[80px] xl:pl-[0px] text-center overflow-x-auto md:overflow-visible">
+                <ul className="flex items-center md:justify-center gap-[16px] -mx-3 pl-[16px] md:pl-[80px] xl:pl-0 text-center overflow-x-auto md:overflow-visible">
                     {fruit.map((item, i) => (
                         <li
-                            className="flex-shrink-0 py-[12px] px-[24px] border border-[#f0f0f0] rounded-pill cursor-pointer hover:bg-[#82be66] group trs-all"
+                            className="shrink-0 py-[12px] px-[24px] border border-[#f0f0f0] rounded-full cursor-pointer hover:bg-[#82be66] group transition-all duration-300"
                             key={i}
                             onClick={() => setSelectedFruit(item)}
                         >
-                            <div className="text-[18px] text-[#767676] group-hover:text-[#fff]">
+                            <div className="text-[18px] text-[#767676] group-hover:text-white">
                                 {item.name}
                             </div>
                         </li>

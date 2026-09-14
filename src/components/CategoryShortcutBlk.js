@@ -8,18 +8,18 @@ const CategoryShortcutBlk = ({ data, query }) => {
     const category = query.category?.split(',').map((c) => c * 1) || []
 
     return (
-        <ul className="scroll-x-blk d-flex flex-xl-wrap align-items-center h-xl-5 flex-fill flex-fill mx-n2 mx-md-n3 mx-xl-0 mb-12px pl-2 pl-md-3 mb-xl-0 pl-xl-0">
+        <ul className="overflow-x-auto flex xl:flex-wrap items-center xl:h-5 flex-1 -mx-2 md:-mx-3 xl:mx-0 mb-[12px] pl-2 md:pl-3 xl:mb-0 xl:pl-0">
             {data
                 ?.filter((cate) => cate.shortcut)
                 .map((cate) => {
                     const isAct = category?.find((c) => c === cate.id)
 
                     return (
-                        <li className="flex-shrink-0 mr-1" key={cate.id}>
+                        <li className="shrink-0 mr-1" key={cate.id}>
                             <button
                                 className={`${
-                                    isAct && 'btn-secondary'
-                                } btn h-5 px-2 rounded-pill`}
+                                    isAct ? 'btn-secondary' : ''
+                                } btn h-5 px-2 rounded-full`}
                                 onClick={() => {
                                     let categoryAfterMerge
                                     if (isAct) {

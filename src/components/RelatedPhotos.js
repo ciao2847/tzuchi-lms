@@ -8,9 +8,9 @@ const RelatedPhotos = ({ data, className }) => {
     const { setPhotoSwipeData } = useContext(PhotoSwipeContext)
     const lang = useLocale()
     return (
-        <ul className={`row g-1 ${className}`}>
+        <ul className={`grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-1 ${className}`}>
             {data.map((img, i) => (
-                <li className="col-6 col-md-4 col-xl-1of5" key={i}>
+                <li key={i}>
                     <a
                         className="hover-thumb-scale"
                         href={img.url}

@@ -12,12 +12,12 @@ const Captcha = forwardRef(({ className }, ref) => {
     }))
     return (
         <div
-            className={`flex-shrink-0 w-10 bg-placeholder rounded overflow-hidden position-relative ${className}`}
+            className={`shrink-0 w-10 bg-placeholder rounded overflow-hidden relative ${className || ''}`}
             style={{ height: 38 }}
         >
             {isClient ? (
                 <img
-                    className={`d-block fill-parent`}
+                    className="block w-full h-full object-cover"
                     src={`/api/zh-tw/util/captcha?${random}`}
                     alt="驗證碼圖片"
                     id="captcha-img"

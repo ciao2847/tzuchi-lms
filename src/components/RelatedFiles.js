@@ -4,9 +4,9 @@ import { useLocale } from 'hooks'
 const RelatedFiles = ({ data, className }) => {
     const lang = useLocale()
     return (
-        <ul className={`d-flex flex-wrap ${className}`}>
+        <ul className={`flex flex-wrap ${className}`}>
             {data.map((file, i) => (
-                <li className="mt-1 mr-2 mr-0-last" key={i}>
+                <li className="mt-1 mr-2 last:mr-0" key={i}>
                     <a
                         className="btn btn-white rounded"
                         href={file.url}
@@ -15,7 +15,7 @@ const RelatedFiles = ({ data, className }) => {
                         rel="noopener noreferrer"
                     >
                         <i
-                            className="icon icon-download mr-1 text-primary fz-16px"
+                            className="icon icon-download mr-1 text-primary text-[16px]"
                             aria-hidden="true"
                         ></i>
                         <span className="">

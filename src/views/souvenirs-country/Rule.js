@@ -211,7 +211,7 @@ const Rule = () => {
     return (
         <>
             <section className="py-10 px-[16px] lg:px-[0]">
-                <ul className="md:max-w-[600px] max-w-[400px] mx-auto grid md:grid-cols-4 grid-cols-3 md:gap-x-10 gap-x-4 gap-y-5 mb-md-5 mb-2">
+                <ul className="md:max-w-[600px] max-w-[400px] mx-auto grid md:grid-cols-4 grid-cols-3 md:gap-x-10 gap-x-4 gap-y-5 md:mb-5 mb-2">
                     {ANCHOR_CONFIG.map((config, i) => {
                         if (config.hideIn && config.hideIn.includes(lang)) {
                             return null
@@ -223,7 +223,7 @@ const Rule = () => {
                                 className="group flex flex-col items-center"
                             >
                                 <button
-                                    className="d-block md:w-[100%] w-[100px]"
+                                    className="block md:w-full w-[100px]"
                                     onClick={() => {
                                         document
                                             .querySelector(
@@ -236,7 +236,7 @@ const Rule = () => {
                                     key={i}
                                 >
                                     <div
-                                        className="md:h-[80px] h-[68px] w-100 mb-1 bg-info rounded-[8px] outline outline-[1px] outline-[#C4C4C4] group-hover:outline-[#82BE66] group-hover:outline-[2px] group-hover:drop-shadow-[0_0_4px_rgba(0,0,0,0.1)]"
+                                        className="md:h-[80px] h-[68px] w-full mb-1 bg-info rounded-[8px] outline outline-1 outline-[#C4C4C4] group-hover:outline-[#82BE66] group-hover:outline-2 group-hover:drop-shadow-[0_0_4px_rgba(0,0,0,0.1)]"
                                         style={{
                                             backgroundImage: `url(${process.env.BASE_PATH}/images/country/${config.img})`,
                                             backgroundSize: 'cover',
@@ -245,33 +245,33 @@ const Rule = () => {
                                         }}
                                     ></div>
                                 </button>
-                                <div className="h-8 w-100 px-1 block fz-20px text-center group-hover:text-[#2D7316]">
+                                <div className="h-8 w-full px-1 block text-[20px] text-center group-hover:text-[#2D7316]">
                                     <I18N>{config.title}</I18N>
                                 </div>
                             </li>
                         )
                     })}
                 </ul>
-                <p className="max-w-[880px] mx-auto fz-18px fz-md-20px px-3">
+                <p className="max-w-[880px] mx-auto text-[18px] md:text-[20px] px-3">
                     ※{' '}
                     <I18N>
                         將植物（水果、蔬菜等）帶到國外的方式，分為旅客攜帶、貨物、郵寄等3種，本網站介紹的是旅客攜帶的規定。
                     </I18N>
                 </p>
             </section>
-            <section className="py-10 px-2 px-md-0">
+            <section className="py-10 px-2 md:px-0">
                 <BlockTitle title="旅客攜帶規定" className="mx-auto" />
                 <ul className="max-w-[900px] mx-auto">
                     {rule.map((rule, i) => (
                         <li
                             key={i}
-                            className="relative px-md-5 py-md-3 p-2 mb-xl-4 mb-3"
+                            className="relative md:px-5 md:py-3 p-2 xl:mb-4 mb-3"
                         >
                             <AnchorFix id={`anchor-${rule.id}`} />
-                            <div className="border border-[0] border-b-[2px] border-dashed pb-2 mb-2">
-                                <div className="fz-24px fz-md-28px font-weight-bold inline-flex gap-2 mb-2">
+                            <div className="border-0 border-b-2 border-dashed pb-2 mb-2">
+                                <div className="text-[24px] md:text-[28px] font-bold inline-flex gap-2 mb-2">
                                     <span
-                                        className="h-[40px] w-[60px] bg-info rounded-[4px] outline outline-[1px] outline-[#C4C4C4] group-hover:outline-[#82BE66] group-hover:outline-[2px] group-hover:drop-shadow-[0_0_4px_rgba(0,0,0,0.1)]"
+                                        className="h-[40px] w-[60px] bg-info rounded-[4px] outline outline-1 outline-[#C4C4C4] group-hover:outline-[#82BE66] group-hover:outline-2 group-hover:drop-shadow-[0_0_4px_rgba(0,0,0,0.1)]"
                                         style={{
                                             backgroundImage: `url(${process.env.BASE_PATH}/images/country/${rule.img})`,
                                             backgroundSize: 'cover',
@@ -281,7 +281,7 @@ const Rule = () => {
                                     ></span>
                                     <I18N>{rule.title}</I18N>
                                 </div>
-                                <div className="fz-16px fz-md-20px text-[#2D7316] ">
+                                <div className="text-[16px] md:text-[20px] text-[#2D7316] ">
                                     <div>
                                         <I18N>{rule.content}</I18N>
                                     </div>
@@ -304,7 +304,7 @@ const Rule = () => {
                                                 <I18N>{rule.detail.title}</I18N>
                                             </span>
                                             <i
-                                                className={`icon icon-link-out ml-4px`}
+                                                className="icon icon-link-out ml-[4px]"
                                                 aria-hidden="true"
                                             ></i>
                                         </Link>
@@ -316,7 +316,7 @@ const Rule = () => {
                                     <li key={j} className="group">
                                         {fruit.url ? (
                                             <Link
-                                                className="inline-flex rounded-pill px-12px py-4px border group-hover:border-[#FBCE4C]"
+                                                className="inline-flex rounded-full px-[12px] py-[4px] border group-hover:border-[#FBCE4C]"
                                                 title={translate(
                                                     fruit.title,
                                                     lang
@@ -325,12 +325,12 @@ const Rule = () => {
                                             >
                                                 <I18N>{fruit.title}</I18N>
                                                 <i
-                                                    className={`icon icon-arrow-right ml-4px text-[#C4C4C4] group-hover:text-[#FBCE4C]`}
+                                                    className="icon icon-arrow-right ml-[4px] text-[#C4C4C4] group-hover:text-[#FBCE4C]"
                                                     aria-hidden="true"
                                                 ></i>
                                             </Link>
                                         ) : (
-                                            <div className="inline-flex rounded-pill px-12px py-4px border">
+                                            <div className="inline-flex rounded-full px-[12px] py-[4px] border">
                                                 <I18N>{fruit.title}</I18N>
                                             </div>
                                         )}
@@ -340,7 +340,7 @@ const Rule = () => {
                         </li>
                     ))}
                 </ul>
-                <p className="max-w-[880px] mx-auto fz-18px fz-md-20px pt-4 px-[16px] md:px-[40px] lg:px-[0] mb-10">
+                <p className="max-w-[880px] mx-auto text-[18px] md:text-[20px] pt-4 px-[16px] md:px-[40px] lg:px-0 mb-10">
                     <I18N>
                         若對於出境伴手禮有任何問題，請洽農業部動植物防疫檢疫署。
                     </I18N>

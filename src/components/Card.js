@@ -15,7 +15,7 @@ const Card = ({ data, isLinkOut }) => {
     const clx = !!tag && TAGS_CONFIG.find(({ id }) => tag.id === id).clx
     return (
         <Link
-            className="d-flex flex-md-column align-items-center w-100 text-default bg-white rounded hover:bg-primary/10 trs-all"
+            className="flex md:flex-col items-center w-full text-default bg-white rounded hover:bg-primary/10 transition-all duration-300"
             href={url}
             {...(isLinkOut
                 ? {
@@ -24,10 +24,10 @@ const Card = ({ data, isLinkOut }) => {
                   }
                 : null)}
         >
-            <div className="flex-shrink-0 w-[150px] md:w-[100%] position-relative">
+            <div className="shrink-0 w-[150px] md:w-full relative">
                 {!!tag && (
                     <div
-                        className={`${clx[0]} m-1 py-2px px-4px rounded-[4px] absolute-top-left z-10 fz-12px lh-initial text-white`}
+                        className={`${clx[0]} m-1 py-[2px] px-[4px] rounded-[4px] absolute top-0 left-0 z-10 text-[12px] leading-normal text-white`}
                     >
                         <I18N>{tag.title}</I18N>
                     </div>
@@ -39,12 +39,12 @@ const Card = ({ data, isLinkOut }) => {
                     ratio="4by3"
                 />
             </div>
-            <div className="d-flex flex-column flex-fill align-self-stretch w-100 miw-0 py-1 px-2 px-md-2 pt-xl-2">
-                <div className="w-100 mb-1 fz-18px fz-xl-22px line-clamp-2 font-weight-bold lh-initial">
+            <div className="flex flex-col flex-1 self-stretch w-full min-w-0 py-1 px-2 md:px-2 xl:pt-2">
+                <div className="w-full mb-1 text-[18px] xl:text-[22px] line-clamp-2 font-bold leading-normal">
                     {title || name}
                 </div>
                 {!!price && (
-                    <div className="mt-auto fz-15px fz-md-16px">
+                    <div className="mt-auto text-[15px] md:text-[16px]">
                         {formatPriceWithLocale(price, lang)}
                     </div>
                 )}

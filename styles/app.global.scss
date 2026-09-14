@@ -1,31 +1,8 @@
 @import 'reset';
-@import 'bootstrap/bootstrap-csii';
 @import 'mixin';
 @import 'iconfont';
 @import 'icon';
-@import 'button';
-@import 'bootstrap/utilities';
-@import 'util';
-@import 'text';
-@import 'bg';
-@import 'border';
-@import 'hover';
-@import 'row-gap';
-@import 'partial/header';
-@import 'partial/main-nav';
-@import 'partial/footer';
-@import 'partial/site-func-blk';
 
-//@import "flickity";
-
-/* * {
-  user-select: none;
-  -webkit-user-select: none;
-}
-input,textarea{
-    user-select: initial;
-  -webkit-user-select: initial;
-} */
 html {
     overflow-x: hidden;
 }
@@ -39,7 +16,7 @@ button,
 select {
     font-size: 1rem;
     background: none;
-    color: $body-color;
+    color: #383838;
     font-family: 'PingFang TC', 'Helvetica Neue', 'Helvetica', 'Segoe UI',
         Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Microsoft JhengHei', sans-serif;
 }
@@ -50,7 +27,7 @@ body {
     font-size: 100%;
     line-height: 1.5;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-    color: $body-color;
+    color: #383838;
 }
 .scroll-blk {
     overflow: hidden;
@@ -112,7 +89,7 @@ body {
             left: 0;
             width: 100%;
             height: 100%;
-            background: /*url(/public/images/not-found/miss.jpg) center no-repeat*/ $gray-200;
+            background: #ededed;
             background-size: cover;
         }
     }
@@ -214,7 +191,7 @@ body {
     .goog-te-gadget-icon {
         transform: scale(0.75) translateX(4px);
     }
-    @include media-breakpoint-up(xl) {
+    @media (min-width: 1200px) {
         .goog-te-gadget-simple {
             width: 120px;
             height: 40px;
@@ -226,7 +203,7 @@ body {
 }
 
 .goog-te-menu-frame {
-    @include media-breakpoint-up(xl) {
+    @media (min-width: 1200px) {
         top: 32px !important;
     }
 }
@@ -251,7 +228,7 @@ body {
     clip: rect(0, 0, 0, 0);
     border: 0;
     color: #fff;
-    background-color: $default;
+    background-color: #383838;
     &:focus {
         width: auto;
         height: auto;
@@ -309,7 +286,194 @@ button.gm-ui-hover-effect {
 }
 .sticky-nav {
     top: 56px;
-    @include media-breakpoint-up(xl) {
+    @media (min-width: 1200px) {
         top: 80px;
     }
+}
+
+.breadcrumbs {
+    .crumb:not(:last-child):after {
+        content: iconfont-char('arrow-right');
+        margin: 0 4px;
+        font-size: pxToRem(11px);
+        @extend %iconfont-base;
+    }
+}
+
+.option {
+    &:before {
+        content: '';
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 2px #d7d7d7 solid;
+        margin-right: 8px;
+        background: #fff;
+        flex: 0 0 20px;
+        transition: all 0.3s;
+        border-radius: 50%;
+        font-size: 0.8rem;
+        width: 20px;
+        height: 20px;
+        @include iconfont-base;
+    }
+
+    .hide-switch:checked + & {
+        border-color: #2C5A3E;
+
+        &:before {
+            border-color: #2C5A3E;
+            background-color: #2C5A3E;
+            color: #82be66;
+            content: iconfont-char('checked');
+        }
+    }
+
+    &:hover,
+    .hide-switch.focus-visible:focus + & {
+        color: #2C5A3E;
+    }
+}
+
+.hide-switch {
+    position: absolute;
+    height: 0;
+    width: 0;
+    opacity: 0;
+}
+
+.ipt {
+    min-height: 38px;
+    border: 1px #ced4da solid;
+    width: 100%;
+    -webkit-appearance: none;
+    color: #000;
+    font-size: 1rem;
+    line-height: 38px;
+    background-color: #fff;
+
+    &:focus {
+        outline: 0;
+        border-color: #2C5A3E !important;
+    }
+}
+
+.button-group {
+    --hover-border-color: #eee;
+    > .btn:not(:last-child):not(:first-child),
+    > .item:not(:last-child):not(:first-child) .btn {
+        border-radius: 0 !important;
+    }
+
+    > .btn:not(:first-child) {
+        margin-left: -1px !important;
+    }
+
+    > .btn:first-child,
+    > .item:first-child .btn {
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+    }
+
+    > .btn:last-child,
+    > .item:last-child .btn {
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+    }
+
+    .act + .act {
+        border-left: 1px #fff solid !important;
+    }
+}
+
+.react-datepicker-popper[data-placement^='top'] .react-datepicker__triangle,
+.react-datepicker-popper[data-placement^='bottom'] .react-datepicker__triangle {
+    margin-left: -22px !important;
+}
+
+.map-frame {
+    position: relative;
+    background-color: transparent;
+    &:not(.embed-responsive) {
+        display: block;
+        height: 0;
+        padding-bottom: 75%;
+        .thumb {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    }
+    &.contain {
+        .thumb {
+            background: top center no-repeat #efefef;
+            background-size: contain;
+            object-fit: contain;
+        }
+    }
+
+    .thumb {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        background: center center no-repeat;
+        background-size: cover;
+
+        &.lazyloaded {
+            opacity: 1;
+            -webkit-filter: none;
+            filter: none;
+            background-color: transparent;
+        }
+        &:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #e5e7eb;
+            background-size: cover;
+        }
+    }
+
+    &.bg-none {
+        .thumb {
+            background-color: transparent !important;
+        }
+    }
+
+    &.rounded-circle {
+        .thumb {
+            border-radius: 50% !important;
+        }
+    }
+}
+
+$mrt-map: (
+    'br': #c48c31,
+    'r': #e3002c,
+    'g': #008659,
+    'o': #f8b61c,
+    'bl': #0070bd,
+    'y': #ffdb00
+);
+
+@each $name, $color in $mrt-map {
+    .bg-mrt-#{$name} {
+        background-color: $color;
+    }
+    .border-mrt-#{$name} {
+        border-color: $color;
+    }
+}
+
+.rb{
+    border:#e3002c solid 1px;
 }

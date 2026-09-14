@@ -47,10 +47,10 @@ const FruitsInfo = ({ className, data }) => {
                         className={'mb-[24px] md:mb-[32px]'}
                     />
 
-                    <div className="md:[32px] pb-[16px] md:pb-[16px] text-left fz-20px text-[#2d7316] font-bold">
+                    <div className="pb-[16px] text-left text-[20px] text-[#2d7316] font-bold">
                         盛產期{formattedMonths}月
                     </div>
-                    <p className="text-justify fz-18px text-[#3c3c3c]">
+                    <p className="text-justify text-[18px] text-[#3c3c3c]">
                         {summary}
                     </p>
                 </div>
@@ -67,7 +67,7 @@ const FruitsInfo = ({ className, data }) => {
                         <ThumbFrame
                             src={cover.replace('640x480', '1920x1080')}
                             alt="農特選"
-                            className="thumb-frame embed-responsive embed-responsive-undefined mt-[32px] mx-auto relative  aspect-[1.5] rounded-2xl max-w-[880px] "
+                            className="mt-[32px] mx-auto relative aspect-[1.5] rounded-2xl max-w-[880px]"
                         />
                     </div>
                 </div>

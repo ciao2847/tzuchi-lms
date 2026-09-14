@@ -54,9 +54,9 @@ const TimeRangePicker = forwardRef(
             setEndTime('')
         }, [minTime, maxTime])
         return (
-            <div className={`d-flex align-items-center ${className}`}>
+            <div className={`flex items-center ${className}`}>
                 <select
-                    className="form-select w-20 h-5 pl-12px rounded fz-16px"
+                    className="form-select w-20 h-5 pl-[12px] rounded text-[16px]"
                     value={startTime}
                     onChange={(e) => {
                         setStartTime(e.target.value)
@@ -69,9 +69,9 @@ const TimeRangePicker = forwardRef(
                         </option>
                     ))}
                 </select>
-                <span className="mx-2 fz-20px font-weight-bold">~</span>
+                <span className="mx-2 text-[20px] font-bold">~</span>
                 <select
-                    className="form-select w-20 h-5 pl-12px rounded fz-16px"
+                    className="form-select w-20 h-5 pl-[12px] rounded text-[16px]"
                     value={endTime}
                     onChange={(e) => {
                         setEndTime(e.target.value)

@@ -19,10 +19,10 @@ const AddressInputBlk = forwardRef(
             }
         }, [city, district, zipcode, address])
         return (
-            <div className={`row ${className}`}>
-                <div className="col-6 col-md-3">
+            <div className={`grid grid-cols-12 gap-2 ${className || ''}`}>
+                <div className="col-span-6 md:col-span-3">
                     <select
-                        className="form-select px-1 border-gray-400 w-100 h-5"
+                        className="form-select px-1 border border-gray-400 rounded w-full h-5"
                         value={city}
                         onChange={(e) => {
                             handleCityChange(e.target.value)
@@ -34,9 +34,9 @@ const AddressInputBlk = forwardRef(
                         })}
                     </select>
                 </div>
-                <div className="col-6 col-md-3">
+                <div className="col-span-6 md:col-span-3">
                     <select
-                        className="form-select px-1 border-gray-400 w-100 h-5"
+                        className="form-select px-1 border border-gray-400 rounded w-full h-5"
                         value={district}
                         onChange={(e) => {
                             handleDistrictChange(e.target.value)
@@ -49,9 +49,9 @@ const AddressInputBlk = forwardRef(
                     </select>
                 </div>
                 {!noAddress && (
-                    <div className="col-12 col-md-6 mt-2 mt-md-0">
+                    <div className="col-span-12 md:col-span-6">
                         <input
-                            className={`ipt d-block px-1 rounded fz-16px`}
+                            className={`ipt block px-1 rounded text-[16px]`}
                             type="text"
                             placeholder={`請輸入地址`}
                             value={address}
