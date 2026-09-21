@@ -1,13 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const headerThemeSlice = createSlice({
-	name: 'tours',
-	initialState: 'transparent',
-	reducers: {
-		changeHeaderTheme: (state, action) => {
-			return action.payload
-		}
-	}
+    name: 'headerTheme',
+    initialState: 'clear',
+    reducers: {
+        changeHeaderTheme: (state, action) => action.payload
+    }
 })
 
 export const { changeHeaderTheme } = headerThemeSlice.actions

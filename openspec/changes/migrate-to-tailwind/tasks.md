@@ -24,7 +24,7 @@
 - [x] 5.1 重構首頁頁面：將 `src/views/home/index.js`、`FruitCalendar.js`、`FruitTheme.js` 全面改寫為 Tailwind classes，驗證首頁主橫幅、水果月曆與推薦區塊排版
 - [x] 5.2 重構採果頁面：改寫 `src/views/pick/`（`index.js`、`SearchList.js`、`Notice.js`、`Introduction.js`），驗證條件搜尋列表與介紹正常顯示
 - [x] 5.3 重構時令水果頁面：改寫 `src/views/season-fruits/` 與 `src/views/season-fruit/` 所有路由組件，驗證水果卡片網格與詳細資訊頁面
-- [x] 5.4 重構伴手禮、老樹與 404 頁面：改寫 `src/views/souvenirs*`、`src/views/tree*`、`src/views/not-found/`，驗證所有次級頁面視覺一致
+- [x] 5.4 重構伴手禮、老樹與 404 頁面：改寫 `src/views/edu-service*`、`src/views/tree*`、`src/views/not-found/`，驗證所有次級頁面視覺一致
 
 ## 6. Legacy SCSS Deprecation & Build Verification
 

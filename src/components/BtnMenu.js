@@ -1,14 +1,13 @@
 import React from 'react'
 import I18N from 'components/I18N'
 
-const BtnMenu = ({ className = '', isOpen, toggle }) => {
+const BtnMenu = ({ className = '', controlsId, isOpen, toggle }) => {
     return (
         <button
             type="button"
-            className={`btn-open-menu inline-flex w-8 h-8 shrink-0 top-4 items-center justify-center border-0 bg-transparent p-0 transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-primary ${
-                isOpen ? 'text-main' : 'text-primary'
-            } ${className}`}
-            aria-expanded={isOpen.toString()}
+            className={`btn-open-menu inline-flex w-8 h-8 shrink-0 top-4 items-center justify-center border-0 bg-transparent p-0 text-primary transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-primary ${className}`}
+            aria-controls={controlsId}
+            aria-expanded={isOpen}
             onClick={() => {
                 toggle((prev) => !prev)
             }}

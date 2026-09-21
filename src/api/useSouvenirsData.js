@@ -6,7 +6,7 @@ const useSouvenirsData = ({ lang }) => {
     const [fruit, setFruit] = useState(null)
     const [county, setCounty] = useState(null)
     useEffect(() => {
-        fetch('/_api/zh-tw/souvenirs', {
+        fetch('/_api/zh-tw/edu-service', {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }

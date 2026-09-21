@@ -117,7 +117,7 @@ const CategoryVideoSection = ({ categories = CATEGORY_VIDEO_CONFIG }) => {
             className="bg-[#e4f1f3] px-4 py-10 md:px-6 md:py-20 xl:px-10 xl:py-28"
             aria-label="類別影片"
         >
-            <div className="mx-auto w-full max-w-[1120px]">
+            <div className="mx-auto w-full xl:max-w-[1200px] 2xl:max-w-[1400px]">
                 <ul
                     role="tablist"
                     aria-label="影片類別"
@@ -169,7 +169,7 @@ const CategoryVideoSection = ({ categories = CATEGORY_VIDEO_CONFIG }) => {
                         {videos.map(({ id, ...video }) => (
                             <li
                                 key={id}
-                                className="w-[160px] min-w-0 max-w-full shrink-0 snap-start md:w-[260px] xl:w-auto"
+                                className="w-[160px] min-w-0 max-w-full shrink-0 snap-start last:mr-4 md:w-[260px] md:last:mr-6 xl:w-auto xl:last:mr-0"
                             >
                                 <VideoCard
                                     video={video}

@@ -926,6 +926,24 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.12.tgz#afefe785949f16ac4cdd1e695935a321572dd56a"
   integrity sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==
 
+"@full-ui/headless-calendar@7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@full-ui/headless-calendar/-/headless-calendar-7.1.0.tgz#8efd95c2f2650d5444c7d203e8fc3c3b8dd50e3e"
+  integrity sha512-T54tSUik/ia9Jj4xduFHv1p98eVBgLnE33Q6qhpg+WWkqKCLBCbtVyMcTPPIOP5jjTV2MbtjrRvRt1RLSryGHA==
+
+"@fullcalendar/core@7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@fullcalendar/core/-/core-7.1.0.tgz#72af83347d9191997248e72e8b5569f39b4984ab"
+  integrity sha512-a+ABP7zQpPWpwPT8EsOdShpeOVrJyx/XYStqERd8ibld/FLi/dzpd95r7w3RIdFqFm9iUv0gdGvBshSlI/dbPw==
+
+"@fullcalendar/react@7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@fullcalendar/react/-/react-7.1.0.tgz#cd6d94eabeb37dd37ed5b913ec81883acfda9c3d"
+  integrity sha512-FI5hTnbiVLcW+/ZnPKteBgLpK/ldyTaSDWn9A3ri3vLToAbGt49JqRhQ9CMpH+nhmuNX4ihnCQcVzoqVCsIbBw==
+  dependencies:
+    "@full-ui/headless-calendar" "7.1.0"
+    "@fullcalendar/core" "7.1.0"
+
 "@jest/schemas@^29.6.3":
   version "29.6.3"
   resolved "https://registry.yarnpkg.com/@jest/schemas/-/schemas-29.6.3.tgz#430b5ce8a4e0044a7e3819663305a7b3091c8e03"
@@ -5130,6 +5148,24 @@ tapable@^2.0.0, tapable@^2.2.1, tapable@^2.3.0, tapable@^2.3.3:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/tapable/-/tapable-2.3.3.tgz#5da7c9992c46038221267985ab28421a8879f160"
   integrity sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==
+
+temporal-polyfill@^1.0.1:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/temporal-polyfill/-/temporal-polyfill-1.0.5.tgz#e24905f179e3c78de5a3422221d4aa1571eb8d88"
+  integrity sha512-+H/mmY74i6wXCMcjIhGuSnODcyZnc4eois2myhOyX0UqRAKNXQY5m9iB1en5jQ/n4SXtjLXo1ElBI5bmn8tZwQ==
+  dependencies:
+    temporal-spec "1.0.1"
+    temporal-utils "1.0.3"
+
+temporal-spec@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/temporal-spec/-/temporal-spec-1.0.1.tgz#5679ce2dd0089865afe80e0a8bd22a9033c16717"
+  integrity sha512-wxVoanmDeavXie1vu2JaQ3WIc3JZnWAOYFBsJyATaVsXsycKYUflGsyBmrRSnoCpZJpwPyr38VpgSUlQ8CbFxg==
+
+temporal-utils@1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/temporal-utils/-/temporal-utils-1.0.3.tgz#dbbe3e14adaa81fcf811d0f7380b30a9c6a2ada0"
+  integrity sha512-9jbTSX3HvkOWvDpNpFzwX/d1mkCrgQgwLmVTOEiuocZGKHsrQJtttGZFmybJ2zYP5zCSZuU5ZyeS8+eOEPABiQ==
 
 terser@^5.10.0, terser@^5.31.1:
   version "5.49.0"

@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 const BtnBackTop = () => {
     const [isBtnTopShow, toggleBtnTop] = useState(false)
     const seonsorRef = useRef(null)
+    const { pathname } = useLocation()
+    const isPickDetailPage = /^\/pick\/[^/]+$/.test(pathname)
     useEffect(() => {
         const sensor = seonsorRef.current
         const observer = new IntersectionObserver((entries, observer) => {
@@ -19,7 +22,11 @@ const BtnBackTop = () => {
         <>
             <button
                 className={`${
-                    !isBtnTopShow ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'
+                    !isBtnTopShow
+                        ? 'opacity-0 pointer-events-none'
+                        : 'opacity-100 pointer-events-auto'
+                } ${
+                    isPickDetailPage ? 'max-xl:hidden' : ''
                 } fixed bottom-5 right-2 btn flex flex-col items-center justify-center w-12 h-12 z-[99999] rounded-full transition-all duration-300 shadow border-0`}
                 onClick={() => {
                     document

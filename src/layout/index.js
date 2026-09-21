@@ -43,27 +43,18 @@ const Layout = ({ children }) => {
                 >
                     跳到主要內容區塊
                 </a>
-                <a
-                    className="absolute-top-left text-hide z-2000 pointer-events-none"
-                    title="定位點"
+                <span
+                    className="pointer-events-none absolute left-0 top-0 h-px w-px overflow-hidden"
                     id="top"
-                    tabIndex="-1"
-                >
-                    定位點
-                </a>
+                    aria-hidden="true"
+                />
                 {!isEmbed && <Header />}
-                <a
-                    className="absolute-top-left text-hide z-2000 pointer-events-none"
-                    title="主要內容區塊"
+                <main
                     id="main-content"
                     tabIndex="-1"
-                >
-                    主要內容區塊
-                </a>
-                <main
                     className={`${!isProd ? 'staging-site' : ''} ${
                         isEmbed ? 'pt-2' : 'pt-0'
-                    } min-h-[80vh] mx-auto relative`}
+                    } relative mx-auto min-h-[80vh] scroll-mt-[56px] focus:outline-none xl:scroll-mt-[80px]`}
                 >
                     {children}
                 </main>

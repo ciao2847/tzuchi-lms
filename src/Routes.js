@@ -5,14 +5,11 @@ import { Navigate, Outlet, useRoutes } from 'react-router-dom'
 
 const Home = lazy(() => import('views/home'))
 const NotFound = lazy(() => import('views/not-found'))
-const SeasonFruits = lazy(() => import('views/season-fruits'))
-const SeasonFruit = lazy(() => import('views/season-fruit'))
 const Pick = lazy(() => import('views/pick'))
-const Tree = lazy(() => import('views/tree'))
-const TreeInfo = lazy(() => import('views/tree-info'))
-const Souvenirs = lazy(() => import('views/souvenirs'))
-const Souvenir = lazy(() => import('views/souvenir'))
-const SouvenirsCountry = lazy(() => import('views/souvenirs-country'))
+const PickDetail = lazy(() => import('views/pick-detail'))
+const Calendar = lazy(() => import('views/calendar'))
+const ExternalTraining = lazy(() => import('views/external-training'))
+const MenuPage = lazy(() => import('views/menu-page'))
 
 const routes = [
     {
@@ -35,40 +32,32 @@ const routes = [
                 element: <Navigate to="/404" replace={true} />
             },
             {
-                path: '/season-fruits', //預設沒有季節，判斷季節
-                element: <SeasonFruits />
-            },
-            {
-                path: '/season-fruits/:season',
-                element: <SeasonFruits />
-            },
-            {
-                path: '/season-fruit/:id', //水果的內頁，送 id 以便 ajax 抓取資訊
-                element: <SeasonFruit />
-            },
-            {
                 path: '/pick',
                 element: <Pick />
             },
             {
+                path: '/pick/:id',
+                element: <PickDetail />
+            },
+            {
+                path: '/calendar',
+                element: <Calendar />
+            },
+            {
+                path: '/external-training-data',
+                element: <ExternalTraining />
+            },
+            {
                 path: '/tree',
-                element: <Tree />
+                element: <MenuPage />
             },
             {
-                path: '/tree-info/:id', //果樹的內頁，送 id 以便 ajax 抓取資訊
-                element: <TreeInfo />
+                path: '/edu-service',
+                element: <MenuPage />
             },
             {
-                path: '/souvenirs',
-                element: <Souvenirs />
-            },
-            {
-                path: '/souvenir/:id',
-                element: <Souvenir />
-            },
-            {
-                path: '/souvenirs-country',
-                element: <SouvenirsCountry />
+                path: '/edu-service-country',
+                element: <MenuPage />
             }
         ]
     }

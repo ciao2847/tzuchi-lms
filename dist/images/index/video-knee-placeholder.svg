@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="405" viewBox="0 0 720 405" fill="none">
+  <defs>
+    <radialGradient id="glow">
+      <stop stop-color="#fff"/>
+      <stop offset=".35" stop-color="#ff6253"/>
+      <stop offset="1" stop-color="#ff6253" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <path fill="#071c62" d="M0 0h720v405H0z"/>
+  <path d="m590-10-42 155 50 54-22 144" stroke="#a8c8ec" stroke-width="50" stroke-linecap="round"/>
+  <circle cx="560" cy="190" r="155" fill="url(#glow)"/>
+  <g font-family="Arial, 'Microsoft JhengHei', sans-serif" font-weight="700">
+    <text x="40" y="105" fill="#fff" font-size="64">退化性</text>
+    <text x="40" y="190" fill="#fff" font-size="64">關節炎</text>
+    <text x="38" y="330" stroke="#fff" stroke-width="5" paint-order="stroke" fill="#f9793a" font-size="54">放射抗發炎治療</text>
+  </g>
+</svg>

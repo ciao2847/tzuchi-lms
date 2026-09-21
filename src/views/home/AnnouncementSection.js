@@ -9,7 +9,7 @@ const ANNOUNCEMENT_CONFIG = [
         title: '114年全院通識課程\n學分認列開始申請',
         description:
             '即日起至 2025/06/30 止，請同仁至學習平台完成通識課程學分認列申請，逾期將不受理。',
-        image: `${process.env.BASE_PATH}/images/index/announcement-placeholder.svg`,
+        image: 'https://picsum.photos/200/300',
         link: 'https://nlms.tzuchi.com.tw/tzuchi/',
         isLinkOut: true
     },
@@ -19,7 +19,7 @@ const ANNOUNCEMENT_CONFIG = [
         title: '學習平台使用說明\n常見問題與操作指引',
         description:
             '登入、課程操作與學習紀錄相關問題，請參考學習平台常見問題。',
-        image: `${process.env.BASE_PATH}/images/index/announcement-placeholder.svg`,
+        image: 'https://picsum.photos/200/300',
         link: 'https://cms.tzuchi.com.tw/dl/2024/elearning_qa/index.html',
         isLinkOut: true
     }

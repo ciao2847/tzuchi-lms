@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="405" viewBox="0 0 720 405" fill="none">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="720" y2="320" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/>
+      <stop offset="1" stop-color="#d7e8f0"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#background)" d="M0 0h720v405H0z"/>
+  <g font-family="Arial, 'Microsoft JhengHei', sans-serif" font-weight="700" text-anchor="middle" fill="#263342">
+    <text x="360" y="85" font-size="44">醫療事故之刑事責任分析</text>
+    <text x="360" y="122" font-size="18">醫療專業實務與專業交流</text>
+  </g>
+  <g transform="translate(104 210) rotate(-22)" fill="#725340">
+    <rect x="55" y="-7" width="28" height="137" rx="8"/>
+    <rect x="10" y="-22" width="122" height="45" rx="10"/>
+    <rect y="-30" width="23" height="61" rx="8"/>
+    <rect x="119" y="-30" width="23" height="61" rx="8"/>
+  </g>
+  <ellipse cx="175" cy="316" rx="110" ry="16" fill="#334755" fill-opacity=".15"/>
+  <path d="M333 264c71-80 143-61 233-125" stroke="#fff" stroke-width="26" stroke-linecap="round"/>
+  <path fill="#0d2b46" d="M0 328h720v77H0z"/>
+  <text x="360" y="375" text-anchor="middle" fill="#f0c775" font-family="Arial, 'Microsoft JhengHei', sans-serif" font-size="24">學術演講｜專業實務分享</text>
+</svg>

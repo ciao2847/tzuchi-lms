@@ -18,7 +18,8 @@ module.exports = {
                 danger: '#dd0025',
                 light: '#f9fbff',
                 dark: '#333333',
-                default: '#333333'
+                default: '#333333',
+                blue: '#1769d2'
             },
             dropShadow: {
                 DEFAULT: '0 0 4px rgba(0, 0, 0, 0.25)'
@@ -26,6 +27,7 @@ module.exports = {
             borderRadius: { DEFAULT: '8px' },
             screens: {
                 xl: '1200px',
+                '2xl': '1400px',
                 xxl: '1600px'
             },
             rotate: { 1: '20deg' }

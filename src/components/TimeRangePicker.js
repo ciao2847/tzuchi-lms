@@ -1,4 +1,5 @@
 import React, { useState, useEffect, forwardRef } from 'react'
+import Select from 'components/Select'
 // eslint-disable-next-line react/display-name
 const TimeRangePicker = forwardRef(
     (
@@ -54,36 +55,42 @@ const TimeRangePicker = forwardRef(
             setEndTime('')
         }, [minTime, maxTime])
         return (
-            <div className={`flex items-center ${className}`}>
-                <select
-                    className="form-select w-20 h-5 pl-[12px] rounded text-[16px]"
+            <div
+                className={`flex w-full min-w-0 items-center ${
+                    className || ''
+                }`}
+            >
+                <Select
+                    wrapperClassName="min-w-0 flex-1"
                     value={startTime}
+                    aria-label="開始時間"
                     onChange={(e) => {
                         setStartTime(e.target.value)
                     }}
                 >
-                    <option value="">請選擇開始時間</option>
+                    <option value="">開始時間</option>
                     {timesArr.slice(0, timesArr.length - 1).map((time, i) => (
                         <option value={time.value} key={i}>
                             {time.label}
                         </option>
                     ))}
-                </select>
-                <span className="mx-2 text-[20px] font-bold">~</span>
-                <select
-                    className="form-select w-20 h-5 pl-[12px] rounded text-[16px]"
+                </Select>
+                <span className="mx-2 shrink-0 text-[20px] font-bold">~</span>
+                <Select
+                    wrapperClassName="min-w-0 flex-1"
                     value={endTime}
+                    aria-label="結束時間"
                     onChange={(e) => {
                         setEndTime(e.target.value)
                     }}
                 >
-                    <option value="">請選擇結束時間</option>
+                    <option value="">結束時間</option>
                     {timesArr.slice(1).map((time, i) => (
                         <option value={time.value} key={i}>
                             {time.label}
                         </option>
                     ))}
-                </select>
+                </Select>
             </div>
         )
     }

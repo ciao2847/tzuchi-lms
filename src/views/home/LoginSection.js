@@ -21,6 +21,7 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
 
     return (
         <div
+            id="login"
             className={`flex min-w-0 flex-col justify-center rounded-[20px] border border-solid border-gray-200 bg-white/95 p-6 shadow-sm lg:min-h-[404px] ${className}`}
         >
             <div className="mb-6 text-center text-primary">
@@ -66,7 +67,7 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                         className="mb-2 block text-[16px] font-medium leading-5 text-primary"
                     >
                         密碼
-                        <span className="ml-1 text-[13px]">
+                        <span className="ml-1 text-[12px] md:text-[13px]">
                             （密碼已重置，請使用 lms＋帳號後 6 碼登入）
                         </span>
                     </label>

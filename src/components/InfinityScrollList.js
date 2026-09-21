@@ -1,9 +1,72 @@
-import React, { useState, useEffect, useRef, Suspense } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import React, {
+    Suspense,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState
+} from 'react'
 import Spinner from 'components/Spinner'
 import I18N from 'components/I18N'
 import useQueryObject from 'hooks/useQueryObject'
-import { makeParams, distance } from 'constants/utils'
+import { distance } from 'constants/utils'
+
+const EMPTY_DATA = []
+
+const sortData = ({ data, filterOptions, sortValue, sortby }) => {
+    let sortedData = [...data]
+    let latlng
+
+    if (filterOptions && sortby?.toLowerCase() === 'hits') {
+        sortedData = [
+            ...sortedData
+                .filter(({ priority }) => priority === 0)
+                .sort(
+                    ({ priority: priorityA }, { priority: priorityB }) =>
+                        priorityA - priorityB
+                ),
+            ...sortedData
+                .filter(({ priority }) => priority !== 0)
+                .sort(({ hits: hitsA }, { hits: hitsB }) => hitsB - hitsA)
+        ]
+    }
+
+    if (filterOptions && sortby?.toLowerCase() === 'new') {
+        sortedData.sort(
+            ({ date_created: dateA }, { date_created: dateB }) =>
+                new Date(dateB).getTime() - new Date(dateA).getTime()
+        )
+    }
+
+    if (
+        sortValue &&
+        (sortby?.toLowerCase() === 'near-attraction' ||
+            sortby?.toLowerCase() === 'near-transport')
+    ) {
+        latlng = sortValue.split(',')
+        sortedData.sort(
+            ({ lat: latA, lng: lngA }, { lat: latB, lng: lngB }) =>
+                distance(latA, lngA, latlng[0] * 1, latlng[1] * 1) -
+                distance(latB, lngB, latlng[0] * 1, latlng[1] * 1)
+        )
+    }
+
+    if (
+        sortby?.toLowerCase() === 'price' &&
+        (sortValue === 'desc' || sortValue === 'asc')
+    ) {
+        sortedData = [
+            ...sortedData
+                .filter(({ price }) => !!price)
+                .sort(({ price: priceA }, { price: priceB }) =>
+                    sortValue === 'asc' ? priceA - priceB : priceB - priceA
+                ),
+            ...sortedData.filter(({ price }) => !price)
+        ]
+    }
+
+    return sortedData
+}
 
 const InfinityScrollList = ({
     data,
@@ -11,152 +74,143 @@ const InfinityScrollList = ({
     perScrollNums = 24,
     filterOptions,
     component,
-    className
+    className = '',
+    completeLabel = '',
+    loadingLabel = '正在載入更多資料',
+    resetKey = '',
+    rootMargin = '0px 0px 160px 0px',
+    showResultCount = true
 }) => {
-    const DEFAULT_ITME_NUMS = perScrollNums
-    const [dataDisplay, setDataDisplay] = useState(null)
-    const [currentIdx, setCurrentIdx] = useState(initItemNums)
-    const [isLoading, toggleLoading] = useState(false)
-    const [searchParams, setSearchParams] = useSearchParams()
-    const loadingRef = useRef(null)
     const query = useQueryObject()
     const sortby = query.sortby || 'hits'
     const sortValue = query.sortValue || ''
     const ListComponent = component
-    const observer = new IntersectionObserver((entries, observer) => {
-        toggleLoading(entries[0].isIntersecting)
-    })
+    const normalizedData = Array.isArray(data) ? data : EMPTY_DATA
+    const dataDisplay = useMemo(
+        () =>
+            sortData({
+                data: normalizedData,
+                filterOptions,
+                sortValue,
+                sortby
+            }),
+        [filterOptions, normalizedData, sortValue, sortby]
+    )
+    const { length: dataCount } = dataDisplay
+    const [currentIdx, setCurrentIdx] = useState(() =>
+        Math.min(initItemNums, dataCount)
+    )
+    const [isLoading, setIsLoading] = useState(false)
+    const loadingRef = useRef(null)
+    const loadingLockRef = useRef(false)
+    const timerRef = useRef(null)
+    const hasMore = currentIdx < dataCount
 
-    useEffect(() => {
-        setDataDisplay(data)
-    }, [data])
-    useEffect(() => {
-        if (loadingRef.current) {
-            observer.observe(loadingRef.current)
-        }
-        return () => {
-            observer.disconnect()
-        }
-    }, [dataDisplay, loadingRef.current])
-    useEffect(() => {
-        if (
-            data &&
-            isLoading &&
-            dataDisplay &&
-            currentIdx < dataDisplay.length
-        ) {
-            setCurrentIdx(currentIdx + DEFAULT_ITME_NUMS)
-            observer.unobserve(loadingRef.current)
-            observer.observe(loadingRef.current)
-        }
-    }, [isLoading, data, dataDisplay])
-    const onSort = (sortQuery) => {
-        const queryResult = { ...query }
-        delete queryResult.sortby
-        delete queryResult.sortValue
-        setSearchParams(makeParams(queryResult, sortQuery))
-    }
-    useEffect(() => {
-        let dataAfterSort = [...data]
-        let latlng
-        if (filterOptions && sortby?.toLowerCase() === 'hits') {
-            dataAfterSort = [
-                ...dataAfterSort
-                    .filter((spot) => spot.priority === 0)
-                    .sort((spotA, spotB) => spotA.priority - spotB.priority),
-                ...dataAfterSort
-                    .filter((spot) => spot.priority !== 0)
-                    .sort((spotA, spotB) => spotB.hits - spotA.hits)
-            ]
-        }
-        if (filterOptions && sortby?.toLowerCase() === 'new') {
-            dataAfterSort = [
-                ...dataAfterSort.sort(
-                    (a, b) =>
-                        new Date(b.date_created).getTime() -
-                        new Date(a.date_created).getTime()
-                )
-            ]
-        }
+    const clearLoadingTimer = useCallback(() => {
+        if (timerRef.current === null) return
 
-        if (
-            sortValue &&
-            (sortby?.toLowerCase() === 'near-attraction' ||
-                sortby?.toLowerCase() === 'near-transport')
-        ) {
-            latlng = sortValue.split(',')
+        window.clearTimeout(timerRef.current)
+        timerRef.current = null
+    }, [])
 
-            dataAfterSort.sort(
-                (spotA, spotB) =>
-                    distance(
-                        spotA.lat,
-                        spotA.lng,
-                        latlng[0] * 1,
-                        latlng[1] * 1
-                    ) -
-                    distance(spotB.lat, spotB.lng, latlng[0] * 1, latlng[1] * 1)
+    const loadMore = useCallback(() => {
+        if (!hasMore || loadingLockRef.current) return
+
+        loadingLockRef.current = true
+        setIsLoading(true)
+        timerRef.current = window.setTimeout(() => {
+            setCurrentIdx((currentValue) =>
+                Math.min(currentValue + perScrollNums, dataCount)
             )
-        }
+            loadingLockRef.current = false
+            timerRef.current = null
+            setIsLoading(false)
+        }, 150)
+    }, [dataCount, hasMore, perScrollNums])
+
+    useEffect(() => {
+        clearLoadingTimer()
+        loadingLockRef.current = false
+        setIsLoading(false)
+        setCurrentIdx(Math.min(initItemNums, dataCount))
+    }, [clearLoadingTimer, dataCount, dataDisplay, initItemNums, resetKey])
+
+    useEffect(() => {
+        const target = loadingRef.current
 
         if (
-            sortby?.toLowerCase() === 'price' &&
-            (sortValue === 'desc' || sortValue === 'asc')
+            !target ||
+            !hasMore ||
+            typeof IntersectionObserver === 'undefined'
         ) {
-            dataAfterSort = [
-                ...dataAfterSort
-                    .filter((spot) => !!spot.price)
-                    .sort((a, b) =>
-                        sortValue === 'asc'
-                            ? a.price - b.price
-                            : b.price - a.price
-                    ),
-                ...dataAfterSort.filter((spot) => !spot.price)
-            ]
+            return undefined
         }
-        setDataDisplay(dataAfterSort)
-    }, [data, sortby, sortValue])
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) loadMore()
+            },
+            { rootMargin }
+        )
+
+        observer.observe(target)
+
+        return () => observer.disconnect()
+    }, [currentIdx, hasMore, loadMore, rootMargin])
+
+    useEffect(
+        () => () => {
+            clearLoadingTimer()
+            loadingLockRef.current = false
+        },
+        [clearLoadingTimer]
+    )
+
     return (
         <div className={className}>
-            {!!dataDisplay?.length && (
-                <>
-                    <div className="mt-[20px] pb-1 mb-2 md:mb-[20px] text-info border-b">
-                        <p className="text-[14px]">
-                            <I18N
-                                params={[dataDisplay.length]}
-                            >{`共有 {0} 個結果`}</I18N>
-                        </p>
-                    </div>
-                    <Suspense fallback={<div></div>}>
-                        {/*filterOptions && (
-                            <AdvFilterSortBlk
-                                options={filterOptions}
-                                onSort={onSort}
-                            />
-                        )*/}
-                        <ListComponent
-                            data={dataDisplay}
-                            //category={category}
-                            currentIdx={currentIdx}
-                        />
-                    </Suspense>
-                </>
+            {showResultCount && dataCount > 0 && (
+                <div className="mb-2 mt-5 border-b pb-1 text-info md:mb-5">
+                    <p className="text-[14px]">
+                        <I18N params={[dataCount]}>{`共有 {0} 個結果`}</I18N>
+                    </p>
+                </div>
             )}
-            {dataDisplay && !dataDisplay.length && (
-                <div className="py-10 text-info text-center text-[18px]">
+
+            {dataCount > 0 && (
+                <Suspense fallback={<div></div>}>
+                    <ListComponent data={dataDisplay} currentIdx={currentIdx} />
+                </Suspense>
+            )}
+
+            {dataCount === 0 && (
+                <div className="py-10 text-center text-[18px] text-info">
                     <I18N>暫無資料</I18N>
                 </div>
             )}
-            {
-                /*needInfinityScroll &&*/
-                data && currentIdx < dataDisplay?.length && (
-                    <div
-                        className={`flex justify-center mt-5`}
+
+            {hasMore && (
+                <div className="mt-5 flex min-h-10 justify-center">
+                    <button
                         ref={loadingRef}
+                        type="button"
+                        className="inline-flex min-h-10 items-center justify-center rounded-[6px] px-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+                        aria-label={loadingLabel}
+                        disabled={isLoading}
+                        onClick={loadMore}
                     >
                         <Spinner size={16} />
-                    </div>
-                )
-            }
+                    </button>
+                </div>
+            )}
+
+            {!hasMore && dataCount > 0 && completeLabel && (
+                <p
+                    className="my-5 text-center text-[12px] font-medium text-[#7c8da2] md:my-8 md:text-[13px]"
+                    role="status"
+                >
+                    <I18N>{completeLabel}</I18N>
+                </p>
+            )}
         </div>
     )
 }

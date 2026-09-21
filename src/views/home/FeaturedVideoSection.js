@@ -75,7 +75,7 @@ const FeaturedVideoSection = ({ videos = FEATURED_VIDEO_CONFIG }) => {
             className="bg-light px-4 py-10 md:px-6 md:py-20 xl:px-10 xl:py-32"
             aria-labelledby={`${sectionId}-title`}
         >
-            <div className="mx-auto w-full max-w-[1120px]">
+            <div className="mx-auto w-full xl:max-w-[1200px] 2xl:max-w-[1400px]">
                 <h2
                     id={`${sectionId}-title`}
                     className="mb-6 text-center text-[24px] font-bold text-primary md:mb-8 md:text-[28px] xl:text-[36px]"
@@ -87,7 +87,7 @@ const FeaturedVideoSection = ({ videos = FEATURED_VIDEO_CONFIG }) => {
                         id={`${sectionId}-slider`}
                         className="!-m-2 !p-2"
                         wrapperTag="ul"
-                        slidesPerView={3}
+                        slidesPerView={1}
                         spaceBetween={16}
                         breakpoints={SLIDER_BREAKPOINTS}
                         onSwiper={(swiper) => {

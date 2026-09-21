@@ -40,7 +40,7 @@ const useSpotsData = ({ lang }) => {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             }).then((resp) => resp.json())
 
-            const fruitsResponse = await fetch('/_api/zh-tw/souvenirs', {
+            const fruitsResponse = await fetch('/_api/zh-tw/edu-service', {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             }).then((resp) => resp.json())
 
