@@ -1,45 +1,14 @@
 import React, { useId, useRef, useState } from 'react'
+import useAcademicVideos from 'api/useAcademicVideos'
 import VideoCard from './VideoCard'
 
-// 示範資料：每個類別分別設定影片、日期與講師。
+const ACADEMIC_CATEGORY_ID = 'academic'
+
 const CATEGORY_VIDEO_CONFIG = [
     {
-        id: 'academic',
+        id: ACADEMIC_CATEGORY_ID,
         title: '學術演講',
-        videos: [
-            {
-                id: 'academic-1',
-                title: '人力短缺下的團隊合作',
-                image: `${process.env.BASE_PATH}/images/index/video-lecture-placeholder.svg`,
-                date: '2026-08-11',
-                lecturer: '藍陳清',
-                link: '#'
-            },
-            {
-                id: 'academic-2',
-                title: '醫療事故之刑事責任分析',
-                image: `${process.env.BASE_PATH}/images/index/video-lecture-placeholder.svg`,
-                date: '2026-08-11',
-                lecturer: '藍陳清',
-                link: '#'
-            },
-            {
-                id: 'academic-3',
-                title: '病人安全與照護實務',
-                image: `${process.env.BASE_PATH}/images/index/video-lecture-placeholder.svg`,
-                date: '2026-08-11',
-                lecturer: '藍陳清',
-                link: '#'
-            },
-            {
-                id: 'academic-4',
-                title: '臨床教學與專業交流',
-                image: `${process.env.BASE_PATH}/images/index/video-lecture-placeholder.svg`,
-                date: '2026-08-11',
-                lecturer: '藍陳清',
-                link: '#'
-            }
-        ]
+        videos: []
     },
     {
         id: 'one-minute',
@@ -81,15 +50,24 @@ const CATEGORY_VIDEO_CONFIG = [
     }
 ]
 
-const CategoryVideoSection = ({ categories = CATEGORY_VIDEO_CONFIG }) => {
+const CategoryVideoSection = ({ categories }) => {
     const sectionId = useId()
     const tabRefs = useRef([])
-    const [firstCategory = {}] = categories
+    const { videos: academicVideos, status: academicStatus } =
+        useAcademicVideos({ enabled: !categories })
+    const resolvedCategories =
+        categories ||
+        CATEGORY_VIDEO_CONFIG.map((category) =>
+            category.id === ACADEMIC_CATEGORY_ID
+                ? { ...category, videos: academicVideos }
+                : category
+        )
+    const [firstCategory = {}] = resolvedCategories
     const { id: firstCategoryId } = firstCategory
-    const { length: categoryCount } = categories
+    const { length: categoryCount } = resolvedCategories
     const [activeId, setActiveId] = useState(firstCategoryId)
     const { id: selectedId, videos = [] } =
-        categories.find(({ id }) => id === activeId) || firstCategory
+        resolvedCategories.find(({ id }) => id === activeId) || firstCategory
 
     const handleTabKeyDown = (event, index) => {
         const { key } = event
@@ -106,7 +84,7 @@ const CategoryVideoSection = ({ categories = CATEGORY_VIDEO_CONFIG }) => {
             return
         }
         event.preventDefault()
-        const { id } = categories[nextIndex]
+        const { id } = resolvedCategories[nextIndex]
         const { current } = tabRefs
         setActiveId(id)
         current[nextIndex]?.focus()
@@ -123,7 +101,7 @@ const CategoryVideoSection = ({ categories = CATEGORY_VIDEO_CONFIG }) => {
                     aria-label="影片類別"
                     className="relative z-[1] -mb-px flex gap-3 pl-4 md:pl-6"
                 >
-                    {categories.map(({ id, title }, index) => (
+                    {resolvedCategories.map(({ id, title }, index) => (
                         <li key={id} role="presentation">
                             <button
                                 id={`${sectionId}-tab-${id}`}
@@ -162,23 +140,38 @@ const CategoryVideoSection = ({ categories = CATEGORY_VIDEO_CONFIG }) => {
                     tabIndex={0}
                     className="overflow-hidden rounded-[8px] border border-solid border-gray-200 bg-white py-4 pl-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary md:py-6 md:pl-6 xl:py-10 xl:px-6"
                 >
-                    <ul
-                        key={selectedId}
-                        className="-my-2 -ml-2 flex snap-x snap-mandatory scroll-p-2 gap-4 overflow-x-auto overscroll-x-contain p-2 md:-mr-2 md:gap-6 xl:grid xl:grid-cols-4 xl:snap-none xl:overflow-visible"
-                    >
-                        {videos.map(({ id, ...video }) => (
-                            <li
-                                key={id}
-                                className="w-[160px] min-w-0 max-w-full shrink-0 snap-start last:mr-4 md:w-[260px] md:last:mr-6 xl:w-auto xl:last:mr-0"
-                            >
-                                <VideoCard
-                                    video={video}
-                                    showDetails
-                                    thumbnailClassName="!h-[100px] !pb-0 md:!h-0 md:!pb-[56.25%]"
-                                />
-                            </li>
-                        ))}
-                    </ul>
+                    {videos.length > 0 ? (
+                        <ul
+                            key={selectedId}
+                            className="-my-2 -ml-2 flex snap-x snap-mandatory scroll-p-2 gap-4 overflow-x-auto overscroll-x-contain p-2 md:-mr-2 md:gap-6 xl:grid xl:grid-cols-4 xl:snap-none xl:overflow-visible"
+                        >
+                            {videos.map(({ id, ...video }) => (
+                                <li
+                                    key={id}
+                                    className="w-[160px] min-w-0 max-w-full shrink-0 snap-start last:mr-4 md:w-[260px] md:last:mr-6 xl:w-auto xl:last:mr-0"
+                                >
+                                    <VideoCard
+                                        video={video}
+                                        showDetails
+                                        thumbnailClassName="!h-[100px] !pb-0 md:!h-0 md:!pb-[56.25%]"
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p
+                            className="py-8 pr-4 text-center text-[14px] text-secondary md:pr-6 md:text-[16px] xl:pr-0"
+                            role="status"
+                        >
+                            {selectedId === ACADEMIC_CATEGORY_ID &&
+                            academicStatus === 'loading'
+                                ? '學術演講載入中…'
+                                : selectedId === ACADEMIC_CATEGORY_ID &&
+                                  academicStatus === 'error'
+                                ? '學術演講資料暫時無法載入。'
+                                : '目前沒有影片資料。'}
+                        </p>
+                    )}
                 </div>
             </div>
         </section>

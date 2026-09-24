@@ -1,0 +1,716 @@
+慈濟醫療志業學習網－API 與欄位需求
+更新日期：2026-09-24
+
+======================================================================
+一、文件範圍
+======================================================================
+
+本文件依目前前端已啟用的頁面整理：
+1. 首頁
+2. 登入／登出
+3. 消息與公告
+4. 快速選課／課程詳情
+5. 我的學習行事曆／學程進度
+6. 外訓資料
+
+不在本文件範圍：
+1. 導覽選單、學習服務入口等純靜態連結。
+2. 專案中未被目前路由使用的舊農業觀光 API。
+
+狀態說明：
+[已有]：目前已有可呼叫的正式資料來源。
+[待提供]：畫面目前使用前端假資料或 localStorage，需要後端 API。
+[建議]：不是畫面上線的絕對必要項目，但建議由後端集中管理。
+
+欄位符號：
+*  必填
+?  選填或可能為 null
+
+建議 API 前綴：/api/v1
+實際路徑可依後端既有規範調整，但欄位語意應保持一致。
+
+
+======================================================================
+二、共通規格
+======================================================================
+
+1. 日期時間
+   - 日期使用 YYYY-MM-DD，例如：2026-09-22。
+   - 日期時間使用 ISO 8601 並包含時區，例如：
+     2026-08-07T07:50:00+08:00。
+   - API 回傳原始日期時間，顯示格式由前端處理。
+
+2. 一般成功回應
+   {
+     "success": true,
+     "data": {}
+   }
+
+3. 分頁成功回應
+   {
+     "success": true,
+     "data": [],
+     "meta": {
+       "page": 1,
+       "pageSize": 20,
+       "total": 100,
+       "totalPages": 5
+     }
+   }
+
+4. 錯誤回應
+   {
+     "success": false,
+     "error": {
+       "code": "VALIDATION_ERROR",
+       "message": "欄位資料不正確",
+       "fields": {
+         "account": "帳號為必填"
+       }
+     }
+   }
+
+5. HTTP 狀態碼
+   - 200：查詢或更新成功
+   - 201：新增成功
+   - 204：刪除或無內容操作成功
+   - 400：請求格式錯誤
+   - 401：尚未登入或登入已失效
+   - 403：沒有權限
+   - 404：資料不存在
+   - 409：重複報名、重複推薦等狀態衝突
+   - 422：欄位驗證錯誤
+   - 500：伺服器錯誤
+
+6. 身分驗證
+   - 個人資料、學習紀錄、報名與外訓功能皆須登入。
+   - 建議使用 Secure、HttpOnly、SameSite Cookie 維持登入狀態。
+   - 前端不應保存密碼或存取權杖於 localStorage。
+
+
+======================================================================
+三、已有 API
+======================================================================
+
+3.1 學術演講列表 [已有]
+
+方法／網址：
+GET https://nlms.tzuchi.com.tw/speech/sp.json
+
+用途：
+首頁「學術演講」卡片列表。
+
+查詢參數：
+目前無。
+
+目前回應格式：JSON Array（不是共通回應 envelope）
+
+每筆欄位：
+* id       string  演講 ID
+* title    string  演講標題
+* data     string  演講日期，格式 YYYY-MM-DD
+                     注意：來源欄位名稱確實是 data，不是 date
+* img      string  相對於 /speech/ 的縮圖路徑
+* speaker  string  講師姓名，多位講師可用來源字串呈現
+
+前端衍生欄位：
+- thumbnailUrl = https://nlms.tzuchi.com.tw/speech/ + img
+- targetUrl = https://nlms.tzuchi.com.tw/speech/watch.php?id={id}
+
+範例：
+[
+  {
+    "id": "1090",
+    "title": "跨領域團隊照護會議─脆弱性骨折",
+    "data": "2026-09-22",
+    "img": "uploads/thumbnails/thumb_6ab21ba37aa45.jpg",
+    "speaker": "謝明宏"
+  }
+]
+
+注意事項：
+- 正式站若不是與 nlms.tzuchi.com.tw 同網域，來源伺服器必須提供 CORS。
+- 開發環境目前透過 webpack Proxy 存取此 API。
+
+
+======================================================================
+四、登入與會員
+======================================================================
+
+4.1 登入 [待提供／P0]
+
+方法／建議路徑：
+POST /api/v1/auth/login
+
+Request JSON：
+* account   string   帳號
+* password  string   密碼
+? remember  boolean  是否保持登入，預設 false
+
+Response data：
+* user.id          string
+* user.account     string
+* user.name        string
+? user.campusId    string
+? user.campusName  string
+? user.departmentId string
+? user.departmentName string
+* user.roles       string[]，例如 ["learner"]
+? expiresAt        string，登入到期時間
+
+
+4.2 取得目前登入者 [待提供／P0]
+
+方法／建議路徑：
+GET /api/v1/auth/me
+
+Response data：同 4.1 的 user。
+未登入時回傳 401，不應以固定假使用者代替。
+
+
+4.3 登出 [待提供／P0]
+
+方法／建議路徑：
+POST /api/v1/auth/logout
+
+Request：無。
+Response：200 或 204，並使伺服器端 Session／Cookie 失效。
+
+
+4.4 忘記密碼 [待提供／P1]
+
+方法／建議路徑：
+POST /api/v1/auth/forgot-password
+
+Request JSON：
+* account  string  使用者帳號
+
+Response data：
+* message  string  不應透露帳號是否存在
+
+
+======================================================================
+五、首頁
+======================================================================
+
+5.1 首頁公告輪播 [待提供／P0]
+
+方法／建議路徑：
+GET /api/v1/home/announcements
+
+建議查詢參數：
+? limit  integer  筆數，首頁建議 5
+
+Response data：Array
+* id               string
+* category         string  例如「系統公告」、「學習服務」
+* title            string
+* description      string
+? imageUrl         string  完整網址或站內絕對路徑
+* targetUrl        string  詳細內容連結
+* openInNewWindow  boolean
+* publishedAt      string  ISO 8601
+? startAt          string  上架時間
+? endAt            string  下架時間
+? sortOrder        integer
+
+
+5.2 我的學習摘要 [待提供／P0，需登入]
+
+方法／建議路徑：
+GET /api/v1/me/learning-summary
+
+Response data：
+* stats.upcoming    integer  待上課數量
+* stats.inProgress  integer  進行中數量
+* stats.completed   integer  已完成數量
+? recentCourse      object   最近一堂課；沒有資料時為 null
+
+recentCourse 欄位：
+* id        string
+* title     string
+* startAt   string  ISO 8601
+* endAt     string  ISO 8601
+? detailUrl string
+
+使用者姓名由 GET /api/v1/auth/me 取得，不必在此重複回傳。
+
+
+5.3 精選影片 [待提供／P0]
+
+方法／建議路徑：
+GET /api/v1/videos?section=featured&limit=6
+
+Response data：Array
+* id               string
+* title            string
+* thumbnailUrl     string
+* targetUrl        string
+* openInNewWindow  boolean
+? publishedAt      string  ISO 8601
+? speakerName      string
+? sortOrder        integer
+
+
+5.4 一分鐘知識 [待提供／P0]
+
+方法／建議路徑：
+GET /api/v1/videos?section=one-minute&limit=10
+
+Response data：Array
+* id               string
+* title            string
+* thumbnailUrl     string
+* publishedAt      string  ISO 8601 或 YYYY-MM-DD
+* speakerName      string
+* targetUrl        string
+* openInNewWindow  boolean
+? sortOrder        integer
+
+
+======================================================================
+六、消息與公告
+======================================================================
+
+6.1 消息／公告列表 [待提供／P0，需登入]
+
+方法／建議路徑：
+GET /api/v1/me/notifications
+
+查詢參數：
+? type      string   all | message | announcement，預設 all
+? page      integer  預設 1
+? pageSize  integer  預設 20
+
+每筆欄位：
+* id           string
+* type         string   message | announcement
+* title        string
+* publishedAt  string   ISO 8601
+* isRead       boolean
+? targetUrl    string
+? content      string   詳情摘要或內文
+
+Response meta 額外欄位：
+* unreadCount  integer
+
+
+6.2 將單筆消息設為已讀 [待提供／P1，需登入]
+
+方法／建議路徑：
+PATCH /api/v1/me/notifications/{notificationId}/read
+
+Request：無。
+Response data：
+* id      string
+* isRead  boolean，應為 true
+
+
+6.3 全部設為已讀 [待提供／P1，需登入]
+
+方法／建議路徑：
+POST /api/v1/me/notifications/read-all
+
+Request JSON：
+? type  string  all | message | announcement，預設 all
+
+Response data：
+* updatedCount  integer
+* unreadCount   integer，應為 0 或剩餘未讀數
+
+
+======================================================================
+七、快速選課與課程
+======================================================================
+
+7.1 選課篩選選項 [待提供／P0]
+
+方法／建議路徑：
+GET /api/v1/course-options
+
+Response data：
+* campuses            Array<{ id: string, name: string }>
+* types               Array<{ id: string, name: string }>
+* attributes          Array<{ id: string, name: string, parentId?: string }>
+* recognizedPrograms  Array<{ id: string, name: string }>
+
+
+7.2 課程列表 [待提供／P0]
+
+方法／建議路徑：
+GET /api/v1/courses
+
+查詢參數：
+? campusId     string
+? type         string   all | physical | online
+? attributeId  string
+? programScope string   all | mine
+? keyword      string
+? from         string   YYYY-MM-DD
+? to           string   YYYY-MM-DD
+? page         integer  預設 1
+? pageSize     integer  10 | 20 | 50，預設 20
+
+每筆欄位：
+* id                         string
+* title                      string
+* campus.id                  string
+* campus.name                string
+* type                       string  physical | online
+* startAt                    string  ISO 8601
+* endAt                      string  ISO 8601
+* speakerName                string
+? enrollment.registeredCount integer
+? enrollment.capacity        integer，無上限時可為 null
+* recognizedPrograms         Array
+  - id                       string
+  - name                     string
+  - credits                  number
+? registrationStatus         string
+                              available | registered | full | closed | completed
+
+備註：
+- 「今天」由前端以 startAt/endAt 判斷，不需要 isToday 欄位。
+- 「0/30」等顯示字串由 registeredCount/capacity 組合。
+
+
+7.3 課程詳情 [待提供／P0]
+
+方法／建議路徑：
+GET /api/v1/courses/{courseId}
+
+Response data：
+* id                    string
+* academicYear          string  例如 "115"
+* title                 string
+* type                  string  physical | online
+* status                string
+* campus.id             string
+* campus.name           string
+* attributes            Array<{ id: string, name: string }>
+* recognizedPrograms    Array
+  - id                  string
+  - name                string
+  - credits             number
+* speaker.id            string
+* speaker.name          string
+? speaker.unit          string
+* outline               string
+* audiences             Array<{ id: string, name: string }>
+* durationMinutes       integer
+* startAt               string  ISO 8601
+* endAt                 string  ISO 8601
+? location              string
+? rules                 string
+? contact.name          string
+? contact.extension     string
+* registration.canRegister      boolean
+* registration.isRegistered     boolean
+? registration.deadline         string  ISO 8601
+? registration.registeredCount  integer
+? registration.capacity         integer
+? registration.externalUrl      string  舊系統報名頁，沒有時為 null
+
+
+7.4 報名課程 [待提供／P0，需登入]
+
+方法／建議路徑：
+POST /api/v1/courses/{courseId}/registrations
+
+Request：無；登入者由 Session 取得。
+
+Response data：
+* courseId            string
+* registrationStatus  string，應為 registered
+* registeredAt        string，ISO 8601
+
+
+7.5 取消報名 [待提供／P1，需登入]
+
+方法／建議路徑：
+DELETE /api/v1/courses/{courseId}/registrations/me
+
+Response：204，或回傳最新 registrationStatus。
+
+
+======================================================================
+八、我的學習行事曆與學程
+======================================================================
+
+8.1 行事曆事件 [待提供／P0，需登入]
+
+方法／建議路徑：
+GET /api/v1/me/calendar-events
+
+查詢參數：
+* from  string  YYYY-MM-DD
+* to    string  YYYY-MM-DD
+
+每筆欄位：
+* id               string
+* courseId         string
+* title            string
+* startAt          string  ISO 8601
+* endAt            string  ISO 8601
+* status           string  pending | registered | completed
+? durationMinutes  integer
+? detailUrl        string
+
+
+8.2 我的學程／學習歷程列表 [待提供／P0，需登入]
+
+方法／建議路徑：
+GET /api/v1/me/programs
+
+查詢參數：
+? historyType  string  active | learning | external | finished
+? page         integer
+? pageSize     integer
+
+每筆欄位：
+* id         string
+* title      string
+* status     string  active | completed | expired
+* startDate  string  YYYY-MM-DD
+* endDate    string  YYYY-MM-DD
+? progress   number  0～100
+
+
+8.3 我的學程詳情與修課進度 [待提供／P0，需登入]
+
+方法／建議路徑：
+GET /api/v1/me/programs/{programId}
+
+Response data：
+* id             string
+* title          string
+* startDate      string  YYYY-MM-DD
+* endDate        string  YYYY-MM-DD
+? prerequisites  string
+? description    string
+? contact.unit   string
+? contact.name   string
+? contact.extension string
+* requirements   Array
+
+requirements 每筆欄位：
+* id          string
+* title       string
+* creditItems Array
+  - id        string
+  - status    string
+              notStarted | inProgress | complete | overdueComplete | failed
+* completedCourses  Array<CourseSummary>
+* availableCourses  Array<CourseSummary>
+
+CourseSummary：
+* id           string
+* title        string
+* status       string
+? category     string
+? detailUrl    string
+? externalUrl  string
+
+
+======================================================================
+九、外訓資料
+======================================================================
+
+9.1 外訓資料列表 [待提供／P0]
+
+方法／建議路徑：
+GET /api/v1/external-trainings
+
+查詢參數：
+? tab       string   latest | ranking | personal | review
+? campusId  string
+? keyword   string   搜尋活動名稱、單位、姓名、心得
+? sort      string   newest | recommendations | views
+? page      integer
+? pageSize  integer  10 | 20 | 50
+
+每筆欄位：
+* id                    string
+* campus.id             string
+* campus.name           string
+* title                 string
+* organization          string  訓練機構
+* department            string  建立者所屬單位
+* attendee.id           string
+* attendee.name         string
+* trainingStartAt       string  ISO 8601
+* trainingEndAt         string  ISO 8601
+* publishedAt           string  ISO 8601
+* views                 integer
+* recommendationCount   integer
+* isRecommendedByMe     boolean
+? reflection            string
+* creditApplication.requested  boolean
+? creditApplication.status     string
+                              draft | pending | approved | rejected
+
+Response meta 額外欄位：
+? totalViews  integer  外訓區總瀏覽人次
+
+
+9.2 外訓資料詳情 [待提供／P0]
+
+方法／建議路徑：
+GET /api/v1/external-trainings/{trainingId}
+
+Response data：包含 9.1 欄位，另加：
+* rocYear         integer  民國年度，例如 115
+* applicability   string   自主外訓／醫師學會發表／進修學術報告／其他
+* durationMinutes integer
+* attributes      Array<{ id: string, name: string }>
+* satisfaction    object
+  - courseOverall  integer  1～5
+  - content        integer  1～5
+  - instructor     integer  1～5
+  - learningOutcome integer 1～5
+  - expectation    integer  1～5
+? reflection      string
+* attachments     Array
+  - id            string
+  - fileName      string
+  - contentType   string
+  - size          integer  bytes
+  - downloadUrl   string
+* creditApplication object，格式同 9.1
+
+
+9.3 建立外訓資料 [待提供／P0，需登入]
+
+方法／建議路徑：
+POST /api/v1/external-trainings
+
+Content-Type：multipart/form-data
+
+表單欄位：
+* rocYear          integer
+* applicability    string
+* title            string
+* organization     string
+* trainingStartAt  string  ISO 8601
+* trainingEndAt    string  ISO 8601，必須晚於 trainingStartAt
+* durationMinutes  integer，須大於或等於 0
+* attributeIds[]   string[]
+* satisfaction     JSON string，內容同 9.2 satisfaction
+? reflection       string
+* applyForCredit   boolean
+? files[]          File[]
+
+建立者姓名、院區、部門由登入 Session 取得，不應信任前端傳入。
+
+Response：201，data 為完整的外訓資料詳情。
+
+
+9.4 推薦外訓心得 [待提供／P1，需登入]
+
+方法／建議路徑：
+POST /api/v1/external-trainings/{trainingId}/recommendations
+
+Request：無。
+
+Response data：
+* recommendationCount  integer
+* isRecommendedByMe    boolean，應為 true
+
+重複推薦時可回傳目前狀態，或使用 409。
+
+
+9.5 取消推薦 [建議／P2，需登入]
+
+方法／建議路徑：
+DELETE /api/v1/external-trainings/{trainingId}/recommendations/me
+
+Response data：
+* recommendationCount  integer
+* isRecommendedByMe    boolean，應為 false
+
+
+9.6 審核學程學分申請 [待提供／P1，需審核權限]
+
+方法／建議路徑：
+PATCH /api/v1/external-trainings/{trainingId}/credit-application
+
+Request JSON：
+* status    string  approved | rejected
+? comment   string  審核意見
+
+Response data：
+* status      string
+* reviewedAt  string  ISO 8601
+* reviewer.id string
+* reviewer.name string
+? comment     string
+
+
+9.7 外訓表單選項 [建議／P2]
+
+方法／建議路徑：
+GET /api/v1/external-training-options
+
+Response data：
+* rocYears       integer[]
+* applicability  Array<{ id: string, name: string }>
+* attributeGroups Array
+  - id           string
+  - name         string
+  - options      Array<{ id: string, name: string }>
+* satisfactionQuestions Array<{ id: string, title: string }>
+
+若這些選項確定不會由管理端調整，也可以繼續放在前端設定，不一定要 API。
+
+
+======================================================================
+十、不需要 API 的資料
+======================================================================
+
+下列內容目前可繼續由前端設定管理：
+1. 主選單與其他平台連結。
+2. 學習服務入口圖示與固定網址。
+3. 顏色、圖示、分頁筆數選項與 RWD 顯示方式。
+4. 外訓尚未送出的本機草稿；目前可保存在 localStorage。
+5. 純顯示文字，例如按鈕名稱、欄位標籤與空資料訊息。
+
+
+======================================================================
+十一、後端實作前尚需確認
+======================================================================
+
+1. API 實際網域、版本前綴及正式／測試環境網址。
+2. 登入是否沿用既有 LMS Session 或需要 SSO。
+3. 學術演講網站與學習網是否共用登入狀態。
+4. 課程報名使用新 API，或仍導向既有 course_opration.php。
+5. 課程狀態、學程狀態與外訓審核狀態的正式代碼表。
+6. 外訓附件允許的副檔名、單檔大小、總大小及檔案數量。
+7. 哪些角色可查看全院外訓資料及執行學分審核。
+8. 公告、影片及通知是否需要多語欄位。
+9. 列表最大 pageSize、排序規則與資料保留期限。
+10. 所有跨網域 API 的 CORS、Cookie SameSite 與 CSRF 規則。
+
+
+======================================================================
+十二、建議開發優先順序
+======================================================================
+
+P0（畫面正式上線必要）
+- 登入、目前使用者、登出
+- 首頁公告、學習摘要、精選影片、一分鐘知識
+- 消息／公告列表
+- 課程選項、課程列表、課程詳情、報名
+- 行事曆事件、學程列表、學程進度
+- 外訓列表、詳情、建立
+
+P1（主要互動完整化）
+- 忘記密碼
+- 通知已讀／全部已讀
+- 取消報名
+- 外訓推薦
+- 學程學分審核
+
+P2（管理彈性）
+- 取消推薦
+- 外訓表單選項 API
+

@@ -8,6 +8,7 @@ require('dotenv').config({
     path: `./.env.${process.env.NODE_ENV}`
 })
 const DOMAIN = 'https://ezgo.ardswc.gov.tw/'
+const SPEECH_DOMAIN = 'https://nlms.tzuchi.com.tw/'
 const basePathName = process.env.BASE_PATH.replace('/', '')
 
 export default merge(common, {
@@ -64,6 +65,12 @@ export default merge(common, {
         },
 
         proxy: [
+            {
+                context: ['/speech'],
+                target: SPEECH_DOMAIN,
+                secure: true,
+                changeOrigin: true
+            },
             {
                 context: ['/_api'],
                 target: DOMAIN,
