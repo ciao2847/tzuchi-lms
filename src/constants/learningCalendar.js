@@ -102,7 +102,28 @@ export const COURSE_PROGRESS = [
     {
         id: 4,
         title: '感染管制',
-        states: ['complete', 'complete', 'complete', 'complete']
+        states: [
+            'complete',
+            'complete',
+            'complete',
+            'complete',
+            'inProgress',
+            'inProgress',
+            'inProgress',
+            'inProgress',
+            'notStarted',
+            'notStarted',
+            'notStarted',
+            'notStarted',
+            'failed',
+            'failed',
+            'failed',
+            'failed',
+            'overdueComplete',
+            'overdueComplete',
+            'overdueComplete',
+            'overdueComplete'
+        ]
     },
     { id: 5, title: '醫事倫理與法律', states: ['complete'] },
     { id: 6, title: '廢棄物分類與資源回收', states: ['failed'] },

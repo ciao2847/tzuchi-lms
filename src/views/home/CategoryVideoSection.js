@@ -143,12 +143,12 @@ const CategoryVideoSection = ({ categories }) => {
                     {videos.length > 0 ? (
                         <ul
                             key={selectedId}
-                            className="-my-2 -ml-2 flex snap-x snap-mandatory scroll-p-2 gap-4 overflow-x-auto overscroll-x-contain p-2 md:-mr-2 md:gap-6 xl:grid xl:grid-cols-4 xl:snap-none xl:overflow-visible"
+                            className="-my-2 -ml-2 flex snap-x snap-mandatory scroll-p-2 gap-4 overflow-x-auto overscroll-x-contain p-2 md:-mr-2 md:gap-6"
                         >
                             {videos.map(({ id, ...video }) => (
                                 <li
                                     key={id}
-                                    className="w-[160px] min-w-0 max-w-full shrink-0 snap-start last:mr-4 md:w-[260px] md:last:mr-6 xl:w-auto xl:last:mr-0"
+                                    className="w-[160px] min-w-0 max-w-full shrink-0 snap-start last:mr-4 md:w-[260px] md:last:mr-6 xl:w-[calc(25%_-_18px)]"
                                 >
                                     <VideoCard
                                         video={video}

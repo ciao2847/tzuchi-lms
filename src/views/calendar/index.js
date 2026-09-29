@@ -386,11 +386,20 @@ const CourseProgressTable = () => {
 
                         return (
                             <tr key={category.id}>
-                                <th scope="row" className={cellClass}>
+                                <th
+                                    scope="row"
+                                    className={cellClass}
+                                    onMouseEnter={() =>
+                                        selectCategory(category.id)
+                                    }
+                                >
                                     <button
                                         type="button"
                                         className="flex min-h-7 w-full items-center px-2 py-1 text-left font-medium hover:text-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary md:min-h-10 md:px-4 md:py-2"
                                         aria-pressed={isSelected}
+                                        onFocus={() =>
+                                            selectCategory(category.id)
+                                        }
                                         onClick={() =>
                                             selectCategory(category.id)
                                         }
@@ -398,12 +407,20 @@ const CourseProgressTable = () => {
                                         {category.title}
                                     </button>
                                 </th>
-                                <td className={cellClass}>
+                                <td
+                                    className={cellClass}
+                                    onMouseEnter={() =>
+                                        selectCategory(category.id)
+                                    }
+                                >
                                     <button
                                         type="button"
-                                        className="flex min-h-7 w-full items-center gap-0.5 px-1 py-1 text-left hover:bg-[#dcecff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary md:min-h-10 md:gap-2 md:px-4 md:py-2"
+                                        className="flex min-h-7 w-full flex-wrap content-center items-center gap-1 overflow-visible px-1 py-1 text-left hover:bg-[#dcecff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary md:min-h-10 md:gap-2 md:px-4 md:py-2"
                                         aria-label={`查看${category.title}的修課情況與課程資訊`}
                                         aria-pressed={isSelected}
+                                        onFocus={() =>
+                                            selectCategory(category.id)
+                                        }
                                         onClick={() =>
                                             selectCategory(category.id)
                                         }
@@ -423,11 +440,20 @@ const CourseProgressTable = () => {
                                         rowSpan={COURSE_PROGRESS.length}
                                         className="bg-white px-2 py-2 align-top md:px-4 md:py-3"
                                     >
-                                        <CourseProgressDetails
-                                            title={title}
-                                            completedCourses={completedCourses}
-                                            availableCourses={availableCourses}
-                                        />
+                                        <div
+                                            key={selectedCategoryId}
+                                            className="h-[308px] overflow-y-auto overscroll-contain pr-1 [scrollbar-gutter:stable] md:h-[440px]"
+                                        >
+                                            <CourseProgressDetails
+                                                title={title}
+                                                completedCourses={
+                                                    completedCourses
+                                                }
+                                                availableCourses={
+                                                    availableCourses
+                                                }
+                                            />
+                                        </div>
                                     </td>
                                 )}
                             </tr>

@@ -11,7 +11,7 @@
 3. 消息與公告
 4. 快速選課／課程詳情
 5. 我的學習行事曆／學程進度
-6. 外訓資料
+6. 外訓資料（先跳過）
 
 不在本文件範圍：
 1. 導覽選單、學習服務入口等純靜態連結。
@@ -553,7 +553,7 @@ Response meta 額外欄位：
 ? totalViews  integer  外訓區總瀏覽人次
 
 
-9.2 外訓資料詳情 [待提供／P0]
+9.2 外訓資料詳情 [待提供／P0]（先跳過）
 
 方法／建議路徑：
 GET /api/v1/external-trainings/{trainingId}
@@ -579,7 +579,7 @@ Response data：包含 9.1 欄位，另加：
 * creditApplication object，格式同 9.1
 
 
-9.3 建立外訓資料 [待提供／P0，需登入]
+9.3 建立外訓資料 [待提供／P0，需登入]（先跳過）
 
 方法／建議路徑：
 POST /api/v1/external-trainings

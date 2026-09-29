@@ -7,6 +7,7 @@ import KeywordSearchRow from 'components/KeywordSearchRow'
 import ViewModeToggle from 'components/ViewModeToggle'
 import FilterButtons from 'components/pick/FilterButtons'
 import Results from 'components/pick/Results'
+import useMedia from 'hooks/useMedia'
 
 const CAMPUS_OPTIONS = [
     { id: 'dalin', title: '大林' },
@@ -99,13 +100,15 @@ const COURSE_LIST = [
 ]
 
 const Page = () => {
+    const isDesktopLayout = useMedia('(min-width: 1200px)')
     const [campus, setCampus] = useState('dalin')
     const [type, setType] = useState('physical')
     const [program, setProgram] = useState('all')
     const [attribute, setAttribute] = useState('labor')
     const [keyword, setKeyword] = useState('')
     const [listResetKey, setListResetKey] = useState(0)
-    const [viewMode, setViewMode] = useState('card')
+    const [selectedViewMode, setSelectedViewMode] = useState(null)
+    const viewMode = selectedViewMode || (isDesktopLayout ? 'list' : 'card')
 
     const submitSearch = (event) => {
         event.preventDefault()
@@ -223,7 +226,7 @@ const Page = () => {
                     <ViewModeToggle
                         ariaLabel="課程顯示方式"
                         value={viewMode}
-                        onChange={setViewMode}
+                        onChange={setSelectedViewMode}
                     />
                 </div>
 

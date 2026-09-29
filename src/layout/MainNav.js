@@ -168,18 +168,6 @@ const DesktopMemberMenu = ({ onLogout, user = {} }) => {
                             <I18N>慈濟醫療學習平台會員</I18N>
                         </span>
                     </div>
-                    <Link
-                        href="/calendar"
-                        className="flex min-h-10 items-center gap-2 px-4 py-2 text-[13px] font-medium text-primary transition-colors hover:bg-[#f3f7fd] hover:text-secondary focus-visible:bg-[#f3f7fd] focus-visible:text-secondary focus-visible:outline-none"
-                        role="menuitem"
-                        onClick={() => setIsOpen(false)}
-                    >
-                        <i
-                            className="icon icon-calendar text-[14px] text-secondary"
-                            aria-hidden="true"
-                        />
-                        <I18N>我的學習行事曆</I18N>
-                    </Link>
                     <button
                         type="button"
                         className="flex min-h-10 w-full items-center gap-2 border-x-0 border-b-0 border-t border-solid border-[#e6ecf4] px-4 py-2 text-left text-[13px] font-medium text-primary transition-colors hover:bg-[#fff5f5] hover:text-danger focus-visible:bg-[#fff5f5] focus-visible:text-danger focus-visible:outline-none"
@@ -475,17 +463,6 @@ const MainNav = () => {
                                             <I18N>慈濟醫療學習平台會員</I18N>
                                         </span>
                                     </div>
-                                    <Link
-                                        href="/calendar"
-                                        className="flex min-h-[44px] items-center gap-3 border-b border-solid border-[#e6ecf4] bg-white py-2 pl-8 pr-4 text-[13px] font-medium text-primary transition-colors active:bg-[#f8fafc] focus-visible:bg-[#f8fafc] focus-visible:outline-none"
-                                        onClick={closeMenu}
-                                    >
-                                        <MobileMenuIcon name="doc" />
-                                        <span className="min-w-0 flex-1">
-                                            <I18N>我的學習行事曆</I18N>
-                                        </span>
-                                        <NavIndicator />
-                                    </Link>
                                     <button
                                         type="button"
                                         className="flex min-h-[44px] w-full items-center gap-3 border-x-0 border-b-0 border-t-0 bg-white py-2 pl-8 pr-4 text-left text-[13px] font-medium text-primary transition-colors active:bg-[#fff5f5] focus-visible:bg-[#fff5f5] focus-visible:text-danger focus-visible:outline-none"
