@@ -3,19 +3,31 @@ import React, { useId, useState } from 'react'
 const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
     const sectionId = useId()
     const [showPassword, setShowPassword] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [errorMessage, setErrorMessage] = useState('')
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
         const { currentTarget } = event
         const values = new FormData(currentTarget)
         const { account = null, password = null } = Object.fromEntries(values)
         const remember = values.has('remember')
-        if (onLogin) {
-            onLogin({
+
+        if (!onLogin || isSubmitting) return
+
+        setErrorMessage('')
+        setIsSubmitting(true)
+
+        try {
+            await onLogin({
                 account,
                 password,
                 remember
             })
+        } catch (error) {
+            setErrorMessage(error?.message || '登入失敗，請稍後再試。')
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -31,7 +43,9 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                 >
                     歡迎登入
                 </h2>
-                <p className="mt-1 text-gray-500 text-[13px] leading-4">慈濟醫療學習平台</p>
+                <p className="mt-1 text-gray-500 text-[13px] leading-4">
+                    慈濟醫療學習平台
+                </p>
             </div>
             <form
                 className="flex flex-col gap-5"
@@ -56,6 +70,12 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                             type="text"
                             autoComplete="username"
                             placeholder="請輸入帳號"
+                            aria-invalid={Boolean(errorMessage)}
+                            aria-describedby={
+                                errorMessage
+                                    ? `${sectionId}-login-error`
+                                    : undefined
+                            }
                             required
                             className="block h-10 w-full min-w-0 rounded border border-gray-200 bg-transparent py-2 pl-9 pr-3 text-[14px] leading-5 text-primary outline-none placeholder:text-gray-400 focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                         />
@@ -82,6 +102,12 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                             type={showPassword ? 'text' : 'password'}
                             autoComplete="current-password"
                             placeholder="請輸入密碼"
+                            aria-invalid={Boolean(errorMessage)}
+                            aria-describedby={
+                                errorMessage
+                                    ? `${sectionId}-login-error`
+                                    : undefined
+                            }
                             required
                             className="block h-10 w-full min-w-0 rounded border border-gray-200 bg-transparent py-2 pl-9 pr-11 text-[14px] leading-5 text-primary outline-none placeholder:text-gray-400 focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                         />
@@ -121,11 +147,21 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                         忘記密碼
                     </button>
                 </div>
+                {errorMessage && (
+                    <p
+                        id={`${sectionId}-login-error`}
+                        className="-my-2 text-[12px] leading-5 text-danger"
+                        role="alert"
+                    >
+                        {errorMessage}
+                    </p>
+                )}
                 <button
                     type="submit"
-                    className="flex h-10 w-full shrink-0 items-center justify-center rounded bg-main text-[16px] font-bold leading-6 text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-main"
+                    disabled={isSubmitting}
+                    className="flex h-10 w-full shrink-0 items-center justify-center rounded bg-main text-[16px] font-bold leading-6 text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-main disabled:cursor-wait disabled:opacity-60"
                 >
-                    登入
+                    {isSubmitting ? '登入中…' : '登入'}
                 </button>
             </form>
         </div>
