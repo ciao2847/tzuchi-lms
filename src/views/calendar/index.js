@@ -4,6 +4,7 @@ import dayGridPlugin from '@fullcalendar/react/daygrid'
 import classicThemePlugin from '@fullcalendar/react/themes/classic'
 import I18N from 'components/I18N'
 import Link from 'components/Link'
+import NotificationDetailDialog from 'components/NotificationDetailDialog'
 import Select from 'components/Select'
 import TitleBlk from 'components/TitleBlk'
 import {
@@ -492,7 +493,7 @@ const CollapsiblePanel = ({ children, icon, isDefaultOpen = false, title }) => {
     )
 }
 
-const NoticeCard = ({ items, title, tone }) => (
+const NoticeCard = ({ items, onSelect, title, tone }) => (
     <section className="overflow-hidden rounded-[9px] border border-solid border-[#dce5f0] bg-white [box-shadow:0_2px_12px_rgba(9,58,123,0.04)]">
         <header className="flex h-[58px] items-center justify-between border-b border-solid border-[#e6ecf4] px-5">
             <h2 className="text-[17px] font-bold text-primary xl:text-[19px]">
@@ -500,23 +501,26 @@ const NoticeCard = ({ items, title, tone }) => (
             </h2>
         </header>
         <ul className="px-5 py-2">
-            {items.map(({ date, id, isUnread, title }) => (
-                <li key={id}>
+            {items.map((item) => (
+                <li key={item.id}>
                     <button
                         type="button"
-                        className="flex w-full items-center gap-3 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary"
+                        className="flex w-full items-center gap-3 rounded-[4px] py-3 text-left transition-colors hover:bg-[#f7f9fd] focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary"
+                        aria-haspopup="dialog"
+                        aria-label={`查看${item.title}`}
+                        onClick={() => onSelect(item)}
                     >
                         <span
                             className={`h-2 w-2 shrink-0 rounded-full ${
                                 tone === 'red' ? 'bg-danger' : 'bg-blue'
-                            } ${isUnread ? '' : 'opacity-45'}`}
+                            } ${item.isUnread ? '' : 'opacity-45'}`}
                             aria-hidden="true"
                         />
                         <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-[#405a78] xl:text-[13px]">
-                            {title}
+                            {item.title}
                         </span>
                         <time className="shrink-0 text-[10px] text-[#8292a7] xl:text-[12px]">
-                            {date}
+                            {item.date}
                         </time>
                     </button>
                 </li>
@@ -579,6 +583,7 @@ const Page = () => {
     const [calendarTitle, setCalendarTitle] = useState('2026年8月')
     const [activeTab, setActiveTab] = useState('program')
     const [selectedProgram, setSelectedProgram] = useState('six-skills-1')
+    const [selectedNotice, setSelectedNotice] = useState(null)
 
     const moveCalendar = (action) => {
         const calendarApi = calendarRef.current?.getApi()
@@ -694,16 +699,24 @@ const Page = () => {
                                 title="消息"
                                 items={MESSAGE_LIST}
                                 tone="blue"
+                                onSelect={setSelectedNotice}
                             />
                             <NoticeCard
                                 title="最新公告"
                                 items={ANNOUNCEMENT_LIST}
                                 tone="red"
+                                onSelect={setSelectedNotice}
                             />
                         </aside>
                     </div>
                 </div>
             </div>
+            {selectedNotice && (
+                <NotificationDetailDialog
+                    notice={selectedNotice}
+                    onClose={() => setSelectedNotice(null)}
+                />
+            )}
         </div>
     )
 }
