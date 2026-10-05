@@ -1,6 +1,15 @@
-import React from 'react'
 import { useLocale } from 'hooks'
-import { ZH_CN_STR, ZH_TW_STR, TRANSLATE_MAP } from 'constants/translate'
+import React from 'react'
+
+const ZH_CN_STR = ''
+const ZH_TW_STR = ''
+const TRANSLATE_MAP = {
+	'快速選單': {
+		en: 'Menu',
+		ja: 'メニュー',
+		ko: '메뉴'
+	}
+}
 
 let data = { ...TRANSLATE_MAP }
 

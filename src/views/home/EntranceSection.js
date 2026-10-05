@@ -21,13 +21,13 @@ const CONFIG = [
         icon: '/images/index/entrance-03.png',
         size: 'w-[40px] md:w-[56px]',
         title: 'ＫＭ知識管理平台',
-        link: 'https://nlms.tzuchi.com.tw/tzuchi/index/km.php'
+        link: 'http://10.2.10.236:8064/tzuchi/index/km.php'
     },
     {
         icon: '/images/index/entrance-04.png',
         size: 'w-[44px] md:w-[68px]',
         title: '素材圖庫',
-        link: 'https://nlms.tzuchi.com.tw/tzuchi/lmsresource/index.php?type=ppts'
+        link: 'http://10.2.10.236:8064/tzuchi/lmsresource/index.php?type=ppts'
     },
     {
         icon: '/images/index/entrance-05.png',

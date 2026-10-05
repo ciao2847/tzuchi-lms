@@ -1,10 +1,10 @@
-import paths from './paths.babel'
+import autoprefixer from 'autoprefixer'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
-import iconfont from 'webpack-iconfont-plugin-nodejs'
 import tailwindcss from 'tailwindcss'
-import autoprefixer from 'autoprefixer'
+import iconfont from 'webpack-iconfont-plugin-nodejs'
+import paths from './paths.babel'
 
 const isDev = process.env.NODE_ENV === 'development'
 require('dotenv').config({
@@ -56,14 +56,6 @@ export default {
                     },
                     noErrorOnMissing: true
                 },
-                {
-                    from: paths.public + '/static-api',
-                    to: 'static-api',
-                    globOptions: {
-                        ignore: ['*.DS_Store']
-                    },
-                    noErrorOnMissing: true
-                }
             ]
         }),
         new HtmlWebpackPlugin({

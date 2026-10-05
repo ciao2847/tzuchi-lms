@@ -239,7 +239,7 @@ const MEDICAL_ETHICS_COURSES = [
         category: '醫事倫理與法律',
         status: '通過',
         originalUrl:
-            'https://nlms.tzuchi.com.tw/tzuchi/edurd/register_course/course_opration.php?id=84540'
+            'http://10.2.10.236:8064/tzuchi/edurd/register_course/course_opration.php?id=84540'
     },
     {
         id: '85257',
@@ -247,7 +247,7 @@ const MEDICAL_ETHICS_COURSES = [
         category: '醫事倫理與法律',
         status: '可選課',
         originalUrl:
-            'https://nlms.tzuchi.com.tw/tzuchi/edurd/register_course/course_opration.php?id=85257'
+            'http://10.2.10.236:8064/tzuchi/edurd/register_course/course_opration.php?id=85257'
     },
     {
         id: '84946',
@@ -255,7 +255,7 @@ const MEDICAL_ETHICS_COURSES = [
         category: '醫事倫理與法律',
         status: '可選課',
         originalUrl:
-            'https://nlms.tzuchi.com.tw/tzuchi/edurd/register_course/course_opration.php?id=84946'
+            'http://10.2.10.236:8064/tzuchi/edurd/register_course/course_opration.php?id=84946'
     }
 ]
 

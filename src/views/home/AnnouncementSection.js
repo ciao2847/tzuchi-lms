@@ -10,7 +10,7 @@ const ANNOUNCEMENT_CONFIG = [
         description:
             '即日起至 2025/06/30 止，請同仁至學習平台完成通識課程學分認列申請，逾期將不受理。',
         image: 'https://picsum.photos/200/300',
-        link: 'https://nlms.tzuchi.com.tw/tzuchi/',
+        link: 'http://10.2.10.236:8064/tzuchi/',
         isLinkOut: true
     },
     {

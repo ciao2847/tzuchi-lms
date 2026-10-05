@@ -17,7 +17,8 @@ const Seo = ({
     const location = useLocation()
     const { lang = 'zh-tw' } = useParams()
     const isTW = lang === 'zh-tw'
-    path = path || process.env.BASE_PATH + location.pathname + location.search
+    const basePath = new URL(process.env.BASE_PATH, window.location.origin).pathname
+    path = path || basePath + location.pathname + location.search
 
     useEffect(() => {
         if (gaNope || isListPage || !isProd) return

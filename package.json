@@ -4,7 +4,7 @@
     "description": "Webpack boilerplate with React 17, using babel, sass, with HMR and an optimized production build",
     "main": "index.js",
     "scripts": {
-        "dev": "NODE_ENV=development webpack serve --config config/webpack.dev.babel.js",
+        "dev": "cross-env NODE_ENV=development webpack serve --config config/webpack.dev.babel.js",
         "build": "NODE_ENV=production webpack --config config/webpack.prod.babel.js",
         "staging": "NODE_ENV=staging webpack --config config/webpack.stag.babel.js"
     },

@@ -1,7 +1,3 @@
-export const API_ROUTES = {
-    sendRegistrationCode: '/api/zh-tw/mineCraft/lottery',
-    getFruits: '/_api/zh-tw/fruit'
-}
 export const MENU_CONFIG = [
     {
         id: 'learning-history',
@@ -100,22 +96,22 @@ export const MENU_CONFIG = [
             {
                 id: 'program-planning',
                 title: '學程規劃',
-                url: 'https://nlms.tzuchi.com.tw/tzuchi/edurd/program_manage/'
+                url: 'http://10.2.10.236:8064/tzuchi/edurd/program_manage/'
             },
             {
                 id: 'course-opening',
                 title: '開課',
-                url: 'https://nlms.tzuchi.com.tw/tzuchi/edurd/course/'
+                url: 'http://10.2.10.236:8064/tzuchi/edurd/course/'
             },
             {
                 id: 'teaching-history',
                 title: '教學歷程',
-                url: 'https://nlms.tzuchi.com.tw/tzuchi/edurd/teach_history/'
+                url: 'http://10.2.10.236:8064/tzuchi/edurd/teach_history/'
             },
             {
                 id: 'cfd-teacher-review',
                 title: 'CFD教師評核',
-                url: 'https://nlms.tzuchi.com.tw/tzuchi/edurd/teacher_judge/'
+                url: 'http://10.2.10.236:8064/tzuchi/edurd/teacher_judge/'
             },
             {
                 id: 'application-service-group',
@@ -125,12 +121,12 @@ export const MENU_CONFIG = [
             {
                 id: 'digital-course-application',
                 title: '數位課程申請',
-                url: 'https://nlms.tzuchi.com.tw/tzuchi/edurd/extjs/app/ui/usr/'
+                url: 'http://10.2.10.236:8064/tzuchi/edurd/extjs/app/ui/usr/'
             },
             {
                 id: 'colleague-teaching-reward-review',
                 title: '同仁教學獎勵審核 - 大林',
-                url: 'https://nlms.tzuchi.com.tw/tzuchi/edurd/extjs/app/ui/usr/'
+                url: 'http://10.2.10.236:8064/tzuchi/edurd/extjs/app/ui/usr/'
             },
             {
                 id: 'equipment-reservation',
@@ -212,7 +208,7 @@ export const MENU_CONFIG = [
     {
         id: 'knowledge-management',
         title: '知識管理',
-        url: 'https://nlms.tzuchi.com.tw/tzuchi/index/km.php',
+        url: 'http://10.2.10.236:8064/tzuchi/index/km.php',
         mobileIcon: 'bulb',
         indicator: 'right'
     },
@@ -240,7 +236,7 @@ export const MENU_CONFIG = [
             {
                 id: 'material-library',
                 title: '素材圖庫',
-                url: 'https://nlms.tzuchi.com.tw/tzuchi/lmsresource/index.php?type=ppts',
+                url: 'http://10.2.10.236:8064/tzuchi/lmsresource/index.php?type=ppts',
                 isLinkOut: true
             },
             {
