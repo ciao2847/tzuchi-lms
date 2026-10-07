@@ -9,7 +9,8 @@ require('dotenv').config({
 })
 const DOMAIN = 'https://ezgo.ardswc.gov.tw/'
 const SPEECH_DOMAIN = 'https://nlms.tzuchi.com.tw/'
-const basePathName = process.env.BASE_PATH.replace('/', '')
+const basePath = new URL(process.env.BASE_PATH, 'http://localhost:3000')
+    .pathname.replace(/\/$/, '')
 
 export default merge(common, {
     mode: 'development',
@@ -47,7 +48,7 @@ export default merge(common, {
         hot: true,
         port: 3000,
         host: '0.0.0.0',
-        open: [`//0.0.0.0:3000${process.env.BASE_PATH}/`],
+        open: [`http://localhost:3000${basePath}/`],
         /* server: {
             type: 'https'
         }, */
@@ -58,8 +59,8 @@ export default merge(common, {
         historyApiFallback: {
             rewrites: [
                 {
-                    from: new RegExp(`^\/${basePathName}\/*`),
-                    to: `/${basePathName}/`
+                    from: new RegExp(`^${basePath}(?:/|$)`),
+                    to: `${basePath}/index.html`
                 }
             ]
         },

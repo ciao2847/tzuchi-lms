@@ -68,7 +68,7 @@ const EntranceSection = () => {
                             isLinkOut={isLinkOut}
                         >
                             <img
-                                src={icon}
+                                src={`${process.env.BASE_PATH}${icon}`}
                                 className={`h-[53px] md:h-20 relative top-2 max-w-full shrink-0 object-contain ${size}`}
                                 alt=""
                             />
