@@ -1,4 +1,7 @@
-import React, { useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
+import { DashboardContext } from 'contexts/DashboardProvider'
+import DashboardStatus from 'components/DashboardStatus'
+import { getCalendarEvents } from 'adapters/dashboardAdapter'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/react/daygrid'
 import classicThemePlugin from '@fullcalendar/react/themes/classic'
@@ -8,49 +11,17 @@ import NotificationDetailDialog from 'components/NotificationDetailDialog'
 import Select from 'components/Select'
 import TitleBlk from 'components/TitleBlk'
 import {
-    ANNOUNCEMENT_LIST,
     COURSE_PROGRESS,
-    MESSAGE_LIST,
     getCalendarCourseById
 } from 'constants/learningCalendar'
 
 const WEEKDAY_LABELS = ['日', '一', '二', '三', '四', '五', '六']
-
-const CALENDAR_EVENTS = [
-    {
-        id: 'event-aug-11',
-        title: '+23m',
-        start: '2026-08-11',
-        extendedProps: { tone: 'registered' }
-    },
-    {
-        id: 'event-aug-13',
-        title: '+3m',
-        start: '2026-08-13',
-        extendedProps: { tone: 'pending' }
-    },
-    {
-        id: 'event-aug-31',
-        title: '+1m',
-        start: '2026-08-31',
-        extendedProps: { tone: 'registered' }
-    }
-]
 
 const HISTORY_TABS = [
     { id: 'program', title: '我的學程' },
     { id: 'learning', title: '學習歷程' },
     { id: 'external', title: '外訓歷程' },
     { id: 'finished', title: '已結束的學程' }
-]
-
-const PROGRAM_OPTIONS = [
-    { id: 'six-skills-1', title: '精實六標準差技能認證' },
-    { id: 'six-skills-2', title: '精實六標準差技能認證' },
-    { id: 'six-skills-3', title: '精實六標準差技能認證' },
-    { id: 'six-skills-4', title: '精實六標準差技能認證' },
-    { id: 'six-skills-5', title: '精實六標準差技能認證' },
-    { id: 'six-skills-6', title: '精實六標準差技能認證' }
 ]
 
 const COURSE_STATUS_CONFIG = {
@@ -163,7 +134,7 @@ const CalendarControls = ({ calendarTitle, onMove }) => (
                 className="inline-flex h-7 items-center justify-center rounded-[4px] bg-[#8995aa] px-3 text-[12px] font-bold text-white transition-colors hover:bg-[#6e7d95] focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary md:h-9 md:px-4 md:text-[12px] xl:text-[14px]"
                 onClick={() => onMove('today')}
             >
-                Today
+                回到今天
             </button>
         </div>
     </div>
@@ -202,7 +173,10 @@ const HistoryTabs = ({ activeTab, onChange }) => (
     </ul>
 )
 
-const ProgramSelector = ({ selectedProgram, onChange }) => {
+const ProgramSelector = ({ programs, selectedProgram, onChange, status }) => {
+    if (!programs.length) return <p className="py-3 text-[14px] text-[#8292a7]">
+        {status === 'success' ? '目前沒有學程' : status === 'loading' ? '學程載入中…' : status === 'idle' ? '請先登入以查看學程' : '學程載入失敗，請重新載入'}
+    </p>
     return (
         <div className="py-2 md:px-1 md:py-3">
             <label className="sr-only" htmlFor="program-select">
@@ -212,26 +186,28 @@ const ProgramSelector = ({ selectedProgram, onChange }) => {
                 id="program-select"
                 wrapperClassName="md:hidden"
                 className="font-bold"
+                truncateOptions
                 value={selectedProgram}
+                title={programs.find(program => program.id === selectedProgram)?.title || ''}
                 onChange={({ target: { value } }) => onChange(value)}
             >
-                {PROGRAM_OPTIONS.map(({ id, title }, index) => (
-                    <option key={id} value={id}>
+                {programs.map(({ id, title }) => (
+                    <option key={id} value={id} title={title}>
                         {title}
-                        {index > 0 ? ` ${index + 1}` : ''}
                     </option>
                 ))}
             </Select>
 
             <ul className="hidden grid-cols-3 gap-3 md:grid">
-                {PROGRAM_OPTIONS.map(({ id, title }) => {
+                {programs.map(({ id, title }) => {
                     const isSelected = selectedProgram === id
 
                     return (
-                        <li key={id}>
+                        <li key={id} className="min-w-0">
                             <button
                                 type="button"
-                                className={`flex min-h-[42px] w-full items-center justify-center rounded-[5px] px-3 py-2 text-[14px] font-bold leading-5 transition-colors lg:text-[15px] xl:text-[17px] xl:leading-6 ${
+                                title={title}
+                                className={`block min-h-[42px] w-full min-w-0 max-w-full overflow-hidden rounded-[5px] px-3 py-2 text-[14px] font-bold leading-5 transition-colors lg:text-[15px] xl:text-[17px] xl:leading-6 ${
                                     isSelected
                                         ? 'bg-blue text-white'
                                         : 'bg-[#f1f5fb] text-[#3c5573] hover:bg-[#e8eff9] hover:text-secondary'
@@ -239,7 +215,7 @@ const ProgramSelector = ({ selectedProgram, onChange }) => {
                                 aria-pressed={isSelected}
                                 onClick={() => onChange(id)}
                             >
-                                <I18N>{title}</I18N>
+                                <span className="block w-full truncate text-center"><I18N>{title}</I18N></span>
                             </button>
                         </li>
                     )
@@ -493,19 +469,20 @@ const CollapsiblePanel = ({ children, icon, isDefaultOpen = false, title }) => {
     )
 }
 
-const NoticeCard = ({ items, onSelect, title, tone }) => (
+const NoticeCard = ({ items, onSelect, title, tone, emptyText }) => (
     <section className="overflow-hidden rounded-[9px] border border-solid border-[#dce5f0] bg-white [box-shadow:0_2px_12px_rgba(9,58,123,0.04)]">
         <header className="flex h-[58px] items-center justify-between border-b border-solid border-[#e6ecf4] px-5">
             <h2 className="text-[17px] font-bold text-primary xl:text-[19px]">
                 <I18N>{title}</I18N>
             </h2>
         </header>
-        <ul className="px-5 py-2">
+        <ul className="max-h-[256px] overflow-y-auto overscroll-contain px-5 py-2">
+            {!items.length && emptyText && <li className="py-3 text-[13px] text-[#8292a7]">{emptyText}</li>}
             {items.map((item) => (
                 <li key={item.id}>
                     <button
                         type="button"
-                        className="flex w-full items-center gap-3 rounded-[4px] py-3 text-left transition-colors hover:bg-[#f7f9fd] focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary"
+                        className="flex h-12 w-full items-center gap-3 rounded-[4px] py-3 text-left transition-colors hover:bg-[#f7f9fd] focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary"
                         aria-haspopup="dialog"
                         aria-label={`查看${item.title}`}
                         onClick={() => onSelect(item)}
@@ -516,7 +493,7 @@ const NoticeCard = ({ items, onSelect, title, tone }) => (
                             } ${item.isUnread ? '' : 'opacity-45'}`}
                             aria-hidden="true"
                         />
-                        <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-[#405a78] xl:text-[13px]">
+                        <span title={item.title} className="min-w-0 flex-1 truncate text-[11px] font-semibold text-[#405a78] xl:text-[13px]">
                             {item.title}
                         </span>
                         <time className="shrink-0 text-[10px] text-[#8292a7] xl:text-[12px]">
@@ -579,11 +556,17 @@ const formatMonthTitle = (date) =>
     `${date.getFullYear()}年${date.getMonth() + 1}月`
 
 const Page = () => {
+    const { data, status } = useContext(DashboardContext)
+    const calendarEvents = getCalendarEvents(data)
     const calendarRef = useRef(null)
-    const [calendarTitle, setCalendarTitle] = useState('2026年8月')
+    const [calendarTitle, setCalendarTitle] = useState(() => formatMonthTitle(new Date()))
     const [activeTab, setActiveTab] = useState('program')
-    const [selectedProgram, setSelectedProgram] = useState('six-skills-1')
+    const [selectedProgram, setSelectedProgram] = useState('')
+    const programs = activeTab === 'finished' ? data.programs.past : data.programs.inProgress
+    const selectedProgramId = programs.some(program => program.id === selectedProgram)
+        ? selectedProgram : programs[0]?.id || ''
     const [selectedNotice, setSelectedNotice] = useState(null)
+    useEffect(() => setSelectedNotice(null), [data])
 
     const moveCalendar = (action) => {
         const calendarApi = calendarRef.current?.getApi()
@@ -596,18 +579,12 @@ const Page = () => {
         setCalendarTitle(formatMonthTitle(currentStart))
     }
 
-    const getDayCellClass = ({ date, isOther }) => {
-        const dateString = [
-            date.getFullYear(),
-            String(date.getMonth() + 1).padStart(2, '0'),
-            String(date.getDate()).padStart(2, '0')
-        ].join('-')
-
+    const getDayCellClass = ({ date, isOther, isToday }) => {
         return [
             'learning-fc-cell',
             date.getDay() === 0 ? 'is-sunday' : '',
             isOther ? 'is-other-month' : '',
-            dateString === '2026-08-07' ? 'is-selected-day' : ''
+            isToday ? '!bg-primary-light' : ''
         ]
             .filter(Boolean)
             .join(' ')
@@ -647,10 +624,8 @@ const Page = () => {
                                         ]}
                                         themeSystem="classic"
                                         initialView="dayGridMonth"
-                                        initialDate="2026-08-01"
                                         headerToolbar={false}
-                                        height="auto"
-                                        aspectRatio={2.05}
+                                        height={540}
                                         firstDay={0}
                                         fixedWeekCount={true}
                                         showNonCurrentDates={true}
@@ -668,10 +643,18 @@ const Page = () => {
                                             date.getDate()
                                         }
                                         eventClass={getEventClass}
-                                        eventContent={({
-                                            event: { title }
-                                        }) => <span>{title}</span>}
-                                        events={CALENDAR_EVENTS}
+                                        eventContent={({ event }) => <span className="block w-full truncate"
+                                            title={`${event.extendedProps.course.start.replace('T', ' ')} ${event.title} ${event.extendedProps.course.classroom}`}>
+                                            {event.extendedProps.course.start.slice(11, 16)} {event.title}
+                                        </span>}
+                                        events={calendarEvents}
+                                        eventOrder="sortTime,title,id"
+                                        eventOrderStrict={true}
+                                        dayMaxEvents={1}
+                                        moreLinkText={(count) => `${count}+`}
+                                        moreLinkHint={(count) => `另有 ${count} 筆課程`}
+                                        moreLinkClick="popover"
+                                        moreLinkClass="learning-fc-more"
                                         displayEventTime={false}
                                         eventDisplay="block"
                                         editable={false}
@@ -686,7 +669,9 @@ const Page = () => {
                                         onChange={setActiveTab}
                                     />
                                     <ProgramSelector
-                                        selectedProgram={selectedProgram}
+                                        programs={programs}
+                                        status={status}
+                                        selectedProgram={selectedProgramId}
                                         onChange={setSelectedProgram}
                                     />
                                     <ProgramDetails />
@@ -695,15 +680,18 @@ const Page = () => {
                         </div>
 
                         <aside className="mt-3 hidden space-y-3 xl:mt-0 xl:block">
+                            <DashboardStatus />
                             <NoticeCard
-                                title="消息"
-                                items={MESSAGE_LIST}
+                                title="通知信"
+                                items={data.messages}
+                                emptyText={status === 'success' ? '目前沒有通知信' : ''}
                                 tone="blue"
                                 onSelect={setSelectedNotice}
                             />
                             <NoticeCard
-                                title="最新公告"
-                                items={ANNOUNCEMENT_LIST}
+                                title="系統公告"
+                                items={data.announcements}
+                                emptyText={status === 'success' ? '目前沒有系統公告' : ''}
                                 tone="red"
                                 onSelect={setSelectedNotice}
                             />
@@ -711,7 +699,7 @@ const Page = () => {
                     </div>
                 </div>
             </div>
-            {selectedNotice && (
+            {selectedNotice && status === 'success' && (
                 <NotificationDetailDialog
                     notice={selectedNotice}
                     onClose={() => setSelectedNotice(null)}

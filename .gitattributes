@@ -1,0 +1,3 @@
+# Preserve the upstream CA bundle bytes so its official SHA-256 remains valid.
+public/api/cacert.pem -text
+dist/api/cacert.pem -text

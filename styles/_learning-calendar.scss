@@ -2,7 +2,7 @@
     --fc-classic-border: #dfe7f1;
     --fc-classic-background: #fff;
     --fc-classic-foreground: #093a7b;
-    --fc-classic-today: transparent;
+    --fc-classic-today: #ffedd7;
     color: #093a7b;
     font-family: inherit;
 
@@ -30,6 +30,7 @@
     }
 
     .learning-fc-cell {
+        position: relative;
         border-color: #dfe7f1;
         background: #fff;
     }
@@ -39,8 +40,17 @@
     }
 
     .learning-fc-cell-inner {
-        min-height: 10px !important;
-        padding-top: 3px;
+        // Cancel FullCalendar's inline min-height; use padding for event space.
+        min-height: unset !important;
+        padding: 3px 0 20px;
+    }
+
+    // Keep the course and overflow count in separate rows with a real gap.
+    .learning-fc-cell > div:has(> .learning-fc-cell-inner) {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        row-gap: 4px;
     }
 
     .learning-fc-cell-top {
@@ -73,31 +83,56 @@
 
     .learning-fc-event {
         margin: 0 !important;
-        min-height: 10px !important;
+        min-height: 20px !important;
         border: 0 !important;
-        padding: 0 !important;
-        background: transparent !important;
+        padding: 2px 4px !important;
+        border-radius: 3px;
+        overflow: hidden;
+        background: #1769d2 !important;
         box-shadow: none !important;
-        color: #1769d2;
+        color: #fff;
         font-size: 10px;
         font-weight: 700;
-        line-height: 10px;
-        text-align: center;
+        line-height: 16px;
+        text-align: left;
 
         > div {
-            min-height: 10px !important;
-            justify-content: center;
+            min-width: 0;
+            min-height: 16px !important;
+            justify-content: flex-start;
             padding: 0 !important;
             color: inherit !important;
         }
     }
 
     .learning-fc-event.is-pending {
-        color: #f59a35;
+        background: #f59a35 !important;
+        color: #093a7b;
     }
 
     .learning-fc-event.is-registered {
+        background: #1769d2 !important;
+        color: #fff;
+    }
+
+    .learning-fc-event.is-complete {
+        background: #04863f !important;
+        color: #fff;
+    }
+
+    .learning-fc-more {
+        position: relative !important;
+        align-self: flex-end;
+        z-index: 2;
+        display: block;
+        width: max-content;
+        margin: 0 0 0 auto;
+        padding: 0 4px 3px;
         color: #1769d2;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 18px;
+        white-space: nowrap;
     }
 
     @media (min-width: 768px) {
@@ -107,7 +142,6 @@
         }
 
         .learning-fc-cell-inner {
-            min-height: 27px !important;
             padding-top: 5px;
         }
 
@@ -149,10 +183,6 @@
         .learning-fc-header-inner {
             height: 42px;
             font-size: 14px;
-        }
-
-        .learning-fc-cell-inner {
-            min-height: 30px !important;
         }
 
         .learning-fc-cell-top-inner {

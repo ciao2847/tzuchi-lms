@@ -27,12 +27,15 @@ const ANNOUNCEMENT_CONFIG = [
 
 const AnnouncementSection = ({
     announcements = ANNOUNCEMENT_CONFIG,
+    onSelect,
     className = ''
 }) => {
     const [activeIndex, setActiveIndex] = useState(0)
     const { category, title, description, image, link, isLinkOut } =
-        announcements[activeIndex] || announcements[0] || ANNOUNCEMENT_CONFIG[0]
+        announcements[activeIndex] || announcements[0] || {}
     const { length: announcementCount } = announcements
+    const Action = onSelect ? 'button' : AutoSwitchLink
+    if (!announcementCount) return <div className={`rounded-[20px] bg-white p-8 text-primary ${className}`}>目前沒有公告</div>
 
     const changeAnnouncement = (direction) => {
         setActiveIndex(
@@ -48,13 +51,13 @@ const AnnouncementSection = ({
             aria-label="公告"
         >
             <article className="relative h-full overflow-hidden rounded-[20px] border border-solid border-gray-200 bg-[#e7effb] shadow-sm">
-                <ThumbFrame
+                {image && <ThumbFrame
                     src={image}
                     alt=""
                     ratio="16by9"
                     lazy={false}
                     className="!absolute inset-0 !h-full w-full !pb-0"
-                />
+                />}
                 <div className="absolute inset-0 bg-gradient-to-r from-[#e7effb] via-[#e7effb]/90 to-transparent" />
                 <div className="relative z-[1] flex min-h-[320px] flex-col items-start justify-center px-8 py-12 lg:h-full lg:min-h-0 lg:px-10">
                     <div
@@ -71,9 +74,8 @@ const AnnouncementSection = ({
                         <p className="mb-6 line-clamp-2 text-[14px] leading-6 text-primary">
                             {description}
                         </p>
-                        <AutoSwitchLink
-                            href={link}
-                            isLinkOut={isLinkOut}
+                        <Action
+                            {...(onSelect ? { type: 'button', onClick: () => onSelect(announcements[activeIndex] || announcements[0]) } : { href: link, isLinkOut })}
                             className="inline-flex items-center gap-3 rounded-full border border-solid border-secondary px-4 py-2 text-[14px] font-bold leading-5 text-secondary transition-colors hover:bg-secondary hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary"
                         >
                             查看詳細內容
@@ -81,7 +83,7 @@ const AnnouncementSection = ({
                                 className="icon icon-arrow-right text-[16px] leading-6"
                                 aria-hidden="true"
                             />
-                        </AutoSwitchLink>
+                        </Action>
                     </div>
                 </div>
                 {announcementCount > 1 && (

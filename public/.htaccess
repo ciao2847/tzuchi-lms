@@ -1,0 +1,12 @@
+# React BrowserRouter fallback for /tzuchi/react/.
+RewriteEngine On
+RewriteBase /tzuchi/react/
+
+# Keep real files, directories, API endpoints and asset paths on Apache.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [END]
+RewriteRule ^(?:api|static-api|images|fonts|js|styles|vendors|videos|files)(?:/|$) - [END]
+
+# Let React handle URLs such as /calendar and /pick/123 on direct requests.
+RewriteRule ^ index.html [END]

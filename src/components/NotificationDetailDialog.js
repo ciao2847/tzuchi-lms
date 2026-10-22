@@ -187,7 +187,7 @@ const NotificationDetailDialog = ({ notice, onClose }) => {
                     <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#deebfb] text-blue md:size-11">
                         <i
                             className={`icon icon-${
-                                isAnnouncement ? 'mail' : 'speaker'
+                                isAnnouncement ? 'speaker' : 'mail'
                             } text-[19px] md:text-[21px]`}
                             aria-hidden="true"
                         />
@@ -202,7 +202,7 @@ const NotificationDetailDialog = ({ notice, onClose }) => {
                         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#70849d] md:text-[12px]">
                             <span>
                                 <I18N>
-                                    {isAnnouncement ? '通知信' : '消息'}
+                                    {isAnnouncement ? '系統公告' : '通知信'}
                                 </I18N>
                             </span>
                             <time dateTime={notice.publishedAt}>
@@ -225,8 +225,7 @@ const NotificationDetailDialog = ({ notice, onClose }) => {
                     id={`${dialogId}-content`}
                     className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 md:px-7 md:py-6"
                 >
-                    {(notice.subject || notice.publishedAt) &&
-                        isAnnouncement && (
+                    {(notice.subject || notice.publishedAt) && (
                             <dl className="mb-5 space-y-2 text-[12px] leading-5 text-[#405a78] md:text-[14px] md:leading-6">
                                 {notice.subject && (
                                     <div className="flex items-start gap-2">
@@ -274,6 +273,13 @@ const NotificationDetailDialog = ({ notice, onClose }) => {
                     </div>
 
                     <NotificationDetail detail={notice.detail} />
+                    {notice.htmlBody && <iframe
+                        title="通知信內容"
+                        sandbox="allow-popups allow-popups-to-escape-sandbox"
+                        referrerPolicy="no-referrer"
+                        className="mt-3 min-h-[400px] w-full border-0 bg-white"
+                        srcDoc={`<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; form-action 'none'; base-uri 'none'"><base target="_blank"><style>body{font:14px/1.7 sans-serif;color:#405a78;overflow-wrap:anywhere}table{max-width:100%;border-collapse:collapse}a{color:#1769d2}</style></head><body>${notice.htmlBody}</body></html>`}
+                    />}
 
                     {notice.sections?.length > 0 && (
                         <div className="mt-5 space-y-4">

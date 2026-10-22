@@ -1,7 +1,11 @@
-import React, { useId, useState } from 'react'
+import React, { useContext, useId, useState } from 'react'
+import { LoginContext } from 'contexts/LoginProvider'
+import { adaptLoginUser } from 'adapters/authAdapter'
+import { AUTH_API_BASE, AUTH_API_KEY } from 'constants/auth'
 
 const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
     const sectionId = useId()
+    const { sessionExpired } = useContext(LoginContext)
     const [showPassword, setShowPassword] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [errorMessage, setErrorMessage] = useState('')
@@ -19,13 +23,36 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
         setIsSubmitting(true)
 
         try {
+            const uid = String(account || '').trim()
+            if (!uid || !password) throw new Error('請輸入帳號與密碼。')
+
+            const response = await fetch(`${AUTH_API_BASE}/login`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-API-Key': AUTH_API_KEY
+                },
+                cache: 'no-store',
+                body: JSON.stringify({ uid, pwd: password, keeplogin: remember ? 1 : 0 })
+            })
+            const result = await response.json().catch(() => null)
+            if (!response.ok || result?.success !== true) {
+                throw new Error(
+                    result?.error?.message || result?.message || result?.errorMessage ||
+                    (result ? '登入失敗，請稍後再試。' : '登入服務回應格式異常。')
+                )
+            }
+
             await onLogin({
-                account,
-                password,
+                user: adaptLoginUser(result.data, uid),
                 remember
             })
         } catch (error) {
-            setErrorMessage(error?.message || '登入失敗，請稍後再試。')
+            setErrorMessage(error instanceof TypeError
+                ? '無法連線至登入服務，請確認網路及 API 跨來源存取設定。'
+                : error?.message || '登入失敗，請稍後再試。')
         } finally {
             setIsSubmitting(false)
         }
@@ -47,6 +74,7 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                     慈濟醫療學習平台
                 </p>
             </div>
+            {sessionExpired && <p role="alert" className="mb-4 text-[13px] text-danger">登入時效已過期，請重新登入。</p>}
             <form
                 className="flex flex-col gap-5"
                 aria-labelledby={`${sectionId}-login-title`}

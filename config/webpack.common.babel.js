@@ -25,6 +25,15 @@ export default {
         new CopyWebpackPlugin({
             patterns: [
                 {
+                    from: paths.public + '/.htaccess',
+                    to: '.htaccess',
+                    toType: 'file'
+                },
+                {
+                    from: paths.public + '/api',
+                    to: 'api'
+                },
+                {
                     from: paths.public + '/images',
                     to: 'images',
                     globOptions: {

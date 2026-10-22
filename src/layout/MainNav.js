@@ -7,6 +7,7 @@ import { LoginContext } from 'contexts/LoginProvider'
 import useMedia from 'hooks/useMedia'
 import useBodyScrollLock from 'hooks/useBodyScrollLock'
 import { MENU_CONFIG } from 'constants'
+import swal from 'sweetalert'
 
 const IS_STAGING = process.env.IS_STAGING === 'true'
 
@@ -112,13 +113,37 @@ const DesktopMenuItem = ({ item, pathname }) => {
     )
 }
 
-const DesktopMemberMenu = ({ onLogout, user = {} }) => {
-    const [isOpen, setIsOpen] = useState(false)
-    const { name = '王小明' } = user
+const MemberIdentity = ({ user }) => (
+    <>
+        <strong className="block break-words text-[14px] font-bold leading-6 text-primary">
+            {[user.department, user.name].filter(Boolean).join('-')}
+        </strong>
+        {user.mail && (
+            <span className="block break-all text-[12px] leading-5 text-[#708399]">
+                {user.mail}
+            </span>
+        )}
+    </>
+)
 
-    const handleLogout = () => {
-        setIsOpen(false)
-        onLogout()
+const ChangePasswordItem = ({ mobile = false }) => (
+    <button
+        type="button"
+        disabled
+        title="修改密碼功能尚未開放"
+        role={mobile ? undefined : 'menuitem'}
+        className={`flex min-h-10 w-full items-center bg-white py-2 pr-4 text-left text-[13px] font-medium text-gray-400 disabled:cursor-not-allowed ${mobile ? 'pl-8' : 'pl-4'}`}
+    >
+        <I18N>修改密碼</I18N>
+    </button>
+)
+
+const DesktopMemberMenu = ({ onLogout, isLoggingOut, user = {} }) => {
+    const [isOpen, setIsOpen] = useState(false)
+    const { name = '' } = user
+
+    const handleLogout = async () => {
+        if (await onLogout()) setIsOpen(false)
     }
 
     return (
@@ -151,34 +176,29 @@ const DesktopMemberMenu = ({ onLogout, user = {} }) => {
             {isOpen && (
                 <div
                     id="desktop-member-menu"
-                    className="absolute right-0 top-full z-30 mt-2 w-[240px] overflow-hidden rounded-[8px] border border-solid border-[#dfe7f1] bg-white drop-shadow"
+                    className="absolute right-0 top-full z-30 mt-2 w-[320px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[8px] border border-solid border-[#dfe7f1] bg-white drop-shadow"
                     role="menu"
                 >
                     <div
                         className="border-b border-solid border-[#e6ecf4] bg-[#f8fbff] px-4 py-3"
                         role="presentation"
                     >
-                        <span className="block text-[12px] font-medium leading-5 text-[#708399]">
-                            <I18N>會員資料</I18N>
-                        </span>
-                        <strong className="mt-0.5 block text-[15px] font-bold leading-6 text-primary">
-                            {name}
-                        </strong>
-                        <span className="block text-[11px] leading-5 text-[#708399]">
-                            <I18N>慈濟醫療學習平台會員</I18N>
-                        </span>
+                        <MemberIdentity user={user} />
                     </div>
+                    <ChangePasswordItem />
                     <button
                         type="button"
                         className="flex min-h-10 w-full items-center gap-2 border-x-0 border-b-0 border-t border-solid border-[#e6ecf4] px-4 py-2 text-left text-[13px] font-medium text-primary transition-colors hover:bg-[#fff5f5] hover:text-danger focus-visible:bg-[#fff5f5] focus-visible:text-danger focus-visible:outline-none"
                         role="menuitem"
                         onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        aria-busy={isLoggingOut}
                     >
                         <i
                             className="icon icon-arrow-forward text-[14px]"
                             aria-hidden="true"
                         />
-                        <I18N>登出</I18N>
+                        <I18N>{isLoggingOut ? '登出中…' : '登出'}</I18N>
                     </button>
                 </div>
             )}
@@ -286,8 +306,8 @@ const MobileMenuItem = ({ item, isActive, onClose, onToggle }) => {
 const MainNav = () => {
     const isLayoutXL = useMedia('(min-width: 1200px)')
     const { pathname, search } = useLocation()
-    const { isLogin, logout, user } = useContext(LoginContext)
-    const { name = '王小明' } = user
+    const { isLogin, logout, user, isLoggingOut } = useContext(LoginContext)
+    const { name = '' } = user
     const visibleMenus = MENU_CONFIG.filter(isMenuVisible)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isMobileMemberOpen, setIsMobileMemberOpen] = useState(false)
@@ -301,9 +321,19 @@ const MainNav = () => {
         setIsMenuOpen(false)
         setIsMobileMemberOpen(false)
     }
-    const handleLogout = () => {
-        logout()
-        closeMenu()
+    const handleLogout = async () => {
+        if (isLoggingOut) return false
+        try {
+            await logout()
+            closeMenu()
+            return true
+        } catch (error) {
+            await swal('登出失敗',
+                error?.data?.error?.message || error?.data?.errorMessage ||
+                (error instanceof TypeError ? '無法連線至登出服務，請稍後再試。' : error?.message) ||
+                '請稍後再試。', 'error')
+            return false
+        }
     }
     const toggleSubmenu = (id) => {
         setActiveMenuId((currentId) => (currentId === id ? null : id))
@@ -376,6 +406,7 @@ const MainNav = () => {
                         <DesktopMemberMenu
                             user={user}
                             onLogout={handleLogout}
+                            isLoggingOut={isLoggingOut}
                         />
                     ) : (
                         <Link
@@ -456,21 +487,19 @@ const MainNav = () => {
                                     className="border-t border-solid border-[#e6ecf4] bg-[#f8fbff]"
                                 >
                                     <div className="border-b border-solid border-[#e6ecf4] px-8 py-3">
-                                        <strong className="block text-[14px] font-bold leading-5 text-primary">
-                                            {name}
-                                        </strong>
-                                        <span className="block text-[11px] leading-5 text-[#708399]">
-                                            <I18N>慈濟醫療學習平台會員</I18N>
-                                        </span>
+                                        <MemberIdentity user={user} />
                                     </div>
+                                    <ChangePasswordItem mobile />
                                     <button
                                         type="button"
                                         className="flex min-h-[44px] w-full items-center gap-3 border-x-0 border-b-0 border-t-0 bg-white py-2 pl-8 pr-4 text-left text-[13px] font-medium text-primary transition-colors active:bg-[#fff5f5] focus-visible:bg-[#fff5f5] focus-visible:text-danger focus-visible:outline-none"
                                         onClick={handleLogout}
+                                        disabled={isLoggingOut}
+                                        aria-busy={isLoggingOut}
                                     >
                                         <MobileMenuIcon name="arrow-forward" />
                                         <span className="min-w-0 flex-1">
-                                            <I18N>登出</I18N>
+                                            <I18N>{isLoggingOut ? '登出中…' : '登出'}</I18N>
                                         </span>
                                     </button>
                                 </div>

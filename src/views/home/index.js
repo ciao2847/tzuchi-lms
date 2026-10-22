@@ -1,4 +1,7 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import { DashboardContext } from 'contexts/DashboardProvider'
+import DashboardStatus from 'components/DashboardStatus'
+import NotificationDetailDialog from 'components/NotificationDetailDialog'
 import { LoginContext } from 'contexts/LoginProvider'
 import EntranceSection from './EntranceSection'
 import LoginSection from './LoginSection'
@@ -9,6 +12,9 @@ import CategoryVideoSection from './CategoryVideoSection'
 
 const Page = () => {
     const { isLogin, login, user } = useContext(LoginContext)
+    const { data, status } = useContext(DashboardContext)
+    const [selectedNotice, setSelectedNotice] = useState(null)
+    useEffect(() => setSelectedNotice(null), [data, isLogin])
 
     return (
         <div className="bg-light pt-[34px] xl:pt-[58px] mt-6">
@@ -28,12 +34,21 @@ const Page = () => {
                     ) : (
                         <LoginSection className="lg:order-2" onLogin={login} />
                     )}
-                    <AnnouncementSection className="lg:order-1" />
+                    {isLogin ? (
+                        <div className="lg:order-1">
+                            {status === 'success' ? <AnnouncementSection
+                                className="h-full"
+                                announcements={data.announcements.map((item) => ({ ...item, category: '最新公告', description: item.date }))}
+                                onSelect={setSelectedNotice}
+                            /> : <DashboardStatus />}
+                        </div>
+                    ) : <AnnouncementSection className="lg:order-1" />}
                 </div>
             </section>
             <EntranceSection />
             <FeaturedVideoSection />
             <CategoryVideoSection />
+            {selectedNotice && isLogin && status === 'success' && <NotificationDetailDialog notice={selectedNotice} onClose={() => setSelectedNotice(null)} />}
         </div>
     )
 }

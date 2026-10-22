@@ -67,6 +67,21 @@ export default merge(common, {
 
         proxy: [
             {
+                context: ['/tzuchi-api'],
+                target: 'http://10.2.10.236:8064',
+                pathRewrite: { '^/tzuchi-api': '/tzuchi/api' },
+                cookieDomainRewrite: '',
+                cookiePathRewrite: '/',
+                changeOrigin: true
+            },
+            {
+                context: [`${basePath}/api/academic-videos.php`],
+                target: SPEECH_DOMAIN,
+                pathRewrite: () => '/speech/sp.json',
+                secure: true,
+                changeOrigin: true
+            },
+            {
                 context: ['/speech'],
                 target: SPEECH_DOMAIN,
                 secure: true,

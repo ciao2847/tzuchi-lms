@@ -129,8 +129,9 @@ GET https://nlms.tzuchi.com.tw/speech/sp.json
 ]
 
 注意事項：
-- 正式站若不是與 nlms.tzuchi.com.tw 同網域，來源伺服器必須提供 CORS。
-- 開發環境目前透過 webpack Proxy 存取此 API。
+- 瀏覽器透過同來源 /tzuchi/react/api/academic-videos.php 取得資料，避免跨來源 CORS 限制。
+- 正式部署使用 dist/api/academic-videos.php，主機需支援 PHP 與 cURL；部署步驟見 docs/speech-proxy.md。
+- 開發環境由 webpack 將相同的 API 路徑代理至上述正式站資料來源。
 
 
 ======================================================================

@@ -24,6 +24,7 @@ const Select = forwardRef(
             name,
             onChange,
             disabled = false,
+            truncateOptions = false,
             ...props
         },
         ref
@@ -39,6 +40,7 @@ const Select = forwardRef(
             .map((option) => ({
                 value: String(option.props.value ?? option.props.children),
                 label: option.props.children,
+                title: option.props.title,
                 disabled: Boolean(option.props.disabled)
             }))
         const selectedIndex = options.findIndex(
@@ -264,6 +266,7 @@ const Select = forwardRef(
                                     key={`${option.value}-${index}`}
                                     id={`${menuId}-option-${index}`}
                                     role="option"
+                                    title={option.title}
                                     aria-selected={
                                         option.value === String(value)
                                     }
@@ -273,7 +276,7 @@ const Select = forwardRef(
                                     }
                                     onMouseEnter={() => setActiveIndex(index)}
                                     onClick={() => selectOption(index)}
-                                    className={`flex min-h-10 cursor-pointer items-center break-words px-3 py-2 leading-5 ${
+                                    className={`flex min-h-10 cursor-pointer items-center px-3 py-2 leading-5 ${truncateOptions ? 'min-w-0 overflow-hidden' : 'break-words'} ${
                                         index === activeIndex
                                             ? 'bg-[#eaf3ff] text-primary'
                                             : 'hover:bg-[#f3f7fd]'
@@ -283,7 +286,7 @@ const Select = forwardRef(
                                             : ''
                                     }`}
                                 >
-                                    {option.label}
+                                    {truncateOptions ? <span className="block min-w-0 flex-1 truncate">{option.label}</span> : option.label}
                                 </li>
                             ))}
                         </ul>,

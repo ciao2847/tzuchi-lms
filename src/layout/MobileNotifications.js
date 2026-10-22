@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import I18N from 'components/I18N'
 import NotificationDetailDialog from 'components/NotificationDetailDialog'
 import useBodyScrollLock from 'hooks/useBodyScrollLock'
-import {
-    ANNOUNCEMENT_LIST,
-    HAS_UNREAD_NOTICE,
-    MESSAGE_LIST
-} from 'constants/learningCalendar'
+import { DashboardContext } from 'contexts/DashboardProvider'
+import { LoginContext } from 'contexts/LoginProvider'
+import DashboardStatus from 'components/DashboardStatus'
 
 const NoticeSection = ({ items, onSelect, title, tone }) => (
     <section className="overflow-hidden rounded-[8px] border border-solid border-[#dfe7f1] bg-white [box-shadow:0_2px_10px_rgba(9,58,123,0.06)]">
@@ -27,12 +25,13 @@ const NoticeSection = ({ items, onSelect, title, tone }) => (
             </button> */}
         </header>
 
-        <ul className="divide-y divide-[#edf1f6] px-4">
-            {items.map((item) => (
-                <li key={item.id}>
+        <ul className="divide-y divide-[#edf1f6] px-4 md:max-h-[380px] md:overflow-y-auto md:overscroll-contain">
+            {!items.length && <li className="py-4 text-[13px] text-gray-500">目前沒有資料</li>}
+            {items.map((item, index) => (
+                <li key={item.id} className={`h-[76px] ${index >= 3 ? 'hidden md:block' : ''}`}>
                     <button
                         type="button"
-                        className="flex w-full items-start gap-3 rounded-[4px] py-3 text-left transition-colors hover:bg-[#f7f9fd] focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary"
+                        className="flex h-full w-full items-start gap-3 rounded-[4px] py-3 text-left transition-colors hover:bg-[#f7f9fd] focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary"
                         aria-haspopup="dialog"
                         aria-label={`查看${item.title}`}
                         onClick={() => onSelect(item)}
@@ -44,7 +43,7 @@ const NoticeSection = ({ items, onSelect, title, tone }) => (
                             aria-hidden="true"
                         />
                         <span className="min-w-0 flex-1">
-                            <span className="block text-[13px] font-medium leading-5 text-primary">
+                            <span title={item.title} className="block truncate text-[13px] font-medium leading-5 text-primary">
                                 {item.title}
                             </span>
                             <time className="mt-1 block text-[11px] leading-4 text-[#7d8fa5]">
@@ -60,8 +59,10 @@ const NoticeSection = ({ items, onSelect, title, tone }) => (
 
 const MobileNotifications = () => {
     const { pathname, search } = useLocation()
+    const { isLogin } = useContext(LoginContext)
+    const { data } = useContext(DashboardContext)
     const [isOpen, setIsOpen] = useState(false)
-    const [hasUnread, setHasUnread] = useState(HAS_UNREAD_NOTICE)
+    const hasUnread = data.messages.some(item => item.isUnread)
     const [isNavigationOpen, setIsNavigationOpen] = useState(false)
     const [selectedNotice, setSelectedNotice] = useState(null)
     useBodyScrollLock(isOpen, `${pathname}${search}`)
@@ -75,7 +76,6 @@ const MobileNotifications = () => {
             const nextValue = !currentValue
 
             if (nextValue) {
-                setHasUnread(false)
                 window.dispatchEvent(
                     new CustomEvent('tzuchi:notifications-open')
                 )
@@ -87,7 +87,7 @@ const MobileNotifications = () => {
 
     useEffect(() => {
         closeNotifications()
-    }, [pathname, search])
+    }, [pathname, search, data])
 
     useEffect(() => {
         const closeOnEscape = ({ key }) => {
@@ -117,6 +117,7 @@ const MobileNotifications = () => {
         }
     }, [])
 
+    if (!isLogin) return null
     return (
         <>
             <div className="xl:hidden">
@@ -127,7 +128,7 @@ const MobileNotifications = () => {
                             ? 'pointer-events-none opacity-0'
                             : 'opacity-100'
                     }`}
-                    aria-label="查看消息與公告"
+                    aria-label="查看通知信與系統公告"
                     aria-controls="mobile-notifications-panel"
                     aria-expanded={isOpen}
                     onClick={toggleNotifications}
@@ -156,12 +157,12 @@ const MobileNotifications = () => {
                     <div className="flex h-full flex-col">
                         <div className="flex h-12 shrink-0 items-center justify-between border-y border-solid border-[#dfe7f1] bg-white px-4">
                             <h1 className="text-[17px] font-bold text-primary">
-                                <I18N>消息與公告</I18N>
+                                <I18N>通知信與系統公告</I18N>
                             </h1>
                             <button
                                 type="button"
                                 className="inline-flex h-8 w-8 items-center justify-center rounded-full text-primary focus-visible:ring-2 focus-visible:ring-primary"
-                                aria-label="關閉消息與公告"
+                                aria-label="關閉通知信與系統公告"
                                 onClick={closeNotifications}
                             >
                                 <i
@@ -172,15 +173,16 @@ const MobileNotifications = () => {
                         </div>
 
                         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-3 pb-[calc(env(safe-area-inset-bottom)+16px)]">
+                            <DashboardStatus />
                             <NoticeSection
-                                title="消息"
-                                items={MESSAGE_LIST}
+                                title="通知信"
+                                items={data.messages}
                                 tone="blue"
                                 onSelect={setSelectedNotice}
                             />
                             <NoticeSection
-                                title="最新公告"
-                                items={ANNOUNCEMENT_LIST}
+                                title="系統公告"
+                                items={data.announcements}
                                 tone="red"
                                 onSelect={setSelectedNotice}
                             />

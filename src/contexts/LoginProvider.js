@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { login as requestLogin } from 'api/auth'
+import React, { useCallback, useRef, useState } from 'react'
+import { logout as requestLogout } from 'api/auth'
 
 const LOGIN_STORAGE_KEY = 'tzuchi-lms-login'
 
@@ -15,17 +15,10 @@ const LOGGED_OUT_STATE = {
 const parseStoredLogin = (storedValue) => {
     if (!storedValue || storedValue === 'false') return null
 
-    // 相容舊版只儲存 true / false 的登入狀態。
-    if (storedValue === 'true') {
-        return {
-            isLogin: true,
-            user: DEFAULT_USER
-        }
-    }
-
     try {
         const storedLogin = JSON.parse(storedValue)
-        if (!storedLogin?.isLogin || !storedLogin.user) return null
+        if (!storedLogin?.isLogin || !storedLogin.user?.id ||
+            storedLogin.user.id === 'user-001') return null
 
         return storedLogin
     } catch (error) {
@@ -63,12 +56,21 @@ export const LoginContext = React.createContext({
     isLogin: false,
     user: {},
     login: async () => undefined,
-    logout: () => undefined,
+    logout: async () => undefined,
+    isLoggingOut: false,
     toggleLogin: () => undefined
 })
 
 const LoginProvider = ({ children }) => {
     const [loginState, setLoginState] = useState(getInitialLoginState)
+    const [sessionExpired, setSessionExpired] = useState(false)
+    const expireSession = useCallback(() => {
+        clearLoginState()
+        setLoginState(LOGGED_OUT_STATE)
+        setSessionExpired(true)
+    }, [])
+    const [isLoggingOut, setIsLoggingOut] = useState(false)
+    const logoutRequest = useRef(null)
 
     const toggleLogin = (nextValue) => {
         setLoginState((currentState) => {
@@ -94,36 +96,43 @@ const LoginProvider = ({ children }) => {
         })
     }
 
-    const login = async ({ remember = false, ...credentials } = {}) => {
-        const response = await requestLogin(credentials)
-
-        if (response?.status !== 200) {
-            const error = new Error(
-                response?.message || '登入失敗，請稍後再試。'
-            )
-            error.status = response?.status
-            throw error
+    const login = async ({ remember = false, user } = {}) => {
+        if (!user?.id || !user?.name) {
+            throw new Error('登入回應資料不完整，請稍後再試。')
         }
-
-        const user = response.data?.user || DEFAULT_USER
         const nextState = {
             isLogin: true,
             user
         }
 
         saveLoginState(nextState, remember)
+        setSessionExpired(false)
         setLoginState(nextState)
 
         return nextState
     }
 
     const logout = () => {
-        clearLoginState()
-        setLoginState(LOGGED_OUT_STATE)
+        if (logoutRequest.current) return logoutRequest.current
+        setIsLoggingOut(true)
+        logoutRequest.current = (async () => {
+            try {
+                await requestLogout()
+                clearLoginState()
+                setLoginState(LOGGED_OUT_STATE)
+            } finally {
+                logoutRequest.current = null
+                setIsLoggingOut(false)
+            }
+        })()
+        return logoutRequest.current
     }
 
     const contextValue = {
         ...loginState,
+        sessionExpired,
+        expireSession,
+        isLoggingOut,
         login,
         logout,
         toggleLogin

@@ -1,42 +1,24 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { DashboardContext } from 'contexts/DashboardProvider'
+import DashboardStatus from 'components/DashboardStatus'
 import I18N from 'components/I18N'
 import Link from 'components/Link'
 
-const LEARNING_STATS = [
-    {
-        id: 'upcoming',
-        label: '待上課',
-        value: 3,
-        className: 'bg-[#fff3e7] text-[#d96d21]'
-    },
-    {
-        id: 'in-progress',
-        label: '進行中',
-        value: 2,
-        className: 'bg-[#eaf3ff] text-[#1769d2]'
-    },
-    {
-        id: 'completed',
-        label: '已完成',
-        value: 18,
-        className: 'bg-[#e9f8ef] text-[#168742]'
-    }
-]
-
-const RECENT_COURSE = {
-    title: '護理部_PI/NOR_專科主題課程_嬰兒足底採血情境式模擬演練',
-    dateTime: '2026-08-07T07:50:00+08:00',
-    displayTime: '2026/08/07 07:50–08:50'
-}
-
 const LearningSummarySection = ({
     user = {},
-    stats = LEARNING_STATS,
-    recentCourse = RECENT_COURSE,
     className = ''
 }) => {
-    const { name = '王小明' } = user
-    const { title, dateTime, displayTime } = recentCourse
+    const { name = '' } = user
+    const { data, status } = useContext(DashboardContext)
+    const stats = [
+        { id: 'upcoming', label: '待上課', value: data.coming.length, className: 'bg-[#fff3e7] text-[#d96d21]' },
+        { id: 'in-progress', label: '進行中學程', value: data.programs.inProgress.length, className: 'bg-[#eaf3ff] text-[#1769d2]' },
+        { id: 'completed', label: '已完成課程', value: data.passed.length, className: 'bg-[#e9f8ef] text-[#168742]' }
+    ]
+    const recent = [...data.coming].filter(course => course.start).sort((a, b) => a.start.localeCompare(b.start))[0]
+    const title = recent?.title || '目前沒有待上課課程'
+    const dateTime = recent?.start || ''
+    const displayTime = dateTime.replace('T', ' ') + (recent?.end ? ` ～ ${recent.end.replace('T', ' ')}` : '')
 
     return (
         <section
@@ -63,6 +45,7 @@ const LearningSummarySection = ({
                 </div>
             </header>
 
+            <DashboardStatus />
             <ul className="mb-4 grid grid-cols-3 gap-2" aria-label="學習狀態">
                 {stats.map(({ className: statClassName, id, label, value }) => (
                     <li
@@ -70,7 +53,7 @@ const LearningSummarySection = ({
                         className={`flex min-w-0 flex-col items-center justify-center rounded-[8px] px-2 py-3 text-center ${statClassName}`}
                     >
                         <strong className="text-[22px] font-bold leading-7">
-                            {value}
+                            {status === 'success' ? value : '—'}
                         </strong>
                         <span className="mt-0.5 text-[12px] font-bold leading-4">
                             <I18N>{label}</I18N>
@@ -81,10 +64,10 @@ const LearningSummarySection = ({
 
             <article className="mb-5 rounded-[10px] border border-solid border-[#dfe7f1] bg-[#f8fbff] p-4">
                 <p className="mb-1 text-[12px] font-bold leading-5 text-secondary">
-                    <I18N>最近一堂課程</I18N>
+                    <I18N>下一堂課程</I18N>
                 </p>
                 <h3 className="line-clamp-2 text-[14px] font-bold leading-5 text-primary">
-                    {title}
+                    {status === 'success' ? title : '—'}
                 </h3>
                 <p className="mt-2 flex items-center gap-2 text-[12px] leading-5 text-[#55718f]">
                     <i
