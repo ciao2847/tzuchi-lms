@@ -6,7 +6,7 @@ import React from 'react'
 const NotFound = () => {
     const lang = useLocale()
     return (
-        <div className="mx-auto mt-6 flex min-h-[calc(100dvh-48px)] w-full items-center justify-center px-4 pt-[56px] xl:max-w-[1200px] xl:pt-[80px] 2xl:max-w-[1400px]">
+        <div className="mx-auto mt-6 flex min-h-[calc(100dvh-48px)] w-full items-center justify-center px-4 pt-[var(--header-height)] xl:max-w-[1200px] 2xl:max-w-[1400px]">
             <div className="mx-auto flex flex-col items-center justify-center">
                 {/* <ThumbFrame
                     src={`${process.env.BASE_PATH}/images/not-found/404.png`}

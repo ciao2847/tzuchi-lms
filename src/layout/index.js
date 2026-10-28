@@ -54,7 +54,7 @@ const Layout = ({ children }) => {
                     tabIndex="-1"
                     className={`${!isProd ? 'staging-site' : ''} ${
                         isEmbed ? 'pt-2' : 'pt-0'
-                    } relative mx-auto min-h-[80vh] scroll-mt-[56px] focus:outline-none xl:scroll-mt-[80px]`}
+                    } relative mx-auto min-h-[80vh] scroll-mt-[var(--header-height)] focus:outline-none`}
                 >
                     {children}
                 </main>

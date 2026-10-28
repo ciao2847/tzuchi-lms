@@ -125,7 +125,7 @@ const Page = () => {
     }
 
     return (
-        <div className="min-h-[calc(100dvh-48px)] bg-[#f7f9fd] pt-[56px] xl:pt-[80px]">
+        <div className="min-h-[calc(100dvh-48px)] bg-[#f7f9fd] pt-[var(--header-height)]">
             <TitleBlk
                 title="快速選課"
                 icon="pencil"

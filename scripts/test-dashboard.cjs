@@ -106,6 +106,7 @@ async function main() {
     let calendarProps
     const Calendar = load('src/views/calendar/index.js', {
         'adapters/dashboardAdapter': adapter,
+        './LearningHistory': () => null,
         'contexts/DashboardProvider': { DashboardContext },
         'components/DashboardStatus': () => null,
         '@fullcalendar/react': React.forwardRef((props, ref) => {

@@ -127,7 +127,7 @@ const Page = () => {
     const { breadcrumbs, icon, title } = pageGroup[pageId] || pageGroup.default
 
     return (
-        <div className="min-h-[calc(100dvh-48px)] bg-[#f4f7fd] pt-[56px] xl:pt-[80px]">
+        <div className="min-h-[calc(100dvh-48px)] bg-[#f4f7fd] pt-[var(--header-height)]">
             <TitleBlk title={title} icon={icon} breadcrumbs={breadcrumbs} />
         </div>
     )

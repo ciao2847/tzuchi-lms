@@ -142,7 +142,7 @@ const RegistrationDetail = ({ course }) => {
 
     return (
         <div
-            className={`min-h-[calc(100dvh-48px)] bg-light pt-[56px] xl:pt-[80px] ${
+            className={`min-h-[calc(100dvh-48px)] bg-light pt-[var(--header-height)] ${
                 canRegister ? 'pb-[76px] xl:pb-0' : ''
             }`}
         >

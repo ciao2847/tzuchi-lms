@@ -382,14 +382,14 @@ const MainNav = () => {
     return (
         <>
             <BtnMenu
-                className="absolute right-2 md:right-6 top-[12px] z-[2000] xl:hidden"
+                className="absolute right-5 top-[14px] z-[2000] md:right-10 md:top-[33px] xl:hidden"
                 controlsId="mobile-main-navigation"
                 isOpen={isMenuOpen}
                 toggle={setIsMenuOpen}
             />
 
             <nav
-                className="hidden h-[80px] items-center xl:flex"
+                className="hidden h-full items-center xl:flex"
                 aria-label="主選單"
             >
                 <ul className="flex h-full w-[800px] items-center justify-between">
@@ -439,7 +439,7 @@ const MainNav = () => {
                         isMenuOpen ? 'translate-x-0' : 'translate-x-full'
                     } mobile-scroll-wrapper absolute inset-0 z-10 flex h-full w-full flex-col bg-white transition-transform duration-300`}
                 >
-                    <div className="flex h-14 shrink-0 items-center border-b border-solid border-gray-200 px-3 pr-12">
+                    <div className="flex h-[var(--header-height)] shrink-0 items-center border-b border-solid border-gray-200 px-5 pr-16 md:px-10 md:pr-20">
                         <Link
                             href="/"
                             className="block h-[40px] w-[147px] max-w-full bg-contain bg-left bg-no-repeat"

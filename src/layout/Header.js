@@ -31,13 +31,13 @@ const Header = () => {
     return (
         <>
             <header
-                className={`header-wrapper fixed left-0 right-0 top-0 z-50 w-full border-b bg-white transition-all duration-300 ${
+                className={`top-navbar header-wrapper fixed left-0 right-0 top-0 z-50 box-border h-[var(--header-height)] w-full border-b border-[#e0e0e0] bg-white transition-all duration-300 ${
                     headerTheme === 'shadow'
                         ? '[box-shadow:0_4px_12px_rgba(9,58,123,0.14)]'
                         : 'shadow-none'
                 }`}
             >
-                <div className="header flex h-[56px] w-full items-center justify-between px-2 md:mx-auto xl:h-[80px] xl:max-w-[1200px] md:px-6 xl:px-10 2xl:px-0 2xl:max-w-[1400px]">
+                <div className="header flex h-full w-full items-center justify-between px-5 md:px-10">
                     <MainComp className="mr-auto z-10 relative shrink-0">
                         <Link
                             className="main-logo block h-12 w-[176px] bg-contain bg-center bg-no-repeat xl:h-16 xl:w-[235px]"
@@ -54,7 +54,7 @@ const Header = () => {
 
                     <MobileNotifications />
 
-                    <div className="flex flex-col items-end gap-2">
+                    <div className="flex h-full flex-col items-end gap-2">
                         <MainNav />
                     </div>
                 </div>

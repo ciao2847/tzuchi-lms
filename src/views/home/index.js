@@ -17,8 +17,8 @@ const Page = () => {
     useEffect(() => setSelectedNotice(null), [data, isLogin])
 
     return (
-        <div className="bg-light pt-[34px] xl:pt-[58px] mt-6">
-            <section className="relative isolate flex items-center justify-center bg-light px-4 py-10 md:px-6 xl:min-h-[calc(100dvh-80px)] xl:px-10 ">
+        <div className="bg-light pt-[var(--header-height)]">
+            <section className="relative isolate flex items-center justify-center bg-light px-4 py-10 md:px-6 xl:min-h-[calc(100dvh-var(--header-height))] xl:px-10 ">
                 <img
                     src={`${process.env.BASE_PATH}/images/index/login-bg-deco.png`}
                     className="pointer-events-none absolute inset-x-0 bottom-0 h-auto w-full object-cover object-bottom md:h-auto"

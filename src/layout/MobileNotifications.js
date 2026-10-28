@@ -123,7 +123,7 @@ const MobileNotifications = () => {
             <div className="xl:hidden">
                 <button
                     type="button"
-                    className={`absolute right-12 md:right-16 top-[12px] z-[2000] inline-flex size-8 items-center justify-center border-0 bg-transparent p-0 text-primary transition-opacity focus-visible:ring-2 focus-visible:ring-primary ${
+                    className={`absolute right-[60px] top-[14px] z-[2000] inline-flex size-8 items-center justify-center border-0 bg-transparent p-0 text-primary transition-opacity focus-visible:ring-2 focus-visible:ring-primary md:right-20 md:top-[33px] ${
                         isNavigationOpen
                             ? 'pointer-events-none opacity-0'
                             : 'opacity-100'
@@ -147,7 +147,7 @@ const MobileNotifications = () => {
 
                 <div
                     id="mobile-notifications-panel"
-                    className={`fixed inset-x-0 bottom-0 top-[56px] z-[1200] bg-[#f5f8fd] transition-[visibility,opacity,transform] duration-300 ${
+                    className={`fixed inset-x-0 bottom-0 top-[var(--header-height)] z-[1200] bg-[#f5f8fd] transition-[visibility,opacity,transform] duration-300 ${
                         isOpen
                             ? 'visible translate-y-0 opacity-100'
                             : 'invisible -translate-y-2 opacity-0'

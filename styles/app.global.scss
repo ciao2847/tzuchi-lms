@@ -4,13 +4,17 @@
 @import 'icon';
 @import 'learning-calendar';
 
+:root {
+    --header-height: 60px;
+
+    @media (min-width: 768px) {
+        --header-height: 98px;
+    }
+}
+
 html {
     overflow-x: clip;
-    scroll-padding-top: 56px;
-
-    @media (min-width: 1200px) {
-        scroll-padding-top: 80px;
-    }
+    scroll-padding-top: var(--header-height);
 }
 html,
 body {
@@ -291,10 +295,7 @@ button.gm-ui-hover-effect {
     overflow: hidden !important;
 }
 .sticky-nav {
-    top: 56px;
-    @media (min-width: 1200px) {
-        top: 80px;
-    }
+    top: var(--header-height);
 }
 
 .breadcrumbs {

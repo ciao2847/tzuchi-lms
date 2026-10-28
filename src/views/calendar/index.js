@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { DashboardContext } from 'contexts/DashboardProvider'
 import DashboardStatus from 'components/DashboardStatus'
 import { getCalendarEvents } from 'adapters/dashboardAdapter'
+import LearningHistory from './LearningHistory'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/react/daygrid'
 import classicThemePlugin from '@fullcalendar/react/themes/classic'
@@ -596,7 +597,7 @@ const Page = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#f4f7fd] pt-[56px] text-primary xl:pt-[80px]">
+        <div className="min-h-screen bg-[#f4f7fd] pt-[var(--header-height)] text-primary">
             <TitleBlk
                 title="我的學習行事曆"
                 icon="calendar"
@@ -627,7 +628,8 @@ const Page = () => {
                                         headerToolbar={false}
                                         height={540}
                                         firstDay={0}
-                                        fixedWeekCount={true}
+                                        fixedWeekCount={false}
+                                        expandRows={true}
                                         showNonCurrentDates={true}
                                         dayHeaders={true}
                                         dayHeaderContent={({ date }) =>
@@ -668,6 +670,7 @@ const Page = () => {
                                         activeTab={activeTab}
                                         onChange={setActiveTab}
                                     />
+                                    {activeTab === 'learning' ? <LearningHistory courses={data.history} status={status} /> : <>
                                     <ProgramSelector
                                         programs={programs}
                                         status={status}
@@ -675,6 +678,7 @@ const Page = () => {
                                         onChange={setSelectedProgram}
                                     />
                                     <ProgramDetails />
+                                    </>}
                                 </div>
                             </section>
                         </div>

@@ -230,7 +230,7 @@ const Page = () => {
     }
 
     return (
-        <div className="min-h-[calc(100dvh-48px)] bg-[#f4f7fd] pt-[56px] text-primary xl:pt-[80px]">
+        <div className="min-h-[calc(100dvh-48px)] bg-[#f4f7fd] pt-[var(--header-height)] text-primary">
             <TitleBlk
                 title="外訓資料"
                 icon="adv"
