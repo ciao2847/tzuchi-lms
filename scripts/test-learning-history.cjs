@@ -49,6 +49,7 @@ const { default: LearningHistory, LearningHistoryResults } = load('src/views/cal
     'components/PaginatedList': PageList,
     'components/ViewModeToggle': Toggle,
     'components/DashboardStatus': () => React.createElement('p', null, 'Loading'),
+    'components/Select': load('src/components/Select.js').default,
     'hooks/useMedia': () => desktop,
     'adapters/learningHistoryAdapter': adapter
 })
@@ -78,6 +79,15 @@ const card = renderToStaticMarkup(tree)
 assert(card.includes('<article') && card.includes('Previous year') && !card.includes('<table'))
 find(tree, node => node.type === Toggle).props.onChange('list')
 assert(renderToStaticMarkup(render()).includes('<table'))
+tree = render()
+const details = { open: true }
+find(tree, node => node.type === 'button' && node.props.children === 2015).props.onClick({
+    currentTarget: { closest: () => details }
+})
+tree = render()
+assert.equal(details.open, false)
+assert.equal(find(tree, node => node.type === PageList).props.data[0].id, '4')
+assert.equal(find(tree, node => node.type === 'summary').props.children[0], 2015)
 desktop = false; slots = []
 assert.equal(find(render(), node => node.type === Toggle).props.value, 'card')
 const results = adapter.filterLearningHistory(courses, 2026)

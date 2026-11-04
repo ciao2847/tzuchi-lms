@@ -71,12 +71,13 @@ export const MENU_CONFIG = [
             {
                 id: 'external-training-data',
                 title: '外訓資料',
-                url: '/external-training-data'
+                // Temporarily use the existing service; keep the local page and dialogs for later.
+                url: 'https://nlms.tzuchi.com.tw/tzuchi/edurd/training/'
             },
             {
                 id: 'external-training-form',
                 title: '填寫外訓資料',
-                url: '/tree#external-training-form'
+                url: 'https://nlms.tzuchi.com.tw/tzuchi/edurd/training/#addOuter'
             }
         ]
     },

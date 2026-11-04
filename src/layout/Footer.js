@@ -1,8 +1,8 @@
-import React from 'react'
-import { useLocale } from 'hooks'
-import I18N, { translate } from 'components/I18N'
 import AutoSwitchLink from 'components/AutoSwitchLink'
+import I18N, { translate } from 'components/I18N'
 import { OTHER_CONFIG } from 'constants'
+import { useLocale } from 'hooks'
+import React from 'react'
 import { useLocation } from 'react-router-dom'
 
 const Footer = () => {
@@ -13,7 +13,7 @@ const Footer = () => {
     return (
         <footer className="relative z-[1] bg-white w-full">
             {isHomePage && (
-                <div className="mx-auto flex w-full flex-col items-center justify-center gap-12 px-4 py-4 text-center md:px-6 xl:max-w-[1200px] xl:px-10 2xl:max-w-[1400px]">
+                <div className="mx-auto flex w-full flex-col items-center justify-center gap-12 px-4 py-4 text-center md:px-6 xl:max-w-[1200px] xl:px-0 2xl:max-w-[1400px]">
                     <div className="flex flex-col items-center gap-4 w-full">
                         <h2 className="flex w-full items-center gap-4 text-primary text-[20px] md:text-[24px] font-bold">
                             <span

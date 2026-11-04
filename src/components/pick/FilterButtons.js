@@ -7,9 +7,10 @@ const FilterButtons = ({
     options,
     value,
     onChange,
-    tone = 'blue'
+    tone = 'blue',
+    desktopSearch = false
 }) => (
-    <fieldset className="min-w-0">
+    <fieldset className={`min-w-0 ${desktopSearch ? 'xl:[&_legend]:text-[12px] xl:[&_legend]:font-normal xl:[&_legend]:leading-4 xl:[&_span]:h-10 xl:[&_span]:rounded-[8px] xl:[&_span]:text-[13px]' : ''}`}>
         <legend className="mb-1 text-[12px] font-bold leading-4 text-primary md:mb-2 md:text-[13px] md:leading-5 xl:text-[15px] xl:leading-6">
             <I18N>{label}</I18N>
         </legend>

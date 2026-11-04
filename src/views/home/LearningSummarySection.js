@@ -24,6 +24,7 @@ const LearningSummarySection = ({
         <section
             className={`flex min-w-0 flex-col justify-center rounded-[20px] border border-solid border-gray-200 bg-white/95 p-5 shadow-sm sm:p-6 lg:min-h-[404px] ${className}`}
             aria-labelledby="learning-summary-title"
+            aria-busy={status === 'loading'}
         >
             <header className="mb-5 flex items-center gap-3">
                 <span
@@ -45,7 +46,7 @@ const LearningSummarySection = ({
                 </div>
             </header>
 
-            <DashboardStatus />
+            {status !== 'loading' && status !== 'success' && <DashboardStatus />}
             <ul className="mb-4 grid grid-cols-3 gap-2" aria-label="學習狀態">
                 {stats.map(({ className: statClassName, id, label, value }) => (
                     <li
@@ -70,10 +71,10 @@ const LearningSummarySection = ({
                     {status === 'success' ? title : '—'}
                 </h3>
                 <p className="mt-2 flex items-center gap-2 text-[12px] leading-5 text-[#55718f]">
-                    <i
+                    {dateTime && <i
                         className="icon icon-calendar shrink-0 text-[13px] text-secondary"
                         aria-hidden="true"
-                    />
+                    />}
                     <time dateTime={dateTime}>{displayTime}</time>
                 </p>
             </article>

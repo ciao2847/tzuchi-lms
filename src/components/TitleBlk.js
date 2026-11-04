@@ -13,8 +13,16 @@ const TitleBlk = ({
 
     return (
         <header
-            className={`border-y border-solid border-[#dce5f0] bg-gradient-to-r from-[#e8f2ff] via-[#eff6ff] to-[#f8fbff] ${className}`}
+            className={`relative isolate border-y border-solid border-[#dce5f0] bg-cover bg-center bg-no-repeat ${className}`}
+            style={{
+                backgroundImage: `url('${process.env.BASE_PATH}/images/global/banner.jpg')`,
+                backgroundPosition: '50% 65%'
+            }}
         >
+            <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 -z-[1] bg-gradient-to-r from-[#e8f2ff] via-[#eff6ff] to-[#f8fbff] opacity-80"
+            />
             <div className="mx-auto w-full px-4 py-3 md:px-6 md:py-4 xl:max-w-[1200px] xl:px-6 2xl:max-w-[1400px] 2xl:px-0">
                 <Breadcrumbs
                     data={breadcrumbItems}

@@ -3,6 +3,7 @@ import I18N from 'components/I18N'
 import PaginatedList from 'components/PaginatedList'
 import ViewModeToggle from 'components/ViewModeToggle'
 import DashboardStatus from 'components/DashboardStatus'
+import Select from 'components/Select'
 import useMedia from 'hooks/useMedia'
 import { getLearningHistoryYears, filterLearningHistory } from 'adapters/learningHistoryAdapter'
 
@@ -30,7 +31,7 @@ const HistoryTable = ({ data }) => (
                 <col className="w-[8%]" /><col className="w-[35%]" /><col className="w-[10%]" />
                 <col className="w-[16%]" /><col className="w-[16%]" /><col className="w-[15%]" />
             </colgroup>
-            <thead><tr className="border-b border-solid border-[#e6ecf4] bg-[#eaf0fb] text-primary">
+            <thead><tr className="border-b border-solid border-[#e6ecf4] bg-slate-100 text-primary">
                 {HEADINGS.map(title => <th key={title} scope="col" className="px-3 pb-2 pt-4 font-semibold"><I18N>{title}</I18N></th>)}
             </tr></thead>
             <tbody>{data.map(course => <tr key={`${course.status}-${course.id}-${course.start}`}
@@ -84,12 +85,36 @@ const LearningHistory = ({ courses, status }) => {
     const viewMode = selectedViewMode || (isDesktopLayout ? 'list' : 'card')
     if (status !== 'success') return <div className="mt-3"><DashboardStatus /></div>
     return <section className="pt-3 md:pt-4" aria-label="學習歷程">
-        <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label="學習歷程年份">
-            {years.map(year => <button key={year} type="button" aria-pressed={activeYear === year}
+        <Select
+            wrapperClassName="md:hidden"
+            aria-label="學習歷程年份"
+            value={activeYear ?? ''}
+            onChange={event => setSelectedYear(Number(event.target.value))}
+            className="!h-[42px] !rounded-full !border-[#1769d2] !bg-[#edf3fc] !px-5 !text-[14px] !text-[#0755cf]"
+        >
+            {years.map(year => <option key={year} value={year}>{year} 年</option>)}
+        </Select>
+        <div className="hidden flex-wrap items-center gap-2 py-1 md:flex" role="group" aria-label="學習歷程年份">
+            {years.slice(0, 5).map(year => <button key={year} type="button" aria-pressed={activeYear === year}
                 onClick={() => setSelectedYear(year)}
-                className={`inline-flex h-10 min-w-[84px] shrink-0 items-center justify-center rounded-[6px] px-4 text-[13px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-secondary xl:text-[14px] ${activeYear === year ? 'bg-blue text-white' : 'bg-[#eef3fb] text-primary hover:bg-[#e1eafa]'}`}>
+                className={`inline-flex h-9 min-w-[68px] shrink-0 items-center justify-center rounded-full border border-solid px-4 text-[13px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary xl:text-[14px] ${activeYear === year ? 'border-blue bg-[#eaf3ff] text-blue ring-2 ring-blue/15' : 'border-[#d8e1ee] bg-white text-[#486785] hover:border-secondary hover:bg-[#f3f7fd]'}`}>
                 {year}
             </button>)}
+            {years.length > 5 && <details className="relative"
+                onBlur={({ currentTarget, relatedTarget }) => { if (!currentTarget.contains(relatedTarget)) currentTarget.open = false }}
+                onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus() } }}>
+                <summary title="更多年份" className={`flex h-9 cursor-pointer list-none items-center justify-center gap-2 rounded-full border border-solid px-4 text-[13px] font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary xl:text-[14px] [&::-webkit-details-marker]:hidden ${years.slice(0, 5).includes(activeYear) ? 'border-[#d8e1ee] bg-white text-[#486785] hover:border-secondary hover:bg-[#f3f7fd]' : 'border-blue bg-[#eaf3ff] text-blue ring-2 ring-blue/15'}`}>
+                    {years.slice(0, 5).includes(activeYear) ? '更多' : activeYear}
+                    <i className="icon icon-arrow-down text-[9px]" aria-hidden="true" />
+                </summary>
+                <div className="absolute left-0 top-full z-20 mt-2 max-h-60 min-w-[120px] overflow-y-auto rounded-[8px] border border-solid border-[#d8e1ee] bg-white py-1 shadow-lg" role="group" aria-label="更多學習歷程年份">
+                    {years.slice(5).map(year => <button key={year} type="button" aria-pressed={activeYear === year}
+                        className={`block w-full px-4 py-2 text-left text-[13px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-secondary xl:text-[14px] ${activeYear === year ? 'bg-[#eaf3ff] font-bold text-blue' : 'text-primary hover:bg-[#f3f7fd]'}`}
+                        onClick={event => { setSelectedYear(year); event.currentTarget.closest('details').open = false }}>
+                        {year}
+                    </button>)}
+                </div>
+            </details>}
         </div>
         <div className="mb-3 mt-4 flex flex-wrap items-center justify-between gap-3 md:mb-4 md:mt-5">
             <h2 className="text-[13px] font-bold leading-5 text-primary md:text-[15px] xl:text-[17px] xl:leading-6">

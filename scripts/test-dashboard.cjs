@@ -55,6 +55,7 @@ async function main() {
     assert.equal(mixed.passed.length, 1)
     assert.equal(mixed.yet.length, 1)
     const events = adapter.getCalendarEvents(data)
+    assert.equal(events[0].url, `https://nlms.tzuchi.com.tw/tzuchi/edurd/register_course/course_opration.php?id=${encodeURIComponent(events[0].extendedProps.course.id)}`)
     assert.equal(events.length, 2) // Missing date in the third record is not plotted.
     assert.equal(events[0].start, '2026-10-22')
     assert.equal(events[0].extendedProps.tone, 'registered')
@@ -72,7 +73,25 @@ async function main() {
 
     const client = load('src/lib/apiClient.js')
     const auth = load('src/constants/auth.js')
-    const api = load('src/api/dashboard.js', { 'lib/apiClient': client, 'adapters/dashboardAdapter': adapter, 'constants/auth': auth })
+    const programAdapter = load('src/adapters/programAdapter.js')
+    const api = load('src/api/dashboard.js', { 'lib/apiClient': client, 'adapters/dashboardAdapter': adapter, 'adapters/programAdapter': programAdapter, 'constants/auth': auth })
+    global.fetch = async () => ({ ok: true, json: async () => ({ success: false, error: { code: 'SESSION_EXPIRED' } }) })
+    await assert.rejects(api.getProgramInfo('3324'), error => error.status === 401)
+    global.fetch = async (url, options) => {
+        assert(url.endsWith('/dashboard/programInfo/3324'))
+        assert.equal(options.credentials, 'include')
+        assert.equal(options.headers['X-API-Key'], auth.AUTH_API_KEY)
+        return { ok: true, json: async () => ({ success: true, data: {
+            programCategory: { '14818': { name: 'Category', credit: '2',
+                status: ['p', 'q', 'w', 'd.', 'o'],
+                course: [{ id: 1, name: 'Course', status: '', type: 'digital' }] } },
+            totalCredit: 5, passCredit: 2, passRealCredit: 1
+        } }) }
+    }
+    const program = await api.getProgramInfo('3324')
+    assert.deepEqual(program.categories[0].states, ['complete', 'overdueComplete', 'inProgress', 'failed', 'notStarted'])
+    assert.equal(program.categories[0].courses[0].status, '')
+    assert.equal(program.passRealCredit, 1)
     let request
     global.fetch = async (url, options) => {
         request = { url, options }
@@ -104,9 +123,42 @@ async function main() {
     assert.equal(calendarConstants.MESSAGE_LIST, undefined)
     assert.equal(calendarConstants.HAS_UNREAD_NOTICE, undefined)
     let calendarProps
+    const RoundedSearchField = load('src/components/RoundedSearchField.js').default
+    let mobileSelector = false
+    const SearchableProgramSelector = load('src/views/calendar/SearchableProgramSelector.js', {
+        'hooks/useMedia': () => mobileSelector,
+        'components/Select': load('src/components/Select.js').default,
+        'components/KeywordSearchRow': load('src/components/KeywordSearchRow.js', { 'components/I18N': ({ children }) => children }).default,
+        'components/RoundedSearchField': RoundedSearchField
+    }).default
+    const selector = renderToStaticMarkup(React.createElement(SearchableProgramSelector, {
+        programs: Array.from({ length: 8 }, (_, id) => ({ id: String(id), title: `Course ${id}` })),
+        selectedProgram: '4', onChange: () => {}, status: 'success'
+    }))
+    assert(selector.includes('col-start-3') && selector.includes('overflow-y-auto'))
+    assert(selector.includes('Course 7') && selector.includes('更多：Course 4'))
+    assert(selector.includes('type="search"') && selector.includes('rounded-full'))
+    mobileSelector = true
+    const compactSelector = renderToStaticMarkup(React.createElement(SearchableProgramSelector, {
+        programs: [{ id: '4', title: '花慈師資培育課程' }], selectedProgram: '4', onChange: () => {}, status: 'success', searchWithButtons: true
+    }))
+    assert(compactSelector.includes('role="combobox"') && compactSelector.includes('花慈師資培育課程'))
+    assert(compactSelector.includes('aria-label="開始查詢"') && compactSelector.includes('aria-label="清除條件"'))
+    assert(!compactSelector.includes('col-start-3'))
+    mobileSelector = false
+    const desktopSelector = renderToStaticMarkup(React.createElement(SearchableProgramSelector, {
+        programs: [{ id: '4', title: '花慈師資培育課程' }], selectedProgram: '4', onChange: () => {}, status: 'success', searchWithButtons: true
+    }))
+    assert(desktopSelector.includes('col-start-3') && desktopSelector.includes('開始查詢') && desktopSelector.includes('清除條件'))
+    assert(!desktopSelector.includes('role="combobox"'))
     const Calendar = load('src/views/calendar/index.js', {
+        'components/Spinner': () => null,
+        'hooks/useMedia': () => false,
+        'api/dashboard': api,
+        'contexts/LoginProvider': { LoginContext: React.createContext({ user: {}, expireSession: () => {} }) },
         'adapters/dashboardAdapter': adapter,
         './LearningHistory': () => null,
+        './SearchableProgramSelector': SearchableProgramSelector,
         'contexts/DashboardProvider': { DashboardContext },
         'components/DashboardStatus': () => null,
         '@fullcalendar/react': React.forwardRef((props, ref) => {
@@ -126,7 +178,7 @@ async function main() {
     assert(calendar.includes('Announcement') && calendar.includes('Unread'))
     assert(calendar.includes('\u901a\u77e5\u4fe1') && calendar.includes('\u7cfb\u7d71\u516c\u544a'))
     assert(calendar.includes('xl:grid-cols-[minmax(0,1fr)_330px]'))
-    assert(calendar.includes('2020/11/01'))
+    assert(!calendar.includes('2020/11/01'))
     assert(calendar.includes('Program from API'))
     assert(calendar.includes('value="4"'))
     assert(!calendar.includes('six-skills-1'))

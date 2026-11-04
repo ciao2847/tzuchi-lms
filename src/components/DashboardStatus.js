@@ -5,10 +5,14 @@ import { LoginContext } from 'contexts/LoginProvider'
 
 const DashboardStatus = () => {
     const { status, error, reload } = useContext(DashboardContext)
-    const { sessionExpired } = useContext(LoginContext)
+    const { sessionExpired, sessionStatus, sessionError, retrySession } = useContext(LoginContext)
+    if (sessionStatus === 'checking') return <p role="status" aria-busy="true" className="rounded border border-gray-200 bg-white p-4 text-[14px] text-primary">正在確認登入狀態…</p>
+    if (sessionStatus === 'error') return <div role="alert" className="rounded border border-gray-200 bg-white p-4 text-[14px] text-primary">
+        {sessionError}<button type="button" onClick={retrySession} className="ml-3 text-secondary underline">重新確認登入狀態</button>
+    </div>
     if (status === 'success') return null
     return (
-        <div className="rounded border border-gray-200 bg-white p-4 text-[14px] text-primary" role={status === 'error' || sessionExpired ? 'alert' : 'status'}>
+        <div className="rounded border border-gray-200 bg-white p-4 text-[14px] text-primary" aria-busy={status === 'loading'} role={status === 'error' || sessionExpired ? 'alert' : 'status'}>
             {status === 'idle' ? <Link href="/#login">{sessionExpired ? '登入時效已過期，請重新登入。' : '請先登入以查看個人學習歷程。'}</Link> :
                 status === 'loading' ? '學習歷程載入中…' : <>{error}<button type="button" onClick={reload} className="ml-3 text-secondary underline">重新載入</button></>}
         </div>

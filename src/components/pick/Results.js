@@ -203,6 +203,14 @@ const Table = ({ data }) => {
                         }) => (
                             <tr
                                 key={id}
+                                tabIndex={0}
+                                aria-label={`院區：${campus}；類型：${type}${isToday ? '；今天' : ''}；課程名稱：${title}；上課時間：${date}；講師：${lecturer}；報名人數：${enrollment || '—'}；認列學程：${programs.join('；') || '無'}。按 Enter 查看課程`}
+                                onKeyDown={(event) => {
+                                    if (event.key === 'Enter' && event.target === event.currentTarget) {
+                                        event.preventDefault()
+                                        navigate(`/pick/${id}`)
+                                    }
+                                }}
                                 onClick={(event) => {
                                     if (
                                         event.defaultPrevented ||
@@ -212,7 +220,7 @@ const Table = ({ data }) => {
                                     }
                                     navigate(`/pick/${id}`)
                                 }}
-                                className="cursor-pointer border-b border-solid border-[#e5ebf3] transition-colors hover:bg-[#eaf3ff] focus-within:bg-primary-[#eaf3ff] last:border-b-0"
+                                className="cursor-pointer border-b border-solid border-[#e5ebf3] transition-colors hover:bg-[#eaf3ff] focus-within:bg-[#eaf3ff] focus-visible:bg-[#eaf3ff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary last:border-b-0"
                             >
                                 <td className="px-3 py-3">
                                     <ul className="flex flex-wrap items-center gap-1">
@@ -222,7 +230,14 @@ const Table = ({ data }) => {
                                     </ul>
                                 </td>
                                 <td className="px-3 py-3 font-semibold">
-                                    <CellText>{title}</CellText>
+                                    <Link
+                                        href={`/pick/${id}`}
+                                        tabIndex={-1}
+                                        className="block rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                                        aria-label={`查看課程：${title}`}
+                                    >
+                                        <CellText>{title}</CellText>
+                                    </Link>
                                 </td>
                                 <td className="px-3 py-3 text-[#486785]">
                                     <CellText>{date}</CellText>

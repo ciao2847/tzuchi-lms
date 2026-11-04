@@ -18,7 +18,7 @@ const Page = () => {
 
     return (
         <div className="bg-light pt-[var(--header-height)]">
-            <section className="relative isolate flex items-center justify-center bg-light px-4 py-10 md:px-6 xl:min-h-[calc(100dvh-var(--header-height))] xl:px-10 ">
+            <section id="login" className="relative isolate flex min-h-[calc(100dvh-var(--header-height))] scroll-mt-[var(--header-height)] items-center justify-center bg-light px-4 py-10 md:px-6 xl:px-10">
                 <img
                     src={`${process.env.BASE_PATH}/images/index/login-bg-deco.png`}
                     className="pointer-events-none absolute inset-x-0 bottom-0 h-auto w-full object-cover object-bottom md:h-auto"
@@ -34,15 +34,13 @@ const Page = () => {
                     ) : (
                         <LoginSection className="lg:order-2" onLogin={login} />
                     )}
-                    {isLogin ? (
-                        <div className="lg:order-1">
-                            {status === 'success' ? <AnnouncementSection
-                                className="h-full"
-                                announcements={data.announcements.map((item) => ({ ...item, category: '最新公告', description: item.date }))}
-                                onSelect={setSelectedNotice}
-                            /> : <DashboardStatus />}
-                        </div>
-                    ) : <AnnouncementSection className="lg:order-1" />}
+                    <AnnouncementSection
+                        className="h-full lg:order-1"
+                        announcements={isLogin ? data.announcements.map((item) => ({ ...item, category: '最新公告', description: item.date })) : undefined}
+                        loading={isLogin && status !== 'success' && status !== 'error'}
+                        statusContent={isLogin && status === 'error' ? <DashboardStatus /> : null}
+                        onSelect={isLogin ? setSelectedNotice : undefined}
+                    />
                 </div>
             </section>
             <EntranceSection />

@@ -20,6 +20,7 @@ export const getCalendarEvents = (data) => [...data.coming, ...data.history]
     .map(course => ({
         id: `${course.status}-${course.id}`,
         title: course.title,
+        url: `https://nlms.tzuchi.com.tw/tzuchi/edurd/register_course/course_opration.php?id=${encodeURIComponent(course.id)}`,
         start: course.start.slice(0, 10),
         allDay: true,
         extendedProps: { tone: course.tone, sortTime: course.start, course }

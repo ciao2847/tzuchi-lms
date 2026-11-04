@@ -3,6 +3,7 @@ import { DashboardContext } from 'contexts/DashboardProvider'
 import DashboardStatus from 'components/DashboardStatus'
 import { getCalendarEvents } from 'adapters/dashboardAdapter'
 import LearningHistory from './LearningHistory'
+import SearchableProgramSelector from './SearchableProgramSelector'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/react/daygrid'
 import classicThemePlugin from '@fullcalendar/react/themes/classic'
@@ -11,10 +12,10 @@ import Link from 'components/Link'
 import NotificationDetailDialog from 'components/NotificationDetailDialog'
 import Select from 'components/Select'
 import TitleBlk from 'components/TitleBlk'
-import {
-    COURSE_PROGRESS,
-    getCalendarCourseById
-} from 'constants/learningCalendar'
+import Spinner from 'components/Spinner'
+import useMedia from 'hooks/useMedia'
+import { getProgramInfo } from 'api/dashboard'
+import { LoginContext } from 'contexts/LoginProvider'
 
 const WEEKDAY_LABELS = ['日', '一', '二', '三', '四', '五', '六']
 
@@ -186,7 +187,7 @@ const ProgramSelector = ({ programs, selectedProgram, onChange, status }) => {
             <Select
                 id="program-select"
                 wrapperClassName="md:hidden"
-                className="font-bold"
+                className="!h-[42px] !rounded-full !border-[#1769d2] !bg-[#edf3fc] !px-5 !text-[14px] !text-[#0755cf]"
                 truncateOptions
                 value={selectedProgram}
                 title={programs.find(program => program.id === selectedProgram)?.title || ''}
@@ -199,7 +200,7 @@ const ProgramSelector = ({ programs, selectedProgram, onChange, status }) => {
                 ))}
             </Select>
 
-            <ul className="hidden grid-cols-3 gap-3 md:grid">
+            <ul className="hidden grid-cols-3 gap-2 md:grid">
                 {programs.map(({ id, title }) => {
                     const isSelected = selectedProgram === id
 
@@ -208,10 +209,10 @@ const ProgramSelector = ({ programs, selectedProgram, onChange, status }) => {
                             <button
                                 type="button"
                                 title={title}
-                                className={`block min-h-[42px] w-full min-w-0 max-w-full overflow-hidden rounded-[5px] px-3 py-2 text-[14px] font-bold leading-5 transition-colors lg:text-[15px] xl:text-[17px] xl:leading-6 ${
+                                className={`block h-10 w-full min-w-0 max-w-full overflow-hidden rounded-full border border-solid px-4 py-2 text-[13px] font-normal leading-5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary xl:text-[14px] ${
                                     isSelected
-                                        ? 'bg-blue text-white'
-                                        : 'bg-[#f1f5fb] text-[#3c5573] hover:bg-[#e8eff9] hover:text-secondary'
+                                        ? 'border-blue bg-[#eaf3ff] text-blue ring-2 ring-blue/15'
+                                        : 'border-[#dce5f0] bg-white text-[#708399] hover:border-secondary hover:bg-[#f3f7fd]'
                                 }`}
                                 aria-pressed={isSelected}
                                 onClick={() => onChange(id)}
@@ -236,7 +237,8 @@ const ProgramInfoRow = ({ children, icon, iconColor = 'text-secondary' }) => (
 )
 
 const CourseStatusIcon = ({ status, decorative = false, large = false }) => {
-    const { image, label } = COURSE_STATUS_CONFIG[status]
+    const { image, label } = COURSE_STATUS_CONFIG[status] || {}
+    if (!image) return <span aria-label="未知燈號">？</span>
 
     return (
         <img
@@ -249,22 +251,23 @@ const CourseStatusIcon = ({ status, decorative = false, large = false }) => {
     )
 }
 
-const ProgressCourseList = ({ courses, emptyText, showStatus = false }) =>
+export const ProgressCourseList = ({ courses, emptyText, showStatus = false }) =>
     courses.length ? (
         <ul className="space-y-1 md:space-y-2">
-            {courses.map(({ id, status, title }) => (
-                <li key={id} className="break-words">
+            {courses.map(({ id, status, title, type }, index) => (
+                <li key={`${id}-${index}`} className="break-words">
                     {showStatus && (
                         <>
                             <span>{status}</span>{' '}
                         </>
                     )}
-                    <Link
-                        href={`/pick/${id}`}
+                    {type && <span className="mr-1">【{type}】</span>}
+                    {!id || ["morning", "other", "[morning]", "[other]"].includes(status.trim().toLowerCase()) ? <span>{title}</span> : <Link
+                        href={`https://nlms.tzuchi.com.tw/tzuchi/edurd/register_course/course_opration.php?id=${encodeURIComponent(id)}`}
                         className="font-semibold text-secondary underline decoration-transparent underline-offset-2 hover:decoration-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary"
                     >
                         {title}
-                    </Link>
+                    </Link>}
                 </li>
             ))}
         </ul>
@@ -301,27 +304,15 @@ const CourseProgressDetails = ({
     </div>
 )
 
-const CourseProgressTable = () => {
-    const [selectedCategoryId, setSelectedCategoryId] = useState(5)
-    const selectedCategory =
-        COURSE_PROGRESS.find(({ id }) => id === selectedCategoryId) ||
-        COURSE_PROGRESS[0]
-    const { id, states, title } = selectedCategory
-    const programCourse = getCalendarCourseById(`program-${id}`)
-    const completedCourses =
-        id === 5
-            ? [getCalendarCourseById('84540')]
-            : states.some((status) => ['complete', 'failed'].includes(status))
-            ? [programCourse]
-            : []
-    const availableCourses =
-        id === 5
-            ? [getCalendarCourseById('85257'), getCalendarCourseById('84946')]
-            : states.some((status) =>
-                  ['notStarted', 'inProgress', 'failed'].includes(status)
-              )
-            ? [programCourse]
-            : []
+export const CourseProgressTable = ({ categories }) => {
+    const [selectedCategoryId, setSelectedCategoryId] = useState(categories[0]?.id)
+    const selectedCategory = categories.find(({ id }) => id === selectedCategoryId) || categories[0]
+    if (!selectedCategory) return <p className="min-h-[340px] p-4 md:min-h-[480px]">目前沒有學程類別。</p>
+    const rowCount = Math.max(categories.length, 11)
+    const emptyRowCount = rowCount - categories.length
+    const { title, courses } = selectedCategory
+    const completedCourses = courses.filter(course => course.status !== '')
+    const availableCourses = courses.filter(course => course.status === '')
 
     const selectCategory = (categoryId) => {
         setSelectedCategoryId(categoryId)
@@ -329,7 +320,7 @@ const CourseProgressTable = () => {
 
     return (
         <div className="overflow-x-auto border-t border-solid border-[#dfe7f1]">
-            <table className="w-full table-fixed border-collapse text-left text-[11px] leading-4 text-[#49617e] md:text-[12px] xl:text-[15px] xl:leading-6">
+            <table className="h-[340px] w-full table-fixed border-collapse text-left text-[11px] leading-4 text-[#49617e] md:h-[480px] md:text-[12px] xl:text-[15px] xl:leading-6">
                 <thead>
                     <tr className="bg-[#f3f7fd]">
                         <th
@@ -353,9 +344,9 @@ const CourseProgressTable = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {COURSE_PROGRESS.map((category, index) => {
+                    {categories.map((category, index) => {
                         const isSelected = category.id === selectedCategoryId
-                        const isLastRow = index === COURSE_PROGRESS.length - 1
+                        const isLastRow = index === rowCount - 1
                         const cellClass = `${
                             isLastRow ? '' : 'border-b'
                         } border-r border-solid border-[#dfe7f1] align-middle ${
@@ -364,28 +355,8 @@ const CourseProgressTable = () => {
 
                         return (
                             <tr key={category.id}>
-                                <th
-                                    scope="row"
-                                    className={cellClass}
-                                    onMouseEnter={() =>
-                                        selectCategory(category.id)
-                                    }
-                                >
-                                    <button
-                                        type="button"
-                                        className="flex min-h-7 w-full items-center px-2 py-1 text-left font-medium hover:text-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary md:min-h-10 md:px-4 md:py-2"
-                                        aria-pressed={isSelected}
-                                        onFocus={() =>
-                                            selectCategory(category.id)
-                                        }
-                                        onClick={() =>
-                                            selectCategory(category.id)
-                                        }
-                                    >
-                                        {category.title}
-                                    </button>
-                                </th>
                                 <td
+                                    colSpan={2}
                                     className={cellClass}
                                     onMouseEnter={() =>
                                         selectCategory(category.id)
@@ -393,8 +364,7 @@ const CourseProgressTable = () => {
                                 >
                                     <button
                                         type="button"
-                                        className="flex min-h-7 w-full flex-wrap content-center items-center gap-1 overflow-visible px-1 py-1 text-left hover:bg-[#dcecff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary md:min-h-10 md:gap-2 md:px-4 md:py-2"
-                                        aria-label={`查看${category.title}的修課情況與課程資訊`}
+                                        className="grid min-h-7 w-full grid-cols-[32fr_23fr] items-stretch text-left font-medium hover:text-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-secondary md:min-h-10 md:grid-cols-[35fr_23fr]"
                                         aria-pressed={isSelected}
                                         onFocus={() =>
                                             selectCategory(category.id)
@@ -403,6 +373,11 @@ const CourseProgressTable = () => {
                                             selectCategory(category.id)
                                         }
                                     >
+                                        <span className="flex items-center border-r border-solid border-[#dfe7f1] px-2 py-1 md:px-4 md:py-2">
+                                            {category.title}（{category.credit} 學分）
+                                        </span>
+                                        <span className="flex flex-wrap content-center items-center gap-1 px-1 py-1 md:gap-2 md:px-4 md:py-2">
+                                        <span className="sr-only">修課情況：</span>
                                         {category.states.map(
                                             (status, stateIndex) => (
                                                 <CourseStatusIcon
@@ -411,16 +386,17 @@ const CourseProgressTable = () => {
                                                 />
                                             )
                                         )}
+                                        </span>
                                     </button>
                                 </td>
                                 {index === 0 && (
                                     <td
-                                        rowSpan={COURSE_PROGRESS.length}
+                                        rowSpan={rowCount}
                                         className="bg-white px-2 py-2 align-top md:px-4 md:py-3"
                                     >
                                         <div
                                             key={selectedCategoryId}
-                                            className="h-[308px] overflow-y-auto overscroll-contain pr-1 [scrollbar-gutter:stable] md:h-[440px]"
+                                            className="break-words"
                                         >
                                             <CourseProgressDetails
                                                 title={title}
@@ -437,6 +413,14 @@ const CourseProgressTable = () => {
                             </tr>
                         )
                     })}
+                    {Array.from({ length: emptyRowCount }, (_, index) => (
+                        <tr key={`empty-${index}`} aria-hidden="true">
+                            <td className={`border-r border-solid border-[#dfe7f1] bg-white ${index < emptyRowCount - 1 ? 'border-b' : ''}`}>
+                                <div className="min-h-7 md:min-h-10" />
+                            </td>
+                            <td className={`border-r border-solid border-[#dfe7f1] bg-white ${index < emptyRowCount - 1 ? 'border-b' : ''}`} />
+                        </tr>
+                    ))}
                 </tbody>
             </table>
         </div>
@@ -450,7 +434,7 @@ const CollapsiblePanel = ({ children, icon, isDefaultOpen = false, title }) => {
         <section className="overflow-hidden rounded-[6px] border border-solid border-[#e0e8f2] bg-white">
             <button
                 type="button"
-                className="flex min-h-[42px] w-full items-center gap-2 bg-[#f3f7fd] px-3 py-2 text-left text-[14px] font-bold text-primary transition-colors hover:bg-[#eaf1fb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary md:min-h-[48px] md:px-5 md:text-[16px] xl:text-[18px]"
+                className="flex min-h-[42px] w-full items-center gap-2 bg-[#f3f7fd] px-3 py-2 text-left text-[14px] font-bold text-primary transition-colors hover:bg-[#eaf1fb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-secondary md:min-h-[48px] md:px-5 md:text-[16px] xl:text-[18px]"
                 aria-expanded={isOpen}
                 onClick={() => setIsOpen((currentValue) => !currentValue)}
             >
@@ -507,29 +491,47 @@ const NoticeCard = ({ items, onSelect, title, tone, emptyText }) => (
     </section>
 )
 
-const ProgramDetails = () => (
-    <>
-        <div className="overflow-hidden rounded-[6px] border border-solid border-[#e0e8f2] bg-white">
-            <ProgramInfoRow icon="calendar">
-                <strong className="font-bold text-primary">學程起迄：</strong>
-                2020/11/01 ～ 2028/01/31
-            </ProgramInfoRow>
-            <ProgramInfoRow icon="bulb" iconColor="text-main">
-                <strong className="font-bold text-primary">先備知識：</strong>-
-            </ProgramInfoRow>
-            <ProgramInfoRow icon="document">
-                <strong className="font-bold text-primary">學程說明：</strong>
-                為培養同仁持續改善能力，以最少資源達成醫院目標，歡迎同仁自由報名參加「精實六標準差技能認證」。
-            </ProgramInfoRow>
-            <ProgramInfoRow icon="user">
-                <strong className="font-bold text-primary">學程聯絡人：</strong>
-                精實醫療中心 課程負責人 5410
-            </ProgramInfoRow>
+export const ProgramDetails = ({ programId }) => {
+    const { expireSession, user } = useContext(LoginContext)
+    const [result, setResult] = useState({ status: 'loading' })
+    const [revision, setRevision] = useState(0)
+    useEffect(() => {
+        const controller = new AbortController()
+        setResult({ status: 'loading', programId, owner: user.id })
+        getProgramInfo(programId, controller.signal).then(data => {
+            if (!controller.signal.aborted) setResult({ status: 'success', data, programId, owner: user.id })
+        }).catch(error => {
+            if (controller.signal.aborted) return
+            if (error.status === 401) {
+                setResult({ status: 'expired', programId, owner: user.id })
+                expireSession()
+                return
+            }
+            setResult({ status: 'error', programId, owner: user.id, error: error instanceof TypeError
+                ? '無法連線至學程服務，請確認網路後重試。' : error.message })
+        })
+        return () => controller.abort()
+    }, [programId, user.id, expireSession, revision])
+    if (result.programId !== programId || result.owner !== user.id || result.status === 'loading') return (
+        <div role="status" aria-busy="true" className="flex h-[480px] items-center justify-center p-4 md:h-[640px]">
+            <span aria-hidden="true"><Spinner size={12} color="#093a7b" /></span>
+            <span className="sr-only">學程明細載入中…</span>
         </div>
-
+    )
+    if (result.status === 'expired') return <p role="alert" className="min-h-[480px] p-4 md:min-h-[640px]"><Link href="/#login">登入時效已過期或尚未登入，請重新登入。</Link></p>
+    if (result.status === 'error') return <div role="alert" className="min-h-[480px] p-4 md:min-h-[640px]">
+        <p>{result.error}</p>
+        <button type="button" className="mt-2 text-secondary underline" onClick={() => setRevision(value => value + 1)}>重新載入</button>
+    </div>
+    return <>
+        <div className="flex flex-wrap gap-4 rounded border border-solid border-[#e0e8f2] bg-white p-4 text-[14px]">
+            <span>應完成總學分：{result.data.totalCredit}</span>
+            <span>已取得通過學分：{result.data.passCredit}</span>
+            <span>綠色 OK 學分：{result.data.passRealCredit}</span>
+        </div>
         <div className="mt-3 space-y-2">
             <CollapsiblePanel title="修課列表" isDefaultOpen={true}>
-                <CourseProgressTable />
+                <CourseProgressTable categories={result.data.categories} />
             </CollapsiblePanel>
             <CollapsiblePanel title="修課說明" icon="help">
                 <ul className="grid xl:gap-3 border-t border-solid border-[#e1e8f1] p-2 xl:p-4 text-[13px] leading-5 text-[#49617e] md:grid-cols-2 md:px-5 xl:grid-cols-3 xl:text-[15px] xl:leading-6">
@@ -551,12 +553,13 @@ const ProgramDetails = () => (
             </CollapsiblePanel>
         </div>
     </>
-)
+}
 
 const formatMonthTitle = (date) =>
     `${date.getFullYear()}年${date.getMonth() + 1}月`
 
 const Page = () => {
+    const isMobile = useMedia('(max-width: 767px)')
     const { data, status } = useContext(DashboardContext)
     const calendarEvents = getCalendarEvents(data)
     const calendarRef = useRef(null)
@@ -607,7 +610,7 @@ const Page = () => {
                 <div className="mx-auto w-full xl:max-w-[1200px] 2xl:max-w-[1400px]">
                     <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_330px] xl:items-start xl:gap-3">
                         <div className="min-w-0">
-                            <section className="overflow-hidden rounded-[8px] border border-solid border-[#dce5f0] bg-white px-2 pb-3 pt-2 [box-shadow:0_2px_14px_rgba(9,58,123,0.035)] md:px-4 md:pb-5 md:pt-4">
+                            <section className="overflow-visible rounded-[8px] border border-solid border-[#dce5f0] bg-white px-2 pb-3 pt-2 [box-shadow:0_2px_14px_rgba(9,58,123,0.035)] md:px-4 md:pb-5 md:pt-4">
                                 <div className="flex items-start gap-2 px-1 md:items-center md:px-2">
                                     <CalendarLegend />
                                     <CalendarControls
@@ -626,7 +629,7 @@ const Page = () => {
                                         themeSystem="classic"
                                         initialView="dayGridMonth"
                                         headerToolbar={false}
-                                        height={540}
+                                        height={isMobile ? 340 : 540}
                                         firstDay={0}
                                         fixedWeekCount={false}
                                         expandRows={true}
@@ -652,10 +655,14 @@ const Page = () => {
                                         events={calendarEvents}
                                         eventOrder="sortTime,title,id"
                                         eventOrderStrict={true}
-                                        dayMaxEvents={1}
+                                        dayMaxEvents={isMobile ? 0 : 1}
                                         moreLinkText={(count) => `${count}+`}
+                                        moreLinkContent={({ num }) => `${num}+`}
                                         moreLinkHint={(count) => `另有 ${count} 筆課程`}
                                         moreLinkClick="popover"
+                                        popoverClass="learning-calendar-popover"
+                                        popoverCloseClass="learning-calendar-popover__close"
+                                        popoverCloseContent={() => <span aria-hidden="true">×</span>}
                                         moreLinkClass="learning-fc-more"
                                         displayEventTime={false}
                                         eventDisplay="block"
@@ -671,13 +678,20 @@ const Page = () => {
                                         onChange={setActiveTab}
                                     />
                                     {activeTab === 'learning' ? <LearningHistory courses={data.history} status={status} /> : <>
-                                    <ProgramSelector
+                                    {activeTab === 'external' || activeTab === 'finished' ? <SearchableProgramSelector
+                                        key={activeTab}
+                                        searchWithButtons
                                         programs={programs}
                                         status={status}
                                         selectedProgram={selectedProgramId}
                                         onChange={setSelectedProgram}
-                                    />
-                                    <ProgramDetails />
+                                    /> : <ProgramSelector
+                                        programs={programs}
+                                        status={status}
+                                        selectedProgram={selectedProgramId}
+                                        onChange={setSelectedProgram}
+                                    />}
+                                    {selectedProgramId && <ProgramDetails key={selectedProgramId} programId={selectedProgramId} />}
                                     </>}
                                 </div>
                             </section>

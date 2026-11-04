@@ -1,14 +1,23 @@
-import React, { useContext, useId, useState } from 'react'
+import React, { useContext, useEffect, useId, useState } from 'react'
 import { LoginContext } from 'contexts/LoginProvider'
 import { adaptLoginUser } from 'adapters/authAdapter'
-import { AUTH_API_BASE, AUTH_API_KEY } from 'constants/auth'
+import { login as requestLogin } from 'api/auth'
 
 const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
     const sectionId = useId()
-    const { sessionExpired } = useContext(LoginContext)
+    const { sessionExpired, sessionStatus, sessionError, retrySession } = useContext(LoginContext)
     const [showPassword, setShowPassword] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [errorMessage, setErrorMessage] = useState('')
+
+    useEffect(() => {
+        if (window.location.hash !== '#login') return undefined
+        const frame = window.requestAnimationFrame(() => {
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+            document.getElementById(`${sectionId}-account`)?.focus({ preventScroll: true })
+        })
+        return () => window.cancelAnimationFrame(frame)
+    }, [sectionId])
 
     const handleSubmit = async (event) => {
         event.preventDefault()
@@ -17,7 +26,7 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
         const { account = null, password = null } = Object.fromEntries(values)
         const remember = values.has('remember')
 
-        if (!onLogin || isSubmitting) return
+        if (!onLogin || isSubmitting || sessionStatus === 'checking') return
 
         setErrorMessage('')
         setIsSubmitting(true)
@@ -26,24 +35,7 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
             const uid = String(account || '').trim()
             if (!uid || !password) throw new Error('請輸入帳號與密碼。')
 
-            const response = await fetch(`${AUTH_API_BASE}/login`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'X-API-Key': AUTH_API_KEY
-                },
-                cache: 'no-store',
-                body: JSON.stringify({ uid, pwd: password, keeplogin: remember ? 1 : 0 })
-            })
-            const result = await response.json().catch(() => null)
-            if (!response.ok || result?.success !== true) {
-                throw new Error(
-                    result?.error?.message || result?.message || result?.errorMessage ||
-                    (result ? '登入失敗，請稍後再試。' : '登入服務回應格式異常。')
-                )
-            }
+            const result = await requestLogin({ uid, pwd: password, keeplogin: remember ? 1 : 0 })
 
             await onLogin({
                 user: adaptLoginUser(result.data, uid),
@@ -60,8 +52,7 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
 
     return (
         <div
-            id="login"
-            className={`flex min-w-0 flex-col justify-center rounded-[20px] border border-solid border-gray-200 bg-white/95 p-6 shadow-sm lg:min-h-[404px] ${className}`}
+            className={`flex min-w-0 scroll-mt-[calc(var(--header-height)+16px)] flex-col justify-center rounded-[20px] border border-solid border-gray-200 bg-white/95 p-6 shadow-sm lg:min-h-[404px] ${className}`}
         >
             <div className="mb-6 text-center text-primary">
                 <h2
@@ -75,9 +66,15 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                 </p>
             </div>
             {sessionExpired && <p role="alert" className="mb-4 text-[13px] text-danger">登入時效已過期，請重新登入。</p>}
+            {sessionStatus === 'checking' && <p role="status" className="mb-4 text-[13px] text-primary">正在確認登入狀態…</p>}
+            {sessionStatus === 'error' && <div role="alert" className="mb-4 text-[13px] text-danger">
+                <p>{sessionError}</p>
+                <button type="button" className="mt-1 text-secondary underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary" onClick={retrySession}>重新確認登入狀態</button>
+            </div>}
             <form
                 className="flex flex-col gap-5"
                 aria-labelledby={`${sectionId}-login-title`}
+                aria-busy={isSubmitting || sessionStatus === 'checking'}
                 onSubmit={handleSubmit}
             >
                 <div>
@@ -186,7 +183,7 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                 )}
                 <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || sessionStatus === 'checking'}
                     className="flex h-10 w-full shrink-0 items-center justify-center rounded bg-main text-[16px] font-bold leading-6 text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-main disabled:cursor-wait disabled:opacity-60"
                 >
                     {isSubmitting ? '登入中…' : '登入'}

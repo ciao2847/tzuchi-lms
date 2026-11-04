@@ -1,8 +1,8 @@
+import I18N from 'components/I18N'
+import Link from 'components/Link'
 import React, { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
-import I18N from 'components/I18N'
-import Link from 'components/Link'
 import { changeHeaderTheme } from 'store/style/headerThemeSlice'
 import MainNav from './MainNav'
 import MobileNotifications from './MobileNotifications'
@@ -40,7 +40,7 @@ const Header = () => {
                 <div className="header flex h-full w-full items-center justify-between px-5 md:px-10">
                     <MainComp className="mr-auto z-10 relative shrink-0">
                         <Link
-                            className="main-logo block h-12 w-[176px] bg-contain bg-center bg-no-repeat xl:h-16 xl:w-[235px]"
+                            className="main-logo block h-12 w-[176px] bg-contain bg-center bg-no-repeat md:h-16 md:w-[235px]"
                             href="/"
                             style={{
                                 backgroundImage: `url('${process.env.BASE_PATH}/images/global/main-logo.png')`

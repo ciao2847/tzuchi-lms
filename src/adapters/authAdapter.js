@@ -9,6 +9,7 @@ export const adaptLoginUser = (data, account) => {
         name: data.name,
         department: data.depname || '',
         mail: data.mail || '',
-        modurl: data.modurl || ''
+        modurl: data.modurl || '',
+        branch: data.branch || ''
     }
 }

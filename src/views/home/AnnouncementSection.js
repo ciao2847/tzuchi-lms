@@ -28,6 +28,8 @@ const ANNOUNCEMENT_CONFIG = [
 const AnnouncementSection = ({
     announcements = ANNOUNCEMENT_CONFIG,
     onSelect,
+    loading = false,
+    statusContent = null,
     className = ''
 }) => {
     const [activeIndex, setActiveIndex] = useState(0)
@@ -35,7 +37,7 @@ const AnnouncementSection = ({
         announcements[activeIndex] || announcements[0] || {}
     const { length: announcementCount } = announcements
     const Action = onSelect ? 'button' : AutoSwitchLink
-    if (!announcementCount) return <div className={`rounded-[20px] bg-white p-8 text-primary ${className}`}>目前沒有公告</div>
+    const showNavigation = !loading && !statusContent && announcementCount > 1
 
     const changeAnnouncement = (direction) => {
         setActiveIndex(
@@ -49,9 +51,10 @@ const AnnouncementSection = ({
             className={`relative min-w-0 ${className}`}
             role="region"
             aria-label="公告"
+            aria-busy={loading}
         >
             <article className="relative h-full overflow-hidden rounded-[20px] border border-solid border-gray-200 bg-[#e7effb] shadow-sm">
-                {image && <ThumbFrame
+                {!loading && !statusContent && image && <ThumbFrame
                     src={image}
                     alt=""
                     ratio="16by9"
@@ -60,7 +63,21 @@ const AnnouncementSection = ({
                 />}
                 <div className="absolute inset-0 bg-gradient-to-r from-[#e7effb] via-[#e7effb]/90 to-transparent" />
                 <div className="relative z-[1] flex min-h-[320px] flex-col items-start justify-center px-8 py-12 lg:h-full lg:min-h-0 lg:px-10">
-                    <div
+                    {loading ? <>
+                        <span role="status" className="sr-only">最新公告載入中…</span>
+                        <div className="w-full motion-safe:animate-pulse sm:max-w-[65%]" aria-hidden="true">
+                            <div className="mb-5 h-6 w-20 rounded-full bg-secondary/15" />
+                            <div className="mb-4 space-y-2">
+                                <div className="h-7 w-full rounded bg-primary/10 md:h-8" />
+                                <div className="h-7 w-4/5 rounded bg-primary/10 md:h-8" />
+                            </div>
+                            <div className="mb-6 space-y-1">
+                                <div className="h-5 w-full rounded bg-primary/10" />
+                                <div className="h-5 w-3/4 rounded bg-primary/10" />
+                            </div>
+                            <div className="h-10 w-40 rounded-full border border-solid border-secondary/20 bg-secondary/10" />
+                        </div>
+                    </> : statusContent || (!announcementCount ? <p className="text-primary">目前沒有公告</p> : <div
                         className="w-full sm:max-w-[65%]"
                         aria-live="polite"
                         aria-atomic="true"
@@ -84,9 +101,9 @@ const AnnouncementSection = ({
                                 aria-hidden="true"
                             />
                         </Action>
-                    </div>
+                    </div>)}
                 </div>
-                {announcementCount > 1 && (
+                {showNavigation && (
                     <div className="absolute inset-x-0 bottom-5 z-[1] flex justify-center gap-2">
                         {announcements.map(({ id }, index) => (
                             <button
@@ -112,7 +129,7 @@ const AnnouncementSection = ({
                     </div>
                 )}
             </article>
-            {announcementCount > 1 && (
+            {showNavigation && (
                 <>
                     <button
                         type="button"

@@ -1,3 +1,123 @@
+// FullCalendar renders overflow lists through a portal outside the calendar.
+.learning-calendar-popover {
+    width: min(360px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
+    max-height: min(520px, 70dvh);
+    overflow: hidden;
+    border: 1px solid #dfe7f1;
+    border-radius: 8px;
+    background: #fff;
+    color: #093a7b;
+    box-shadow: 0 8px 24px rgba(9, 58, 123, 0.18);
+
+    > .learning-fc-header-cell {
+        position: relative;
+        display: flex;
+        flex: 0 0 auto;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 44px;
+        padding: 0 52px 0 12px;
+        background: #f3f7fd;
+
+        > div {
+            display: flex;
+            min-height: 44px;
+            align-items: center;
+        }
+
+        .learning-fc-header-inner {
+            display: flex;
+            align-items: center;
+            margin: 0;
+            line-height: 1;
+        }
+    }
+
+    .learning-calendar-popover__close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        display: flex;
+        width: 44px;
+        height: 44px;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        font-size: 26px;
+        line-height: 1;
+
+        > span {
+            display: block;
+            line-height: 1;
+        }
+    }
+
+    > .learning-fc-cell {
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .learning-fc-cell-inner {
+        min-width: 0;
+        padding: 8px;
+    }
+
+    .learning-fc-event {
+        display: block;
+        min-width: 0;
+        max-width: 100%;
+        height: auto;
+        margin: 0 0 6px;
+        padding: 6px 8px;
+        border-radius: 4px;
+        background: #1769d2;
+        color: #fff;
+        font-size: 13px;
+        line-height: 1.5;
+
+        &.is-pending { background: #f59a35; color: #093a7b; }
+        &.is-complete { background: #04863f; }
+
+        > div { min-width: 0; }
+
+        span {
+            display: block;
+            min-width: 0;
+            max-width: 100%;
+            overflow: visible;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            text-overflow: clip;
+        }
+    }
+
+    @media (max-width: 767px) {
+        // Override the library's inline positioning so the full frame stays
+        // inside the viewport even when opened from a day near its edge.
+        position: fixed !important;
+        top: calc(var(--header-height, 64px) + 12px) !important;
+        left: 12px !important;
+        right: 12px !important;
+        width: auto;
+        max-width: none;
+        max-height: calc(100dvh - var(--header-height, 64px) - 24px);
+
+        .learning-fc-event span {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    }
+}
+
 .learning-calendar__fullcalendar {
     --fc-classic-border: #dfe7f1;
     --fc-classic-background: #fff;
@@ -133,6 +253,34 @@
         font-weight: 700;
         line-height: 18px;
         white-space: nowrap;
+    }
+
+    @media (max-width: 767px) {
+        .learning-fc-cell > div {
+            position: static !important;
+        }
+
+        .learning-fc-cell-inner {
+            padding: 3px 0 0;
+        }
+
+        .learning-fc-more {
+            position: absolute !important;
+            top: calc(50% + 7px) !important;
+            left: 50% !important;
+            right: auto !important;
+            bottom: auto !important;
+            transform: translate(-50%, -50%);
+            align-self: center;
+            width: max-content;
+            max-width: 100%;
+            margin: 0 !important;
+            padding: 1px 5px;
+            border-radius: 5px;
+            background: #eaf3ff;
+            line-height: 22px;
+            text-align: center;
+        }
     }
 
     @media (min-width: 768px) {

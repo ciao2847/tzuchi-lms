@@ -1,4 +1,7 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
+import { getQuickCourses } from 'api/quickCourses'
+import { LoginContext } from 'contexts/LoginProvider'
+import DashboardStatus from 'components/DashboardStatus'
 import I18N from 'components/I18N'
 import PaginatedList from 'components/PaginatedList'
 import Select from 'components/Select'
@@ -10,120 +13,89 @@ import Results from 'components/pick/Results'
 import useMedia from 'hooks/useMedia'
 
 const CAMPUS_OPTIONS = [
-    { id: 'dalin', title: '大林' },
-    { id: 'hualien', title: '花蓮' },
-    { id: 'taipei', title: '台北' },
-    { id: 'taichung', title: '台中' }
+    { id: 'all', title: '全部' },
+    { id: 'n2', title: '志業中心' },
+    { id: 'fd', title: '基金會' },
+    { id: 'mf', title: '法人' },
+    { id: 'sy', title: '三義' },
+    { id: 'dl', title: '大林' },
+    { id: 'hl', title: '花蓮' },
+    { id: 'xd', title: '台北' },
+    { id: 'tc', title: '台中' }
 ]
 
 const TYPE_OPTIONS = [
     { id: 'all', title: '全部' },
-    { id: 'physical', title: '實體' },
-    { id: 'online', title: '數位' }
+    { id: '2', title: '實體' },
+    { id: '1', title: '數位' }
 ]
 
 const PROGRAM_OPTIONS = [
     { id: 'all', title: '全部' },
-    { id: 'mine', title: '我的學程' }
-]
-
-const RECOGNIZED_PROGRAMS = [
-    '115年度(下)檢驗實習生(輔英、慈大) - 生化檢驗：1學分',
-    '115年度(下)檢驗實習生(輔英、慈大) - 生化翻轉9堂：1學分',
-    '115年度(下)檢驗實習生(輔英、慈大) - 血液檢驗：1學分',
-    '115年度(下)檢驗實習生(輔英、慈大) - 微生物檢驗：1學分',
-    '115年度(下)檢驗實習生(輔英、慈大) - 免疫血清檢驗：1學分',
-    '115年度(下)檢驗實習生(輔英、慈大) - 臨床鏡檢：1學分',
-    '115年度(下)檢驗實習生(輔英、慈大) - 輸血醫學：1學分',
-    '115年度(下)檢驗實習生(輔英、慈大) - 分子診斷：1學分'
-]
-
-const COURSE_LIST = [
-    {
-        id: 1,
-        campus: '大林',
-        type: '實體',
-        isToday: true,
-        title: '護理部_PI/NOR_專科主題課程_嬰兒足底採血情境式模擬演練_1150807-8',
-        date: '2026-08-07（星期五）07:50–08:50',
-        lecturer: '戴佳璇',
-        enrollment: '0/0',
-        programs: RECOGNIZED_PROGRAMS
-    },
-    {
-        id: 2,
-        campus: '大林',
-        type: '實體',
-        isToday: true,
-        title: '2026-08-07營養診斷及介入照護流程',
-        date: '2026-08-07（星期五）',
-        lecturer: '張雅芳',
-        programs: RECOGNIZED_PROGRAMS
-    },
-    {
-        id: 3,
-        campus: '大林',
-        type: '實體',
-        isToday: true,
-        title: '感染管制_實體課程(第一場) 防護裝備(PPE)教育訓練與口罩密合度測試',
-        date: '2026-08-18（星期二）',
-        lecturer: '感染管制中心',
-        programs: RECOGNIZED_PROGRAMS
-    },
-    {
-        id: 4,
-        campus: '大林',
-        type: '實體',
-        title: '醫院簡介',
-        date: '2026-08-21（星期五）',
-        lecturer: '人力資源室',
-        programs: RECOGNIZED_PROGRAMS
-    },
-    {
-        id: 5,
-        campus: '大林',
-        type: '實體',
-        title: '病人安全',
-        date: '2026-08-22（星期六）',
-        lecturer: '品質中心',
-        programs: RECOGNIZED_PROGRAMS
-    },
-    {
-        id: 6,
-        campus: '大林',
-        type: '實體',
-        title: '消防安全_實體課程',
-        date: '2026-08-20（星期四）',
-        lecturer: '總務室',
-        programs: RECOGNIZED_PROGRAMS
-    }
+    { id: 'my', title: '我的學程' }
 ]
 
 const Page = () => {
+    const { isLogin, user, expireSession, sessionStatus } = useContext(LoginContext)
+    const defaultCampus = CAMPUS_OPTIONS.some(option => option.id === user.branch) ? user.branch : 'all'
     const isDesktopLayout = useMedia('(min-width: 1200px)')
-    const [campus, setCampus] = useState('dalin')
-    const [type, setType] = useState('physical')
+    const [campus, setCampus] = useState(defaultCampus)
+    const [type, setType] = useState('all')
     const [program, setProgram] = useState('all')
-    const [attribute, setAttribute] = useState('labor')
+    const [attribute, setAttribute] = useState('')
     const [keyword, setKeyword] = useState('')
-    const [listResetKey, setListResetKey] = useState(0)
+    const [oldcourse, setOldcourse] = useState(false)
+    const [page, setPage] = useState(1)
+    const [pageSize, setPageSize] = useState(20)
+    const [filters, setFilters] = useState({ branch: defaultCampus, type: 'all', program: 'all', oldcourse: 0, category: '', keyword: '' })
+    const [revision, setRevision] = useState(0)
+    const [result, setResult] = useState({ status: 'loading', courses: [], total: 0 })
+    useEffect(() => {
+        setCampus(defaultCampus)
+        setFilters(current => ({ ...current, branch: defaultCampus }))
+        setPage(1)
+    }, [defaultCampus, user.id])
+    useEffect(() => {
+        if (!isLogin) {
+            setResult({ status: 'idle', courses: [], total: 0 })
+            return undefined
+        }
+        const controller = new AbortController()
+        setResult({ status: 'loading', courses: [], total: 0 })
+        getQuickCourses({ ...filters, page, pagesize: pageSize }, controller.signal).then(data => {
+            if (!controller.signal.aborted) setResult({ status: 'success', ...data })
+        }).catch(error => {
+            if (controller.signal.aborted) return
+            if (error.status === 401) expireSession()
+            setResult({ status: 'error', courses: [], total: 0, message: error.status === 401 ? '登入時效已過期，請重新登入。' : error instanceof TypeError ? '無法連線至快速選課服務，請稍後重試。' : error.message })
+        })
+        return () => controller.abort()
+    }, [isLogin, filters, page, pageSize, revision, user.id, expireSession])
     const [selectedViewMode, setSelectedViewMode] = useState(null)
     const viewMode = selectedViewMode || (isDesktopLayout ? 'list' : 'card')
 
+    const changeFilter = (key, value, updateField) => {
+        updateField(value)
+        setPage(1)
+        setFilters(current => ({ ...current, [key]: value }))
+    }
+
     const submitSearch = (event) => {
         event.preventDefault()
-        setListResetKey((currentKey) => currentKey + 1)
+        setPage(1)
+        setFilters({ branch: campus, type, program, category: attribute, keyword: keyword.trim(), oldcourse: oldcourse ? 1 : 0 })
     }
 
     const clearFilters = () => {
-        setCampus('dalin')
-        setType('physical')
+        setCampus(defaultCampus)
+        setType('all')
         setProgram('all')
-        setAttribute('labor')
+        setAttribute('')
         setKeyword('')
-        setListResetKey((currentKey) => currentKey + 1)
+        setOldcourse(false)
+        setPage(1)
+        setFilters({ branch: defaultCampus, type: 'all', program: 'all', category: '', keyword: '', oldcourse: 0 })
     }
-
     return (
         <div className="min-h-[calc(100dvh-48px)] bg-[#f7f9fd] pt-[var(--header-height)]">
             <TitleBlk
@@ -132,7 +104,7 @@ const Page = () => {
                 breadcrumbs={[{ title: '快速選課' }]}
             />
             <section className="mx-auto w-full px-4 py-4 md:px-6 md:py-5 xl:max-w-[1200px] xl:p-10 2xl:px-0 2xl:max-w-[1400px]">
-                <div className="overflow-hidden rounded-[8px] border border-solid border-[#dce5f0] bg-white">
+                <div className="overflow-hidden rounded-[8px] border border-solid border-[#dce5f0] bg-white xl:rounded-[12px]">
                     <form
                         className="p-3 md:p-6"
                         aria-describedby="course-filter-keyboard-help"
@@ -142,11 +114,22 @@ const Page = () => {
                             使用 Tab
                             鍵在篩選欄位間移動，在選項群組內使用方向鍵切換選項。
                         </p>
-                        <div className="grid gap-3 md:grid-cols-2 md:gap-4 xl:grid-cols-[0.6fr_1.4fr_1fr_1fr] xl:gap-6">
+                        <label className="mb-5 flex cursor-pointer items-center justify-end gap-2 text-[13px] text-primary">
+                            <input
+                                type="checkbox"
+                                role="switch"
+                                checked={oldcourse}
+                                onChange={event => changeFilter('oldcourse', event.target.checked ? 1 : 0, value => setOldcourse(value === 1))}
+                                className="peer sr-only"
+                            />
+                            <span aria-hidden="true" className="relative h-5 w-[34px] shrink-0 rounded-full bg-[#8190a2] transition-colors after:absolute after:left-[2px] after:top-[2px] after:size-4 after:rounded-full after:bg-white after:transition-transform peer-checked:bg-primary peer-checked:after:translate-x-[14px] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary" />
+                            <span>查詢包含舊課程（{oldcourse ? '開啟' : '關閉'}）</span>
+                        </label>
+                        <div className="grid gap-3 md:grid-cols-2 md:gap-4 xl:grid-cols-[minmax(0,200fr)_minmax(0,206fr)_minmax(0,292fr)_280px] xl:gap-6 xl:[&_label]:text-[13px] xl:[&_label]:font-normal">
                             <div className="min-w-0">
                                 <label
                                     htmlFor="campus-filter"
-                                    className="mb-1 block text-[12px] font-bold leading-4 text-primary md:mb-2 md:text-[13px] md:leading-5 xl:text-[15px] xl:leading-6"
+                                    className="mb-1 block text-[12px] font-bold leading-4 text-primary md:mb-2 md:text-[13px] md:leading-5 xl:text-[12px] xl:font-normal xl:leading-4"
                                 >
                                     <I18N>院區</I18N>
                                 </label>
@@ -155,7 +138,7 @@ const Page = () => {
                                     name="campus"
                                     value={campus}
                                     onChange={({ target: { value } }) =>
-                                        setCampus(value)
+                                        changeFilter('branch', value, setCampus)
                                     }
                                 >
                                     {CAMPUS_OPTIONS.map(({ id, title }) => (
@@ -169,7 +152,7 @@ const Page = () => {
                             <div className="block min-w-0">
                                 <label
                                     htmlFor="attribute-filter"
-                                    className="mb-1 block text-[12px] font-bold leading-4 text-primary md:mb-2 md:text-[13px] md:leading-5 xl:text-[15px] xl:leading-6"
+                                    className="mb-1 block text-[12px] font-bold leading-4 text-primary md:mb-2 md:text-[13px] md:leading-5 xl:text-[12px] xl:font-normal xl:leading-4"
                                 >
                                     <I18N>屬性</I18N>
                                 </label>
@@ -177,40 +160,39 @@ const Page = () => {
                                     id="attribute-filter"
                                     value={attribute}
                                     onChange={({ target: { value } }) =>
-                                        setAttribute(value)
+                                        changeFilter('category', value, setAttribute)
                                     }
                                 >
-                                    <option value="labor">
-                                        政府相關法令 &gt; 勞
-                                    </option>
-                                    <option value="medical">醫療專業</option>
-                                    <option value="management">管理知能</option>
+                                    <option value="">全部</option>
                                 </Select>
                             </div>
 
                             <FilterButtons
+                                desktopSearch
                                 label="類型"
                                 name="course-type"
                                 options={TYPE_OPTIONS}
                                 value={type}
-                                onChange={setType}
+                                onChange={value => changeFilter('type', value, setType)}
                             />
 
                             <FilterButtons
+                                desktopSearch
                                 label="認列學程"
                                 name="recognized-program"
                                 options={PROGRAM_OPTIONS}
                                 value={program}
-                                onChange={setProgram}
+                                onChange={value => changeFilter('program', value, setProgram)}
                                 tone="green"
                             />
                         </div>
 
                         <KeywordSearchRow
-                            className="mt-3 md:mt-4"
+                            desktopSearch
+                            className="mt-3 md:mt-4 xl:mt-6"
                             id="course-keyword"
                             label="課程名稱"
-                            placeholder="想找什麼課程呢？"
+                            placeholder={isDesktopLayout ? '想找什麼課程呢？可用空格分隔多個關鍵字' : '想找什麼課程呢？'}
                             value={keyword}
                             onChange={setKeyword}
                             onClear={clearFilters}
@@ -220,7 +202,7 @@ const Page = () => {
 
                 <div className="mb-3 mt-4 flex flex-wrap items-center justify-between gap-3 md:mb-4 md:mt-5">
                     <h2 className="text-[13px] font-bold leading-5 text-primary md:text-[15px] xl:text-[17px] xl:leading-6">
-                        <I18N>課程數</I18N>：{COURSE_LIST.length}{' '}
+                        <I18N>課程數</I18N>：{result.total}{' '}
                         <I18N>筆</I18N>
                     </h2>
                     <ViewModeToggle
@@ -230,12 +212,15 @@ const Page = () => {
                     />
                 </div>
 
-                <PaginatedList
-                    data={COURSE_LIST}
+                {(!isLogin || sessionStatus === 'checking' || sessionStatus === 'error') && <DashboardStatus />}
+                {isLogin && result.status === 'loading' && <p role="status" aria-busy="true" className="py-6 text-primary">課程載入中…</p>}
+                {isLogin && result.status === 'error' && <div role="alert" className="py-6 text-primary"><p>{result.message}</p><button type="button" className="mt-2 underline" onClick={() => setRevision(value => value + 1)}>重新載入</button></div>}
+                {isLogin && result.status === 'success' && <PaginatedList
+                    data={result.courses}
                     component={Results}
                     componentProps={{ viewMode }}
-                    resetKey={listResetKey}
-                />
+                    pagination={{ page, pageSize, total: result.total, onPageChange: setPage, onPageSizeChange: size => { setPageSize(size); setPage(1) } }}
+                />}
             </section>
         </div>
     )

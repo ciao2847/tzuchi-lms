@@ -34,7 +34,13 @@ const MobileMenuIcon = ({ name }) => (
     />
 )
 
-const DesktopMenuItem = ({ item, pathname }) => {
+const LogoutIcon = () => (
+    <svg className="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+    </svg>
+)
+
+const DesktopMenuItem = ({ item, pathname, openMenuId, setOpenMenuId }) => {
     const {
         id,
         title,
@@ -45,6 +51,8 @@ const DesktopMenuItem = ({ item, pathname }) => {
         children = []
     } = item
     const { length: childCount } = children
+    const isOpen = childCount > 0 && openMenuId === id
+    const closeMenu = () => setOpenMenuId(current => current === id ? null : current)
     const isCurrent = url !== '/edu-service-country' && pathname === url
     const indicatorDirection =
         desktopIndicator || (indicator === 'down' ? indicator : null)
@@ -61,12 +69,31 @@ const DesktopMenuItem = ({ item, pathname }) => {
     )
 
     return (
-        <li key={id} className="group relative flex h-full items-center">
+        <li
+            key={id}
+            className="relative flex h-full items-center"
+            onMouseEnter={() => setOpenMenuId(childCount > 0 ? id : null)}
+            onMouseLeave={closeMenu}
+            onFocus={() => setOpenMenuId(childCount > 0 ? id : null)}
+            onBlur={({ currentTarget, relatedTarget }) => {
+                if (!currentTarget.contains(relatedTarget)) closeMenu()
+            }}
+            onKeyDown={event => {
+                if (event.key === 'Escape') {
+                    event.preventDefault()
+                    event.currentTarget.querySelector('button')?.focus()
+                    closeMenu()
+                }
+            }}
+        >
             {childCount > 0 ? (
                 <button
                     type="button"
                     className={`${triggerClassName} cursor-default bg-transparent p-0`}
                     aria-haspopup="menu"
+                    aria-expanded={isOpen}
+                    aria-controls={`desktop-menu-${id}`}
+                    onClick={() => setOpenMenuId(id)}
                 >
                     {triggerContent}
                 </button>
@@ -78,7 +105,8 @@ const DesktopMenuItem = ({ item, pathname }) => {
 
             {childCount > 0 && (
                 <ul
-                    className="invisible absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-1 overflow-hidden rounded-[8px] bg-white opacity-0 drop-shadow transition-all group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100"
+                    id={`desktop-menu-${id}`}
+                    className={`absolute left-1/2 top-full z-20 -translate-x-1/2 overflow-hidden rounded-[8px] bg-white drop-shadow ${isOpen ? 'visible translate-y-0 opacity-100' : 'invisible translate-y-1 opacity-0'}`}
                     style={{ width: submenuWidth || 220 }}
                     role="menu"
                 >
@@ -94,6 +122,7 @@ const DesktopMenuItem = ({ item, pathname }) => {
                                         href={url}
                                         className="block  px-5 py-3 text-[16px] leading-6 text-primary transition-colors last:border-b-0 hover:bg-primary/5 hover:text-main focus-visible:bg-primary/5 focus-visible:text-main focus-visible:outline-none"
                                         role="menuitem"
+                                        onClick={closeMenu}
                                         {...(isLinkOut
                                             ? {
                                                   target: '_blank',
@@ -165,12 +194,6 @@ const DesktopMemberMenu = ({ onLogout, isLoggingOut, user = {} }) => {
                 onClick={() => setIsOpen((currentValue) => !currentValue)}
             >
                 {name}
-                <i
-                    className={`icon icon-arrow-down h-3 w-3 text-[9px] transition-transform ${
-                        isOpen ? 'rotate-180' : ''
-                    }`}
-                    aria-hidden="true"
-                />
             </button>
 
             {isOpen && (
@@ -194,10 +217,7 @@ const DesktopMemberMenu = ({ onLogout, isLoggingOut, user = {} }) => {
                         disabled={isLoggingOut}
                         aria-busy={isLoggingOut}
                     >
-                        <i
-                            className="icon icon-arrow-forward text-[14px]"
-                            aria-hidden="true"
-                        />
+                        <LogoutIcon />
                         <I18N>{isLoggingOut ? '登出中…' : '登出'}</I18N>
                     </button>
                 </div>
@@ -312,6 +332,7 @@ const MainNav = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isMobileMemberOpen, setIsMobileMemberOpen] = useState(false)
     const [activeMenuId, setActiveMenuId] = useState(null)
+    const [desktopMenuId, setDesktopMenuId] = useState(null)
     useBodyScrollLock(
         isMenuOpen && !isLayoutXL,
         `${pathname}${search}:${isLayoutXL}`
@@ -342,6 +363,7 @@ const MainNav = () => {
     useEffect(() => {
         setIsMenuOpen(false)
         setIsMobileMemberOpen(false)
+        setDesktopMenuId(null)
     }, [pathname, search])
 
     useEffect(() => {
@@ -398,6 +420,8 @@ const MainNav = () => {
                             key={item.id}
                             item={item}
                             pathname={pathname}
+                            openMenuId={desktopMenuId}
+                            setOpenMenuId={setDesktopMenuId}
                         />
                     ))}
                 </ul>
@@ -461,6 +485,7 @@ const MainNav = () => {
                                 className="flex min-h-[48px] w-full items-center gap-3 px-3 py-2 text-left focus-visible:bg-[#f8fafc] focus-visible:outline-none"
                                 aria-expanded={isMobileMemberOpen}
                                 aria-controls="mobile-member-menu"
+                                aria-label={`${name}，會員選單`}
                                 onClick={() =>
                                     setIsMobileMemberOpen(
                                         (currentValue) => !currentValue
@@ -470,15 +495,6 @@ const MainNav = () => {
                                 <span className="inline-flex h-7 items-center justify-center rounded-full bg-secondary px-4 text-[11px] font-bold text-white">
                                     {name}
                                 </span>
-                                <span className="min-w-0 flex-1 text-[12px] font-medium text-[#708399]">
-                                    <I18N>會員資料</I18N>
-                                </span>
-                                <i
-                                    className={`icon icon-arrow-down size-4 shrink-0 text-[14px] transition-transform ${
-                                        isMobileMemberOpen ? 'rotate-180' : ''
-                                    }`}
-                                    aria-hidden="true"
-                                />
                             </button>
 
                             {isMobileMemberOpen && (
@@ -497,7 +513,7 @@ const MainNav = () => {
                                         disabled={isLoggingOut}
                                         aria-busy={isLoggingOut}
                                     >
-                                        <MobileMenuIcon name="arrow-forward" />
+                                        <LogoutIcon />
                                         <span className="min-w-0 flex-1">
                                             <I18N>{isLoggingOut ? '登出中…' : '登出'}</I18N>
                                         </span>

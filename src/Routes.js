@@ -1,5 +1,6 @@
 import Spinner from 'components/Spinner'
 import Layout from 'layout/'
+import RequireLogin from 'components/RequireLogin'
 import React, { lazy, Suspense } from 'react'
 import { Navigate, Outlet, useRoutes } from 'react-router-dom'
 
@@ -24,40 +25,45 @@ const routes = [
                 element: <Home />
             },
             {
-                path: '/404',
-                element: <NotFound />
-            },
-            {
-                path: '*',
-                element: <Navigate to="/404" replace={true} />
-            },
-            {
-                path: '/pick',
-                element: <Pick />
-            },
-            {
-                path: '/pick/:id',
-                element: <PickDetail />
-            },
-            {
-                path: '/calendar',
-                element: <Calendar />
-            },
-            {
-                path: '/external-training-data',
-                element: <ExternalTraining />
-            },
-            {
-                path: '/tree',
-                element: <MenuPage />
-            },
-            {
-                path: '/edu-service',
-                element: <MenuPage />
-            },
-            {
-                path: '/edu-service-country',
-                element: <MenuPage />
+                element: <RequireLogin />,
+                children: [
+                    {
+                        path: '/404',
+                        element: <NotFound />
+                    },
+                    {
+                        path: '*',
+                        element: <Navigate to="/404" replace={true} />
+                    },
+                    {
+                        path: '/pick',
+                        element: <Pick />
+                    },
+                    {
+                        path: '/pick/:id',
+                        element: <PickDetail />
+                    },
+                    {
+                        path: '/calendar',
+                        element: <Calendar />
+                    },
+                    {
+                        path: '/external-training-data',
+                        element: <ExternalTraining />
+                    },
+                    {
+                        path: '/tree',
+                        element: <MenuPage />
+                    },
+                    {
+                        path: '/edu-service',
+                        element: <MenuPage />
+                    },
+                    {
+                        path: '/edu-service-country',
+                        element: <MenuPage />
+                    }
+                ]
             }
         ]
     }

@@ -37,20 +37,21 @@ const PaginatedList = ({
     emptyText = '暫無資料',
     emptyClassName = 'py-10 text-center text-[18px] text-info',
     resetKey = '',
-    className = ''
+    className = '',
+    pagination
 }) => {
     const pageSizeId = useId()
     const [pageSize, setPageSize] = useState(20)
     const normalizedData = Array.isArray(data) ? data : EMPTY_DATA
-    const normalizedPageSize = Math.max(1, pageSize)
+    const normalizedPageSize = Math.max(1, pagination?.pageSize || pageSize)
     const pageCount = Math.max(
         1,
-        Math.ceil(normalizedData.length / normalizedPageSize)
+        Math.ceil((pagination?.total ?? normalizedData.length) / normalizedPageSize)
     )
     const [page, setPage] = useState(1)
     const listRef = useRef(null)
-    const currentPage = Math.min(page, pageCount)
-    const currentItems = normalizedData.slice(
+    const currentPage = Math.min(pagination?.page || page, pageCount)
+    const currentItems = pagination ? normalizedData : normalizedData.slice(
         (currentPage - 1) * normalizedPageSize,
         currentPage * normalizedPageSize
     )
@@ -64,7 +65,8 @@ const PaginatedList = ({
             return
         }
 
-        setPage(nextPage)
+        if (pagination) pagination.onPageChange(nextPage)
+        else setPage(nextPage)
         window.requestAnimationFrame(() => {
             listRef.current?.scrollIntoView({ block: 'start' })
         })
@@ -149,10 +151,11 @@ const PaginatedList = ({
                     </label>
                     <Select
                         id={pageSizeId}
-                        value={String(pageSize)}
+                        value={String(normalizedPageSize)}
                         wrapperClassName="w-[88px]"
                         className="h-9 px-2 text-[12px] md:h-10 md:text-[14px]"
                         onChange={({ target: { value } }) => {
+                            if (pagination) { pagination.onPageSizeChange(Number(value)); return }
                             setPageSize(Number(value))
                             setPage(1)
                         }}
