@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { Link as RouterLink, useLocation } from 'react-router-dom'
 import I18N from 'components/I18N'
 import Link from 'components/Link'
 import BtnMenu from 'components/BtnMenu'
@@ -155,16 +155,15 @@ const MemberIdentity = ({ user }) => (
     </>
 )
 
-const ChangePasswordItem = ({ mobile = false }) => (
-    <button
-        type="button"
-        disabled
-        title="修改密碼功能尚未開放"
+export const ChangePasswordItem = ({ mobile = false, onNavigate }) => (
+    <RouterLink
+        to="/change-password"
+        onClick={onNavigate}
         role={mobile ? undefined : 'menuitem'}
-        className={`flex min-h-10 w-full items-center bg-white py-2 pr-4 text-left text-[13px] font-medium text-gray-400 disabled:cursor-not-allowed ${mobile ? 'pl-8' : 'pl-4'}`}
+        className={`flex min-h-10 w-full items-center bg-white py-2 pr-4 text-left text-[13px] font-medium text-primary hover:bg-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary ${mobile ? 'pl-8' : 'pl-4'}`}
     >
         <I18N>修改密碼</I18N>
-    </button>
+    </RouterLink>
 )
 
 const DesktopMemberMenu = ({ onLogout, isLoggingOut, user = {} }) => {
@@ -179,7 +178,7 @@ const DesktopMemberMenu = ({ onLogout, isLoggingOut, user = {} }) => {
         <div
             className="relative"
             onBlur={({ currentTarget, relatedTarget }) => {
-                if (!currentTarget.contains(relatedTarget)) setIsOpen(false)
+                if (relatedTarget && !currentTarget.contains(relatedTarget)) setIsOpen(false)
             }}
             onKeyDown={({ key }) => {
                 if (key === 'Escape') setIsOpen(false)
@@ -208,7 +207,7 @@ const DesktopMemberMenu = ({ onLogout, isLoggingOut, user = {} }) => {
                     >
                         <MemberIdentity user={user} />
                     </div>
-                    <ChangePasswordItem />
+                    <ChangePasswordItem onNavigate={() => setIsOpen(false)} />
                     <button
                         type="button"
                         className="flex min-h-10 w-full items-center gap-2 border-x-0 border-b-0 border-t border-solid border-[#e6ecf4] px-4 py-2 text-left text-[13px] font-medium text-primary transition-colors hover:bg-[#fff5f5] hover:text-danger focus-visible:bg-[#fff5f5] focus-visible:text-danger focus-visible:outline-none"
@@ -505,7 +504,7 @@ const MainNav = () => {
                                     <div className="border-b border-solid border-[#e6ecf4] px-8 py-3">
                                         <MemberIdentity user={user} />
                                     </div>
-                                    <ChangePasswordItem mobile />
+                                    <ChangePasswordItem mobile onNavigate={closeMenu} />
                                     <button
                                         type="button"
                                         className="flex min-h-[44px] w-full items-center gap-3 border-x-0 border-b-0 border-t-0 bg-white py-2 pl-8 pr-4 text-left text-[13px] font-medium text-primary transition-colors active:bg-[#fff5f5] focus-visible:bg-[#fff5f5] focus-visible:text-danger focus-visible:outline-none"

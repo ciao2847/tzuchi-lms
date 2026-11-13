@@ -1,6 +1,7 @@
 import React, { useId, useRef, useState } from 'react'
 import useAcademicVideos from 'api/useAcademicVideos'
 import VideoCard from './VideoCard'
+import Spinner from 'components/Spinner'
 
 const ACADEMIC_CATEGORY_ID = 'academic'
 
@@ -163,13 +164,13 @@ const CategoryVideoSection = ({ categories }) => {
                             className="py-8 pr-4 text-center text-[14px] text-secondary md:pr-6 md:text-[16px] xl:pr-0"
                             role="status"
                         >
-                            {selectedId === ACADEMIC_CATEGORY_ID &&
+                            {!categories && selectedId === ACADEMIC_CATEGORY_ID &&
                             academicStatus === 'loading'
-                                ? '學術演講載入中…'
-                                : selectedId === ACADEMIC_CATEGORY_ID &&
+                                ? <Spinner block className="" />
+                                : !categories && selectedId === ACADEMIC_CATEGORY_ID &&
                                   academicStatus === 'error'
                                 ? '學術演講資料暫時無法載入。'
-                                : '目前沒有影片資料。'}
+                                : '暫無資料'}
                         </p>
                     )}
                 </div>

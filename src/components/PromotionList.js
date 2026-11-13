@@ -1,6 +1,8 @@
+import EmptyState from 'components/EmptyState'
 import React from 'react'
 import Card from './Card'
-const PromotionList = ({ data, currentIdx, className }) => {
+const PromotionList = ({ data = [], currentIdx = data.length, className }) => {
+    if (!data.filter((item, index) => index < currentIdx).length) return <EmptyState />
     return (
         <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 md:gap-y-3 xl:gap-2">
             {data

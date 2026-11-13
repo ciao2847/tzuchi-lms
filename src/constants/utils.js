@@ -89,10 +89,9 @@ export const getUserGeolocation = (dispatch, isHint = true) => {
     const p = new Promise(function (resolve, reject) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                const lat = position.coords.latitude
-                const lng = position.coords.longitude
+                const { latitude: lat, longitude: lng } = position.coords
                 localStorage.setItem('isAllowGetUserGeolocation', true)
-                resolve({ lat: lat, lng: lng })
+                resolve({ lat, lng })
             },
             (error) => {
                 const el = document.createElement('div')

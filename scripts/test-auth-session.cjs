@@ -426,17 +426,18 @@ async function main() {
 
     const LoginContext = React.createContext({})
     const LoginSection = load('src/views/home/LoginSection.js', {
+        'components/Spinner': load('src/components/Spinner.js').default,
         'contexts/LoginProvider': { LoginContext },
         'adapters/authAdapter': load('src/adapters/authAdapter.js'),
         'api/auth': { login: async () => ({ success: true }) }
     }).default
     let html = renderToStaticMarkup(React.createElement(LoginContext.Provider,
         { value: { sessionStatus: 'checking' } }, React.createElement(LoginSection)))
-    assert(html.includes('正在確認登入狀態') && html.includes('role="status"'))
+    assert(!html.includes('正在確認登入狀態') && html.includes('role="status"') && html.includes('loading-animate'))
     assert(html.includes('aria-busy="true"') && html.includes('type="submit" disabled=""'))
     const rememberInput = html.match(/<input\b[^>]*\bname="remember"[^>]*>/)?.[0]
     assert(rememberInput && html.includes('保持登入'))
-    assert(!/\bchecked(?:=|\s|>)/.test(rememberInput), 'Remember opt-in must be unchecked by default')
+    assert(/\bchecked(?:=|\s|>)/.test(rememberInput), 'Keep login must be checked by default to survive browser restart')
     html = renderToStaticMarkup(React.createElement(LoginContext.Provider,
         { value: { sessionStatus: 'error', sessionError: 'Network error', retrySession: () => {} } }, React.createElement(LoginSection)))
     assert(html.includes('Network error') && html.includes('重新確認登入狀態') && html.includes('role="alert"'))
@@ -460,6 +461,7 @@ async function main() {
         for (const remember of [false, true]) {
             let submitted, loginArguments
             const Form = load('src/views/home/LoginSection.js', {
+                'components/Spinner': load('src/components/Spinner.js').default,
                 react: {
                     ...React, useId: () => 'login-test', useContext: () => ({ sessionStatus: 'idle' }), useEffect: () => {},
                     useState: initial => [initial, () => {}]

@@ -1,28 +1,12 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import I18N from 'components/I18N'
 import TitleBlk from 'components/TitleBlk'
-import { getCalendarCourseById } from 'constants/learningCalendar'
-
-const COURSE_DETAIL = {
-    title: '護理部_PI/NOR_專科主題課程_嬰兒足底採血情境式模擬演練_1150807-8',
-    attribute: ['護理', '課程規則', '單位專科主題'],
-    programs: [
-        '核心課程階段_第1年基層護理人員臨床專業能力訓練–常見疾病、檢查與治療之護理，一般疼痛評估及護理：1學分',
-        '專業課程階段_第2年基層護理人員臨床專業能力訓練–自我成長(1)、教與學：1學分'
-    ],
-    lecturer: {
-        name: '賴佳穗',
-        unit: '大林慈濟護理部小兒加護病房–護理長'
-    },
-    outline: '嬰兒足底採血情境式模擬演練',
-    audiences: ['醫師', '護理'],
-    duration: '共 60 分',
-    date: '2026年08月07日 07點50分 ～ 08點50分',
-    location: 'P討論室',
-    rule: '本課程需完成【PTT】【滿意度】始得通過課程',
-    contact: '課程負責人 / 1551'
-}
+import { getCourseInfo } from 'api/courseInfo'
+import { LoginContext } from 'contexts/LoginProvider'
+import Spinner from 'components/Spinner'
+import DashboardStatus from 'components/DashboardStatus'
+import CourseHtml from 'components/CourseHtml'
 
 const DetailBlock = ({ title, children, className = '' }) => (
     <section
@@ -52,7 +36,7 @@ const CourseInfoItem = ({ icon, title, children }) => (
     </div>
 )
 
-const RegisterButton = ({ className = '', href }) => {
+const RegisterButton = ({ className = '', href, label }) => {
     const buttonClass = `${className} inline-flex h-11 w-full items-center justify-center rounded-[6px] bg-main px-6 text-[14px] font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:h-12 md:text-[15px] xl:text-[17px]`
 
     return href ? (
@@ -61,48 +45,40 @@ const RegisterButton = ({ className = '', href }) => {
             target="_blank"
             rel="noopener noreferrer"
             className={buttonClass}
+            aria-label={`${label}（另開視窗）`}
         >
-            <I18N>我要報名</I18N>
+            <I18N>{label}</I18N>
         </a>
     ) : (
-        <button type="button" className={buttonClass}>
-            <I18N>我要報名</I18N>
+        <button type="button" disabled className={buttonClass}>
+            <I18N>{label}</I18N>
         </button>
     )
 }
 
-const RegistrationDetail = ({ course }) => {
+export const RegistrationDetail = ({ course }) => {
     const fixedRegisterBarRef = useRef(null)
-    const detail = course
-        ? {
-              title: course.title,
-              attribute: [course.category],
-              programs: [],
-              lecturer: { name: '—', unit: '' },
-              outline: '—',
-              audiences: [],
-              duration: '—',
-              date: '—',
-              location: '—',
-              rule: '—',
-              contact: '—'
-          }
-        : COURSE_DETAIL
     const {
-        title,
-        attribute,
-        programs,
-        lecturer: { name: lecturerName, unit: lecturerUnit },
-        outline,
-        audiences,
-        duration,
-        date,
-        location,
-        rule,
-        contact
-    } = detail
-    const registerUrl = course?.status === '可選課' ? course.originalUrl : null
-    const canRegister = !course || Boolean(registerUrl)
+        id, coursename: title, category, program, teacher, student, length,
+        startdate, starthh, startmm, enddate, endhh, endmm, classroomother,
+        completion, contacter, signUpCheck, registerdate, outline, introduction, purpose, ps,
+        year, type, limit
+    } = course
+    const attribute = Object.values(category || {}).filter(item => typeof item === 'string')
+    const programs = Array.isArray(program) ? program : []
+    const teachers = Array.isArray(teacher) ? teacher : []
+    const audiences = Array.isArray(student) ? student : []
+    const duration = length != null ? `${length} 分鐘` : '—'
+    const time = (date, hh, mm) => date ? `${date}${hh != null && mm != null ? ` ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}` : ''}` : '—'
+    const date = `${time(startdate, starthh, startmm)} ～ ${time(enddate, endhh, endmm)}`
+    const location = classroomother || '—'
+    const rule = Array.isArray(completion) ? completion.join('、') || '—' : '—'
+    const contact = contacter || '—'
+    const check = signUpCheck || {}
+    const canRegister = check.enterCourse === true || check.canRegister === true
+    const actionLabel = check.enterCourse === true ? '進入課程' : '我要報名'
+    const registerUrl = canRegister ? `https://nlms.tzuchi.com.tw/tzuchi/edurd/register_course/course_opration.php?id=${encodeURIComponent(id)}` : null
+    const registrationMessage = typeof check.message?.register === 'string' ? check.message.register : ''
 
     useEffect(() => {
         if (!canRegister) return undefined
@@ -150,7 +126,7 @@ const RegistrationDetail = ({ course }) => {
                 title="報名選課"
                 icon="doc"
                 breadcrumbs={[
-                    { title: '快速選課', url: '/pick' },
+                    { title: '快速選課', url: '/course' },
                     { title: '報名選課' }
                 ]}
             />
@@ -160,7 +136,7 @@ const RegistrationDetail = ({ course }) => {
                         <div>
                             <span className="inline-flex h-6 items-center rounded-full bg-[#e8f2ff] px-3 text-[11px] font-bold text-secondary md:text-[12px] xl:h-7 xl:text-[14px]">
                                 <I18N>
-                                    {course?.status || '115年度–實體課程'}
+                                    {[year != null ? `${year}年度` : '', String(type) === '1' ? '數位課程' : '實體課程'].filter(Boolean).join('–')}
                                 </I18N>
                             </span>
                         </div>
@@ -187,11 +163,11 @@ const RegistrationDetail = ({ course }) => {
                                 </ol>
                             </DetailBlock>
 
-                            <DetailBlock title="學程探討">
+                            <DetailBlock title="認列學程">
                                 <div className="space-y-1 text-[11px] font-medium leading-5 text-primary md:text-[12px] md:leading-6 xl:text-[14px] xl:leading-7">
                                     {programs.length ? (
                                         programs.map((program) => (
-                                            <p key={program}>{program}</p>
+                                            <p key={`${program.id}-${program.name}`}>{program.program} / {program.name}：{program.credit ?? '—'} 學分</p>
                                         ))
                                     ) : (
                                         <p>—</p>
@@ -200,28 +176,29 @@ const RegistrationDetail = ({ course }) => {
                             </DetailBlock>
 
                             <DetailBlock title="講師">
-                                <div className="flex items-center gap-3">
+                                <div className="space-y-3">{teachers.length ? teachers.map((teacher, index) => (
+                                <div key={`${teacher.id}-${index}`} className="flex items-center gap-3">
                                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#78aada] to-[#477db8] text-[20px] font-bold text-white">
-                                        {lecturerName.slice(0, 1)}
+                                        {(teacher.name || '—').slice(0, 1)}
                                     </span>
                                     <div className="min-w-0 flex-1">
                                         <p className="text-[14px] font-bold leading-5 text-primary md:text-[15px] xl:text-[17px] xl:leading-6">
-                                            {lecturerName}
+                                            {teacher.name || '—'}
                                         </p>
-                                        {lecturerUnit && (
+                                        {[teacher.company, teacher.jobname].filter(Boolean).join(' / ') && (
                                             <p className="mt-0.5 text-[10px] leading-4 text-[#60748c] md:text-[11px] xl:text-[13px] xl:leading-5">
-                                                {lecturerUnit}
+                                                {[teacher.company, teacher.jobname].filter(Boolean).join(' / ')}
                                             </p>
                                         )}
                                     </div>
                                 </div>
+                                )) : <p>—</p>}</div>
                             </DetailBlock>
 
-                            <DetailBlock title="課程大綱">
-                                <p className="text-[11px] font-medium leading-5 text-primary md:text-[12px] xl:text-[14px] xl:leading-6">
-                                    {outline}
-                                </p>
-                            </DetailBlock>
+                            <DetailBlock title="課程大綱"><CourseHtml title="課程大綱" html={outline} /></DetailBlock>
+                            <DetailBlock title="課程簡介"><CourseHtml title="課程簡介" html={introduction} /></DetailBlock>
+                            <DetailBlock title="課程目的"><CourseHtml title="課程目的" html={purpose} /></DetailBlock>
+                            {ps && <DetailBlock title="備註"><CourseHtml title="備註" html={ps} /></DetailBlock>}
 
                             <DetailBlock
                                 title="適用對象"
@@ -248,9 +225,7 @@ const RegistrationDetail = ({ course }) => {
                             </DetailBlock>
                         </div>
 
-                        <p className="mt-4 hidden text-center text-[13px] text-[#60748c] xl:block">
-                            ※ <I18N>查無需要到課資料</I18N>
-                        </p>
+
                     </div>
 
                     <aside
@@ -267,6 +242,14 @@ const RegistrationDetail = ({ course }) => {
                             <CourseInfoItem icon="location" title="上課地點">
                                 {location}
                             </CourseInfoItem>
+                            <CourseInfoItem icon="calendar" title="報名截止日">
+                                {registerdate || '—'}
+                            </CourseInfoItem>
+                            {check.typeMes && <CourseInfoItem icon="doc" title="報名人數">
+                                {check.typeMes.currentRegistrations ?? '—'} / {check.typeMes.maxRegistrations ?? limit ?? '—'}
+                                {check.typeMes.registered === true && '（已報名）'}
+                                {check.typeMes.waiting === true && '（候補）'}
+                            </CourseInfoItem>}
                         </section>
 
                         <section className="rounded-[8px] border border-solid border-[#ffdfe4] bg-[#fff2f4] p-4 text-danger">
@@ -289,28 +272,13 @@ const RegistrationDetail = ({ course }) => {
                             </div>
                         </section>
 
-                        {canRegister ? (
-                            <RegisterButton
-                                className="hidden xl:inline-flex"
-                                href={registerUrl}
-                            />
-                        ) : (
-                            course?.originalUrl && (
-                                <a
-                                    href={course.originalUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex min-h-11 w-full items-center justify-center rounded-[6px] bg-main px-6 text-[14px] font-bold text-white hover:opacity-90 xl:min-h-12 xl:text-[15px]"
-                                >
-                                    進入原課程頁
-                                </a>
-                            )
-                        )}
+                        {registrationMessage && <p role="status" className="text-[14px] text-primary">{registrationMessage}</p>}
+                        {canRegister ? <RegisterButton className="hidden xl:inline-flex" href={registerUrl} label={actionLabel} /> :
+                            <button type="button" disabled className="h-11 w-full rounded-[6px] bg-gray-200 text-[14px] text-gray-500">{registrationMessage || '目前不開放報名或進入課程'}</button>}
+
                     </aside>
 
-                    <p className="mt-4 text-center text-[11px] text-[#60748c] xl:hidden">
-                        ※ <I18N>查無需要到課資料</I18N>
-                    </p>
+
                 </div>
             </section>
 
@@ -319,7 +287,7 @@ const RegistrationDetail = ({ course }) => {
                     ref={fixedRegisterBarRef}
                     className="fixed inset-x-0 bottom-0 z-40 border-t border-solid border-[#e0e8f1] bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2 backdrop-blur xl:hidden"
                 >
-                    <RegisterButton href={registerUrl} />
+                    <RegisterButton href={registerUrl} label={actionLabel} />
                 </div>
             )}
         </div>
@@ -328,9 +296,26 @@ const RegistrationDetail = ({ course }) => {
 
 const Page = () => {
     const { id } = useParams()
-    const calendarCourse = getCalendarCourseById(id)
-
-    return <RegistrationDetail course={calendarCourse} />
+    const { isLogin, user, expireSession } = useContext(LoginContext)
+    const [result, setResult] = useState({ status: 'loading' })
+    const [revision, setRevision] = useState(0)
+    useEffect(() => {
+        if (!isLogin) return undefined
+        const controller = new AbortController()
+        setResult({ status: 'loading', id, owner: user.id })
+        getCourseInfo(id, controller.signal).then(course => {
+            if (!controller.signal.aborted) setResult({ status: 'success', course, id, owner: user.id })
+        }).catch(error => {
+            if (controller.signal.aborted) return
+            if (error.status === 401) expireSession()
+            setResult({ status: 'error', id, owner: user.id, message: error instanceof TypeError ? '無法連線至課程資訊服務。' : error.message })
+        })
+        return () => controller.abort()
+    }, [id, isLogin, user.id, expireSession, revision])
+    if (!isLogin) return <div className="pt-[var(--header-height)]"><DashboardStatus /></div>
+    if (result.id !== id || result.owner !== user.id || result.status === 'loading') return <div className="flex flex-1 items-center justify-center pt-[var(--header-height)]"><Spinner block /></div>
+    if (result.status === 'error') return <div role="alert" className="min-h-[50vh] px-4 pt-[calc(var(--header-height)+24px)] text-primary"><p>{result.message}</p><button type="button" className="mt-3 underline" onClick={() => setRevision(value => value + 1)}>重新載入</button></div>
+    return <RegistrationDetail key={id} course={result.course} />
 }
 
 export default React.memo(Page)

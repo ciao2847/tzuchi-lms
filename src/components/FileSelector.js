@@ -33,7 +33,7 @@ const FileSelector = forwardRef(
         ref = ref(fileIptRef.current)
 
         const previewFile = (e) => {
-            const files = e.target.files
+            const { files } = e.target
 
             if (files.length + data.length > maxFileNums) {
                 swal({

@@ -1,6 +1,8 @@
+import EmptyState from 'components/EmptyState'
 import React from 'react'
 import PublicationCard from './PublicationCard'
-const PublicationList = ({ data, currentIdx, className }) => {
+const PublicationList = ({ data = [], currentIdx = data.length, className }) => {
+    if (!data.filter((item, index) => index < currentIdx).length) return <EmptyState />
     return (
         <ul className="grid grid-cols-1 gap-2">
             {data

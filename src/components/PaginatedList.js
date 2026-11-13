@@ -77,12 +77,12 @@ const PaginatedList = ({
             {normalizedData.length > 0 ? (
                 <ListComponent data={currentItems} {...componentProps} />
             ) : (
-                <div className={emptyClassName}>
+                <div role="status" className={emptyClassName}>
                     <I18N>{emptyText}</I18N>
                 </div>
             )}
 
-            <div className="mt-6 grid grid-cols-1 items-center gap-3 md:mt-8 md:grid-cols-[1fr_auto_1fr]">
+            {normalizedData.length > 0 && <div className="mt-6 grid grid-cols-1 items-center gap-3 md:mt-8 md:grid-cols-[1fr_auto_1fr]">
                 {normalizedData.length > 0 && (
                     <nav
                         aria-label="資料頁碼"
@@ -167,7 +167,7 @@ const PaginatedList = ({
                         ))}
                     </Select>
                 </div>
-            </div>
+            </div>}
         </div>
     )
 }

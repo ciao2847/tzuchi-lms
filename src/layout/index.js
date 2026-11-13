@@ -1,6 +1,7 @@
 import LoadingProvider from 'contexts/LoadingProvider'
 import PhotoSwipeProvider from 'contexts/PhotoSwipeProvider'
-import React, { useEffect } from 'react'
+import React, { Suspense, useEffect } from 'react'
+import Spinner from 'components/Spinner'
 import ReactGA_4 from 'react-ga4'
 import { Navigate, useParams, useSearchParams } from 'react-router-dom'
 import BtnBackTop from './BtnBackTop'
@@ -35,6 +36,7 @@ const Layout = ({ children }) => {
     return (
         <LoadingProvider>
             <PhotoSwipeProvider>
+                <div className="flex min-h-[100dvh] flex-col">
                 <a
                     href="#main-content"
                     className="acc-show-at-focus"
@@ -54,15 +56,18 @@ const Layout = ({ children }) => {
                     tabIndex="-1"
                     className={`${!isProd ? 'staging-site' : ''} ${
                         isEmbed ? 'pt-2' : 'pt-0'
-                    } relative mx-auto min-h-[80vh] scroll-mt-[var(--header-height)] focus:outline-none`}
+                    } relative mx-auto flex w-full flex-1 flex-col scroll-mt-[var(--header-height)] focus:outline-none`}
                 >
-                    {children}
+                    <Suspense fallback={<div className="flex flex-1 items-center justify-center pt-[var(--header-height)]"><Spinner block /></div>}>
+                        {children}
+                    </Suspense>
                 </main>
                 <Footer />
                 <BtnBackTop />
                 <LightBox />
                 <LoadingHint />
                 <ScrollReset />
+                </div>
             </PhotoSwipeProvider>
         </LoadingProvider>
     )

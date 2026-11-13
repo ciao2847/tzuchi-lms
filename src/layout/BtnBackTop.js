@@ -5,7 +5,7 @@ const BtnBackTop = () => {
     const [isBtnTopShow, toggleBtnTop] = useState(false)
     const seonsorRef = useRef(null)
     const { pathname } = useLocation()
-    const isPickDetailPage = /^\/pick\/[^/]+$/.test(pathname)
+    const isPickDetailPage = /^\/(?:course|pick)\/[^/]+$/.test(pathname)
     useEffect(() => {
         const sensor = seonsorRef.current
         const observer = new IntersectionObserver((entries, observer) => {

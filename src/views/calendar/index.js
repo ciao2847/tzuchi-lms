@@ -1,8 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { DashboardContext } from 'contexts/DashboardProvider'
 import DashboardStatus from 'components/DashboardStatus'
 import { getCalendarEvents } from 'adapters/dashboardAdapter'
-import LearningHistory from './LearningHistory'
+import LearningHistory from './AnnualLearningHistory'
+import ExternalHistory from './ExternalHistory'
 import SearchableProgramSelector from './SearchableProgramSelector'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/react/daygrid'
@@ -176,8 +178,9 @@ const HistoryTabs = ({ activeTab, onChange }) => (
 )
 
 const ProgramSelector = ({ programs, selectedProgram, onChange, status }) => {
+    if (status === 'loading') return <Spinner block />
     if (!programs.length) return <p className="py-3 text-[14px] text-[#8292a7]">
-        {status === 'success' ? '目前沒有學程' : status === 'loading' ? '學程載入中…' : status === 'idle' ? '請先登入以查看學程' : '學程載入失敗，請重新載入'}
+        {status === 'idle' ? '請先登入以查看學程' : '暫無資料'}
     </p>
     return (
         <div className="py-2 md:px-1 md:py-3">
@@ -263,7 +266,7 @@ export const ProgressCourseList = ({ courses, emptyText, showStatus = false }) =
                     )}
                     {type && <span className="mr-1">【{type}】</span>}
                     {!id || ["morning", "other", "[morning]", "[other]"].includes(status.trim().toLowerCase()) ? <span>{title}</span> : <Link
-                        href={`https://nlms.tzuchi.com.tw/tzuchi/edurd/register_course/course_opration.php?id=${encodeURIComponent(id)}`}
+                        href={`/course/${encodeURIComponent(id)}`}
                         className="font-semibold text-secondary underline decoration-transparent underline-offset-2 hover:decoration-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary"
                     >
                         {title}
@@ -290,7 +293,7 @@ const CourseProgressDetails = ({
             <h3 className="mb-1 font-bold text-primary">◎已上課程資訊</h3>
             <ProgressCourseList
                 courses={completedCourses}
-                emptyText="目前沒有已上課程"
+                emptyText="暫無資料"
                 showStatus={true}
             />
         </section>
@@ -298,7 +301,7 @@ const CourseProgressDetails = ({
             <h3 className="mb-1 font-bold text-primary">◎其他可選之課程</h3>
             <ProgressCourseList
                 courses={availableCourses}
-                emptyText="目前沒有其他可選課程"
+                emptyText="暫無資料"
             />
         </section>
     </div>
@@ -307,7 +310,7 @@ const CourseProgressDetails = ({
 export const CourseProgressTable = ({ categories }) => {
     const [selectedCategoryId, setSelectedCategoryId] = useState(categories[0]?.id)
     const selectedCategory = categories.find(({ id }) => id === selectedCategoryId) || categories[0]
-    if (!selectedCategory) return <p className="min-h-[340px] p-4 md:min-h-[480px]">目前沒有學程類別。</p>
+    if (!selectedCategory) return <p role="status" className="min-h-[340px] p-4 md:min-h-[480px]">暫無資料</p>
     const rowCount = Math.max(categories.length, 11)
     const emptyRowCount = rowCount - categories.length
     const { title, courses } = selectedCategory
@@ -454,15 +457,23 @@ const CollapsiblePanel = ({ children, icon, isDefaultOpen = false, title }) => {
     )
 }
 
-const NoticeCard = ({ items, onSelect, title, tone, emptyText }) => (
+export const NoticeCard = ({ items, onSelect, title, tone, emptyText, status }) => (
     <section className="overflow-hidden rounded-[9px] border border-solid border-[#dce5f0] bg-white [box-shadow:0_2px_12px_rgba(9,58,123,0.04)]">
         <header className="flex h-[58px] items-center justify-between border-b border-solid border-[#e6ecf4] px-5">
             <h2 className="text-[17px] font-bold text-primary xl:text-[19px]">
                 <I18N>{title}</I18N>
             </h2>
         </header>
-        <ul className="max-h-[256px] overflow-y-auto overscroll-contain px-5 py-2">
-            {!items.length && emptyText && <li className="py-3 text-[13px] text-[#8292a7]">{emptyText}</li>}
+        {status === 'loading' || status === 'idle' ? <div role="status" aria-busy="true" aria-label="讀取資料">
+            <div aria-hidden="true" className="h-[256px] animate-pulse px-5 py-2 motion-reduce:animate-none">
+                {[0, 1, 2, 3, 4].map(index => <div key={index} className="flex h-12 items-center gap-3">
+                    <div className="h-2 w-2 shrink-0 rounded-full bg-slate-200" />
+                    <div className={`h-3 flex-1 rounded bg-slate-200 ${index % 2 ? 'max-w-[60%]' : ''}`} />
+                    <div className="ml-auto h-3 w-12 shrink-0 rounded bg-slate-200" />
+                </div>)}
+            </div>
+        </div> : <ul className="max-h-[256px] overflow-y-auto overscroll-contain px-5 py-2">
+            {!items.length && <li role="status" className="py-3 text-[13px] text-[#8292a7]">暫無資料</li>}
             {items.map((item) => (
                 <li key={item.id}>
                     <button
@@ -487,7 +498,7 @@ const NoticeCard = ({ items, onSelect, title, tone, emptyText }) => (
                     </button>
                 </li>
             ))}
-        </ul>
+        </ul>}
     </section>
 )
 
@@ -515,7 +526,6 @@ export const ProgramDetails = ({ programId }) => {
     if (result.programId !== programId || result.owner !== user.id || result.status === 'loading') return (
         <div role="status" aria-busy="true" className="flex h-[480px] items-center justify-center p-4 md:h-[640px]">
             <span aria-hidden="true"><Spinner size={12} color="#093a7b" /></span>
-            <span className="sr-only">學程明細載入中…</span>
         </div>
     )
     if (result.status === 'expired') return <p role="alert" className="min-h-[480px] p-4 md:min-h-[640px]"><Link href="/#login">登入時效已過期或尚未登入，請重新登入。</Link></p>
@@ -559,8 +569,9 @@ const formatMonthTitle = (date) =>
     `${date.getFullYear()}年${date.getMonth() + 1}月`
 
 const Page = () => {
+    const navigate = useNavigate()
     const isMobile = useMedia('(max-width: 767px)')
-    const { data, status } = useContext(DashboardContext)
+    const { data, status, markRead } = useContext(DashboardContext)
     const calendarEvents = getCalendarEvents(data)
     const calendarRef = useRef(null)
     const [calendarTitle, setCalendarTitle] = useState(() => formatMonthTitle(new Date()))
@@ -570,7 +581,8 @@ const Page = () => {
     const selectedProgramId = programs.some(program => program.id === selectedProgram)
         ? selectedProgram : programs[0]?.id || ''
     const [selectedNotice, setSelectedNotice] = useState(null)
-    useEffect(() => setSelectedNotice(null), [data])
+    useEffect(() => setSelectedNotice(null), [status])
+    const selectNotice = notice => { setSelectedNotice(notice); markRead?.(notice) }
 
     const moveCalendar = (action) => {
         const calendarApi = calendarRef.current?.getApi()
@@ -653,6 +665,11 @@ const Page = () => {
                                             {event.extendedProps.course.start.slice(11, 16)} {event.title}
                                         </span>}
                                         events={calendarEvents}
+                                        eventClick={({ event, jsEvent }) => {
+                                            if (jsEvent.ctrlKey || jsEvent.metaKey || jsEvent.shiftKey || jsEvent.altKey) return
+                                            jsEvent.preventDefault()
+                                            navigate(`/course/${encodeURIComponent(event.extendedProps.course.id)}`)
+                                        }}
                                         eventOrder="sortTime,title,id"
                                         eventOrderStrict={true}
                                         dayMaxEvents={isMobile ? 0 : 1}
@@ -677,7 +694,7 @@ const Page = () => {
                                         activeTab={activeTab}
                                         onChange={setActiveTab}
                                     />
-                                    {activeTab === 'learning' ? <LearningHistory courses={data.history} status={status} /> : <>
+                                    {activeTab === 'learning' ? <LearningHistory /> : activeTab === 'external' ? <ExternalHistory /> : <>
                                     {activeTab === 'external' || activeTab === 'finished' ? <SearchableProgramSelector
                                         key={activeTab}
                                         searchWithButtons
@@ -698,20 +715,22 @@ const Page = () => {
                         </div>
 
                         <aside className="mt-3 hidden space-y-3 xl:mt-0 xl:block">
-                            <DashboardStatus />
+                            {status !== 'loading' && status !== 'idle' && <DashboardStatus />}
                             <NoticeCard
+                                status={status}
                                 title="通知信"
                                 items={data.messages}
                                 emptyText={status === 'success' ? '目前沒有通知信' : ''}
                                 tone="blue"
-                                onSelect={setSelectedNotice}
+                                onSelect={selectNotice}
                             />
                             <NoticeCard
+                                status={status}
                                 title="系統公告"
                                 items={data.announcements}
                                 emptyText={status === 'success' ? '目前沒有系統公告' : ''}
                                 tone="red"
-                                onSelect={setSelectedNotice}
+                                onSelect={selectNotice}
                             />
                         </aside>
                     </div>

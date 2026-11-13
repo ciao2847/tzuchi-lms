@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import AutoSwitchLink from 'components/AutoSwitchLink'
 import ThumbFrame from 'components/ThumbFrame'
 
@@ -6,10 +6,10 @@ const ANNOUNCEMENT_CONFIG = [
     {
         id: 'general-course',
         category: '系統公告',
-        title: '114年全院通識課程\n學分認列開始申請',
+        title: '115年全院通識課程\n學分認列開始申請',
         description:
-            '即日起至 2025/06/30 止，請同仁至學習平台完成通識課程學分認列申請，逾期將不受理。',
-        image: 'https://picsum.photos/200/300',
+            '即日起至 2026/06/30 止，請同仁至學習平台完成通識課程學分認列申請，逾期將不受理。',
+        image: `${process.env.BASE_PATH}/images/global/banner-01.png`,
         link: 'http://10.2.10.236:8064/tzuchi/',
         isLinkOut: true
     },
@@ -19,7 +19,7 @@ const ANNOUNCEMENT_CONFIG = [
         title: '學習平台使用說明\n常見問題與操作指引',
         description:
             '登入、課程操作與學習紀錄相關問題，請參考學習平台常見問題。',
-        image: 'https://picsum.photos/200/300',
+        image: `${process.env.BASE_PATH}/images/global/banner-02.png`,
         link: 'https://cms.tzuchi.com.tw/dl/2024/elearning_qa/index.html',
         isLinkOut: true
     }
@@ -38,6 +38,14 @@ const AnnouncementSection = ({
     const { length: announcementCount } = announcements
     const Action = onSelect ? 'button' : AutoSwitchLink
     const showNavigation = !loading && !statusContent && announcementCount > 1
+
+    useEffect(() => {
+        if (!showNavigation) return undefined
+        const timer = window.setInterval(() => {
+            setActiveIndex(current => (current + 1) % announcementCount)
+        }, 5000)
+        return () => window.clearInterval(timer)
+    }, [showNavigation, announcementCount])
 
     const changeAnnouncement = (direction) => {
         setActiveIndex(
@@ -63,21 +71,14 @@ const AnnouncementSection = ({
                 />}
                 <div className="absolute inset-0 bg-gradient-to-r from-[#e7effb] via-[#e7effb]/90 to-transparent" />
                 <div className="relative z-[1] flex min-h-[320px] flex-col items-start justify-center px-8 py-12 lg:h-full lg:min-h-0 lg:px-10">
-                    {loading ? <>
-                        <span role="status" className="sr-only">最新公告載入中…</span>
-                        <div className="w-full motion-safe:animate-pulse sm:max-w-[65%]" aria-hidden="true">
-                            <div className="mb-5 h-6 w-20 rounded-full bg-secondary/15" />
-                            <div className="mb-4 space-y-2">
-                                <div className="h-7 w-full rounded bg-primary/10 md:h-8" />
-                                <div className="h-7 w-4/5 rounded bg-primary/10 md:h-8" />
-                            </div>
-                            <div className="mb-6 space-y-1">
-                                <div className="h-5 w-full rounded bg-primary/10" />
-                                <div className="h-5 w-3/4 rounded bg-primary/10" />
-                            </div>
-                            <div className="h-10 w-40 rounded-full border border-solid border-secondary/20 bg-secondary/10" />
-                        </div>
-                    </> : statusContent || (!announcementCount ? <p className="text-primary">目前沒有公告</p> : <div
+                    {loading ? <div aria-hidden="true" className="flex h-[224px] w-full animate-pulse flex-col justify-center motion-reduce:animate-none sm:max-w-[65%]">
+                        <div className="mb-5 h-6 w-20 rounded-full bg-primary/10" />
+                        <div className="mb-3 h-7 w-full rounded bg-primary/10" />
+                        <div className="mb-5 h-7 w-4/5 rounded bg-primary/10" />
+                        <div className="mb-2 h-4 w-full rounded bg-primary/10" />
+                        <div className="mb-5 h-4 w-3/4 rounded bg-primary/10" />
+                        <div className="h-10 w-36 rounded-[6px] bg-primary/10" />
+                    </div> : statusContent || (!announcementCount ? <p role="status" className="text-primary">暫無資料</p> : <div
                         className="w-full sm:max-w-[65%]"
                         aria-live="polite"
                         aria-atomic="true"

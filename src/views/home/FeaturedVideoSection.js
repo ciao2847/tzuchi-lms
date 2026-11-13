@@ -2,6 +2,7 @@ import React, { useId, useRef, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import VideoCard from './VideoCard'
+import EmptyState from 'components/EmptyState'
 
 // 示範資料：正式影片的縮圖與連結可在這裡替換。
 const FEATURED_VIDEO_CONFIG = [
@@ -82,7 +83,7 @@ const FeaturedVideoSection = ({ videos = FEATURED_VIDEO_CONFIG }) => {
                 >
                     精選影片
                 </h2>
-                <div className="relative">
+                {!videos.length ? <EmptyState /> : <div className="relative">
                     <Swiper
                         id={`${sectionId}-slider`}
                         className="!-m-2 !p-2"
@@ -131,7 +132,7 @@ const FeaturedVideoSection = ({ videos = FEATURED_VIDEO_CONFIG }) => {
                             aria-hidden="true"
                         />
                     </button>
-                </div>
+                </div>}
             </div>
         </section>
     )

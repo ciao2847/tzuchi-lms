@@ -179,7 +179,7 @@ const LoginProvider = ({ children }) => {
         setSessionError('')
     }
 
-    const login = async ({ user, remember = false } = {}) => {
+    const login = async ({ user, remember = true } = {}) => {
         if (!user?.id || !user?.name) {
             throw new Error('登入回應資料不完整，請稍後再試。')
         }

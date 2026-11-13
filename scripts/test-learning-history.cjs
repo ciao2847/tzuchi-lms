@@ -43,19 +43,24 @@ const fakeReact = {
         return [slots[index], value => { slots[index] = value }]
     }
 }
+const MoreOptionsSelector = load('src/components/MoreOptionsSelector.js').default
 const { default: LearningHistory, LearningHistoryResults } = load('src/views/calendar/LearningHistory.js', {
     react: fakeReact,
     'components/I18N': I18N,
+    'components/Link': ({ href, children, ...props }) => React.createElement('a', { href, ...props }, children),
+    'react-router-dom': { useNavigate: () => () => {} },
     'components/PaginatedList': PageList,
     'components/ViewModeToggle': Toggle,
     'components/DashboardStatus': () => React.createElement('p', null, 'Loading'),
     'components/Select': load('src/components/Select.js').default,
+    'components/MoreOptionsSelector': MoreOptionsSelector,
     'hooks/useMedia': () => desktop,
     'adapters/learningHistoryAdapter': adapter
 })
 function find(node, predicate) {
     if (!React.isValidElement(node)) return null
     if (predicate(node)) return node
+    if (node.type === MoreOptionsSelector) return find(MoreOptionsSelector(node.props), predicate)
     for (const child of React.Children.toArray(node.props.children)) {
         const result = find(child, predicate)
         if (result) return result
@@ -69,7 +74,7 @@ function render(status = 'success') {
 let tree = render()
 assert.equal(find(tree, node => node.type === Toggle).props.value, 'list')
 assert.equal(find(tree, node => node.type === PageList).props.data.length, 2)
-find(tree, node => node.type === 'button' && node.props.children === 2025).props.onClick()
+find(tree, node => node.type === 'button' && node.props.children?.props?.children === 2025).props.onClick()
 tree = render()
 assert.equal(find(tree, node => node.type === PageList).props.data[0].id, '3')
 find(tree, node => node.type === Toggle).props.onChange('card')
@@ -87,13 +92,14 @@ find(tree, node => node.type === 'button' && node.props.children === 2015).props
 tree = render()
 assert.equal(details.open, false)
 assert.equal(find(tree, node => node.type === PageList).props.data[0].id, '4')
-assert.equal(find(tree, node => node.type === 'summary').props.children[0], 2015)
+assert.equal(find(tree, node => node.type === 'summary').props.children[0].props.children, '更多：2015')
 desktop = false; slots = []
 assert.equal(find(render(), node => node.type === Toggle).props.value, 'card')
 const results = adapter.filterLearningHistory(courses, 2026)
 for (const mode of ['list', 'card']) {
     const html = renderToStaticMarkup(React.createElement(LearningHistoryResults, { data: results, viewMode: mode }))
     assert(html.includes('Latest') && html.includes('Earlier'))
+    for (const course of results) assert(html.includes(`href="/course/${course.id}"`))
     assert(html.includes('2026-10-20 14:00'))
     assert(html.includes('—'))
     assert(!html.includes('undefined') && !html.includes('Invalid Date'))

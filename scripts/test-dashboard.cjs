@@ -11,7 +11,7 @@ function load(file, mocks = {}) {
     mod.filename = path.resolve(file)
     mod.paths = module.paths
     const original = mod.require.bind(mod)
-    mod.require = (id) => mocks[id] || original(id)
+    mod.require = (id) => mocks[id] || (id === 'components/Spinner' ? load('src/components/Spinner.js').default : original(id))
     mod._compile(babel.transformFileSync(file).code, mod.filename)
     return mod.exports
 }
@@ -55,7 +55,7 @@ async function main() {
     assert.equal(mixed.passed.length, 1)
     assert.equal(mixed.yet.length, 1)
     const events = adapter.getCalendarEvents(data)
-    assert.equal(events[0].url, `https://nlms.tzuchi.com.tw/tzuchi/edurd/register_course/course_opration.php?id=${encodeURIComponent(events[0].extendedProps.course.id)}`)
+    assert.equal(events[0].url, `${process.env.BASE_PATH || ''}/course/${encodeURIComponent(events[0].extendedProps.course.id)}`)
     assert.equal(events.length, 2) // Missing date in the third record is not plotted.
     assert.equal(events[0].start, '2026-10-22')
     assert.equal(events[0].extendedProps.tone, 'registered')
@@ -119,6 +119,13 @@ async function main() {
     const summary = renderToStaticMarkup(React.createElement(Summary, { user: { name: 'Test user' } }))
     assert(summary.includes('Upcoming course'))
     assert(summary.includes('Test user'))
+    const loadingSummary = renderToStaticMarkup(React.createElement(DashboardContext.Provider, { value: { data, status: 'loading' } }, React.createElement(Summary)))
+    assert(loadingSummary.includes('h-[70px]') && loadingSummary.includes('h-[128px]'))
+    assert(loadingSummary.includes('aria-busy="true"') && !loadingSummary.includes('loading-animate'))
+    assert(loadingSummary.includes('animate-pulse') && loadingSummary.includes('motion-reduce:animate-none'))
+    assert(!loadingSummary.includes('<header') && !loadingSummary.includes('<h2') && !loadingSummary.includes('<a'))
+    assert(!loadingSummary.includes('載入中'))
+    assert(!loadingSummary.includes('Upcoming course'))
     const calendarConstants = load('src/constants/learningCalendar.js')
     assert.equal(calendarConstants.MESSAGE_LIST, undefined)
     assert.equal(calendarConstants.HAS_UNREAD_NOTICE, undefined)
@@ -128,6 +135,7 @@ async function main() {
     const SearchableProgramSelector = load('src/views/calendar/SearchableProgramSelector.js', {
         'hooks/useMedia': () => mobileSelector,
         'components/Select': load('src/components/Select.js').default,
+    'components/MoreOptionsSelector': load('src/components/MoreOptionsSelector.js').default,
         'components/KeywordSearchRow': load('src/components/KeywordSearchRow.js', { 'components/I18N': ({ children }) => children }).default,
         'components/RoundedSearchField': RoundedSearchField
     }).default
@@ -151,13 +159,16 @@ async function main() {
     }))
     assert(desktopSelector.includes('col-start-3') && desktopSelector.includes('開始查詢') && desktopSelector.includes('清除條件'))
     assert(!desktopSelector.includes('role="combobox"'))
-    const Calendar = load('src/views/calendar/index.js', {
-        'components/Spinner': () => null,
+    let courseDestination
+    const calendarModule = load('src/views/calendar/index.js', {
+        'react-router-dom': { useNavigate: () => destination => { courseDestination = destination } },
+        'components/Spinner': load('src/components/Spinner.js').default,
         'hooks/useMedia': () => false,
         'api/dashboard': api,
         'contexts/LoginProvider': { LoginContext: React.createContext({ user: {}, expireSession: () => {} }) },
         'adapters/dashboardAdapter': adapter,
-        './LearningHistory': () => null,
+        './AnnualLearningHistory': () => null,
+        './ExternalHistory': () => null,
         './SearchableProgramSelector': SearchableProgramSelector,
         'contexts/DashboardProvider': { DashboardContext },
         'components/DashboardStatus': () => null,
@@ -173,7 +184,31 @@ async function main() {
         'components/NotificationDetailDialog': () => null,
         'components/TitleBlk': () => null,
         'constants/learningCalendar': calendarConstants
-    }).default
+    })
+    const Calendar = calendarModule.default
+    const { NoticeSection } = load('src/layout/MobileNotifications.js', {
+        'contexts/DashboardProvider': { DashboardContext },
+        'contexts/LoginProvider': { LoginContext: React.createContext({}) },
+        'components/I18N': ({ children }) => children,
+        'components/DashboardStatus': () => null,
+        'components/NotificationDetailDialog': () => null,
+        'hooks/useBodyScrollLock': () => {}
+    })
+    for (const Component of [calendarModule.NoticeCard, NoticeSection]) {
+        const loading = renderToStaticMarkup(React.createElement(Component, { items: [], title: '通知信', status: 'loading', emptyText: '目前沒有資料' }))
+        assert(loading.includes('aria-busy="true"') && !loading.includes('載入中'))
+        if (Component === calendarModule.NoticeCard) {
+            assert(loading.includes('h-[256px]') && !loading.includes('loading-animate'))
+            assert(loading.includes('animate-pulse'))
+        } else assert(loading.includes('loading-animate'))
+        assert(!loading.includes('目前沒有資料'))
+        const empty = renderToStaticMarkup(React.createElement(Component, { items: [], title: '通知信', status: 'success', emptyText: '目前沒有資料' }))
+        assert(empty.includes('暫無資料') && !empty.includes('loading-animate'))
+        const populated = renderToStaticMarkup(React.createElement(Component, {
+            items: [{ id: 'notice-test', title: 'Loaded notice', date: '2026-11-11' }], title: '通知信', status: 'success'
+        }))
+        assert(populated.includes('Loaded notice') && !populated.includes('暫無資料') && !populated.includes('loading-animate'))
+    }
     const calendar = renderToStaticMarkup(React.createElement(Calendar))
     assert(calendar.includes('Announcement') && calendar.includes('Unread'))
     assert(calendar.includes('\u901a\u77e5\u4fe1') && calendar.includes('\u7cfb\u7d71\u516c\u544a'))
@@ -186,6 +221,13 @@ async function main() {
     assert.equal(calendarProps.dayMaxEvents, 1)
     assert.equal(calendarProps.moreLinkText(22), '22+')
     assert.equal(calendarProps.moreLinkClick, 'popover')
+    let clickPrevented = false
+    calendarProps.eventClick({ event: { extendedProps: events[0].extendedProps }, jsEvent: { preventDefault: () => { clickPrevented = true } } })
+    assert.equal(clickPrevented, true)
+    assert.equal(courseDestination, `/course/${encodeURIComponent(events[0].extendedProps.course.id)}`)
+    courseDestination = undefined
+    calendarProps.eventClick({ event: { extendedProps: events[0].extendedProps }, jsEvent: { ctrlKey: true, preventDefault: () => { throw new Error('Modified clicks must retain native link behavior') } } })
+    assert.equal(courseDestination, undefined)
     assert.equal(calendarProps.initialDate, undefined)
     const courseMarkup = renderToStaticMarkup(calendarProps.eventContent({ event: {
         title: events[0].title, extendedProps: events[0].extendedProps
@@ -195,15 +237,15 @@ async function main() {
     const emptyCalendar = renderToStaticMarkup(React.createElement(DashboardContext.Provider,
         { value: { data: empty, status: 'success' } }, React.createElement(Calendar)))
     assert(!emptyCalendar.includes('Announcement') && !emptyCalendar.includes('Unread'))
-    assert(emptyCalendar.includes('\u76ee\u524d\u6c92\u6709\u901a\u77e5\u4fe1'))
-    assert(emptyCalendar.includes('\u76ee\u524d\u6c92\u6709\u5b78\u7a0b'))
+    assert(emptyCalendar.includes('\u66ab\u7121\u8cc7\u6599'))
+    assert(!emptyCalendar.includes('loading-animate'))
     // Exercise request lifecycle: no anonymous call, abort on logout, 401 expiration.
     let login = { isLogin: false, user: {} }, effect, state, expired = 0, calls = 0, signal
     let finish, fail
     const fakeReact = {
         createContext: () => ({ Provider: 'provider' }),
         useContext: () => login,
-        useState: initial => [typeof initial === 'function' ? initial() : initial, value => { state = value }],
+        useState: initial => [typeof initial === 'function' ? initial() : initial, value => { state = typeof value === 'function' ? value(state) : value }],
         useCallback: fn => fn,
         useEffect: fn => { effect = fn },
         createElement: (type, props) => ({ type, props })
@@ -224,8 +266,27 @@ async function main() {
     Provider({}); effect(); fail(Object.assign(new Error('Expired'), { status: 401 }))
     await flush(); assert.equal(expired, 1)
     Provider({}); effect(); finish(data); await flush(); assert.equal(state.status, 'success')
+    const previousWindow = global.window
+    const savedReads = new Map()
+    global.window = { localStorage: { getItem: key => savedReads.get(key) ?? null, setItem: (key, value) => savedReads.set(key, value) } }
+    const unreadMessage = data.messages.find(item => item.isUnread)
+    const unreadAnnouncement = data.announcements[0]
+    assert.equal(unreadAnnouncement.isUnread, true, 'Announcements start unread when API provides no read state')
+    const readContext = Provider({}).props.value
+    readContext.markRead(unreadMessage)
+    assert.equal(state.data.messages.find(item => item.id === unreadMessage.id).isUnread, false)
+    readContext.markRead(unreadAnnouncement)
+    assert.equal(state.data.announcements[0].isUnread, false)
+    Provider({}); effect(); finish(data); await flush()
+    assert.equal(state.data.messages.find(item => item.id === unreadMessage.id).isUnread, false, 'Read mail survives a reload')
+    assert.equal(state.data.announcements[0].isUnread, false, 'Read announcements survive a reload')
+    login = { ...login, user: { id: 'other-account' } }
+    Provider({}); effect(); finish(data); await flush()
+    assert.equal(state.data.messages.find(item => item.id === unreadMessage.id).isUnread, true, 'Accounts must not share read state')
+    assert.equal(state.data.announcements[0].isUnread, true)
+    global.window = previousWindow
     Provider({}); effect(); fail(new TypeError('Network')); await flush(); assert.equal(state.status, 'error')
     assert.equal(state.data.messages.length, 0)
-    console.log('PASS: dashboard fields, aliases, empty/invalid data, GET/session, failures, UI rendering, abort and 401 expiration')
+    console.log('PASS: dashboard fields, read mail/announcements, reload persistence, account isolation, GET/session, failures, UI rendering, abort and 401 expiration')
 }
 main().catch(error => { console.error(error); process.exitCode = 1 })

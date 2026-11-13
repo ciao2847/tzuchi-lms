@@ -18,7 +18,7 @@ const HlsVideo = ({ isPlaying, className, ...props }) => {
                     const hls = new Hls()
                     hls.attachMedia(videoRef.current)
                     hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-                        hls.loadSource(props.src)
+                        hls.loadSource(src)
                         hlsSupport.current = true
                         if (isPlaying) videoRef.current.play()
                     })
@@ -27,7 +27,7 @@ const HlsVideo = ({ isPlaying, className, ...props }) => {
         } else {
             if (isPlaying) videoRef.current.play()
         }
-    }, [init, props.src])
+    }, [init, src])
     useEffect(() => {
         if (isHls && !hlsSupport.current) return
         if (isPlaying) {

@@ -16,15 +16,42 @@ const LearningSummarySection = ({
         { id: 'completed', label: '已完成課程', value: data.passed.length, className: 'bg-[#e9f8ef] text-[#168742]' }
     ]
     const recent = [...data.coming].filter(course => course.start).sort((a, b) => a.start.localeCompare(b.start))[0]
-    const title = recent?.title || '目前沒有待上課課程'
+    const title = recent?.title || '暫無資料'
     const dateTime = recent?.start || ''
     const displayTime = dateTime.replace('T', ' ') + (recent?.end ? ` ～ ${recent.end.replace('T', ' ')}` : '')
+    const sectionClass = `flex min-w-0 flex-col justify-center rounded-[20px] border border-solid border-gray-200 bg-white/95 p-5 shadow-sm sm:p-6 lg:min-h-[404px] ${className}`
+    const actionsClass = 'grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2'
+
+    if (status === 'loading' || status === 'idle') return <section
+        className={sectionClass} aria-label="我的學習摘要" aria-busy="true"
+    >
+        <div aria-hidden="true" className="animate-pulse motion-reduce:animate-none">
+            <div className="mb-5 flex h-12 items-center gap-3">
+                <div className="h-12 w-12 shrink-0 rounded-full bg-slate-200" />
+                <div className="flex-1 space-y-2">
+                    <div className="h-3 w-24 rounded bg-slate-200" />
+                    <div className="h-5 w-3/4 rounded bg-slate-200" />
+                </div>
+            </div>
+            <div className="mb-4 grid h-[70px] grid-cols-3 gap-2">
+                {[0, 1, 2].map(index => <div key={index} className="rounded-[8px] bg-slate-200" />)}
+            </div>
+            <div className="mb-5 flex h-[128px] flex-col justify-center gap-3 rounded-[10px] bg-slate-100 p-4">
+                <div className="h-3 w-24 rounded bg-slate-200" />
+                <div className="h-4 w-full rounded bg-slate-200" />
+                <div className="h-3 w-2/3 rounded bg-slate-200" />
+            </div>
+            <div className={actionsClass}>
+                <div className="min-h-10 rounded-[6px] bg-slate-200" />
+                <div className="min-h-10 rounded-[6px] bg-slate-200" />
+            </div>
+        </div>
+    </section>
 
     return (
         <section
-            className={`flex min-w-0 flex-col justify-center rounded-[20px] border border-solid border-gray-200 bg-white/95 p-5 shadow-sm sm:p-6 lg:min-h-[404px] ${className}`}
+            className={sectionClass}
             aria-labelledby="learning-summary-title"
-            aria-busy={status === 'loading'}
         >
             <header className="mb-5 flex items-center gap-3">
                 <span
@@ -63,14 +90,14 @@ const LearningSummarySection = ({
                 ))}
             </ul>
 
-            <article className="mb-5 rounded-[10px] border border-solid border-[#dfe7f1] bg-[#f8fbff] p-4">
+            <article className="mb-5 min-h-[128px] rounded-[10px] border border-solid border-[#dfe7f1] bg-[#f8fbff] p-4">
                 <p className="mb-1 text-[12px] font-bold leading-5 text-secondary">
                     <I18N>下一堂課程</I18N>
                 </p>
-                <h3 className="line-clamp-2 text-[14px] font-bold leading-5 text-primary">
+                <h3 className="line-clamp-2 min-h-10 text-[14px] font-bold leading-5 text-primary">
                     {status === 'success' ? title : '—'}
                 </h3>
-                <p className="mt-2 flex items-center gap-2 text-[12px] leading-5 text-[#55718f]">
+                <p className="mt-2 flex min-h-5 items-center gap-2 text-[12px] leading-5 text-[#55718f]">
                     {dateTime && <i
                         className="icon icon-calendar shrink-0 text-[13px] text-secondary"
                         aria-hidden="true"
@@ -79,7 +106,7 @@ const LearningSummarySection = ({
                 </p>
             </article>
 
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+            <div className={actionsClass}>
                 <Link
                     href="/calendar"
                     className="inline-flex min-h-10 items-center justify-center gap-2 rounded-[6px] bg-main px-3 py-2 text-center text-[13px] font-bold leading-5 text-white transition-colors hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
@@ -91,7 +118,7 @@ const LearningSummarySection = ({
                     <I18N>我的學習行事曆</I18N>
                 </Link>
                 <Link
-                    href="/pick"
+                    href="/course"
                     className="inline-flex min-h-10 items-center justify-center gap-2 rounded-[6px] border border-solid border-main bg-white px-3 py-2 text-center text-[13px] font-bold leading-5 text-main transition-colors hover:bg-main hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
                     <i

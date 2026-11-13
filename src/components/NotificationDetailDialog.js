@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import I18N from 'components/I18N'
 import Link from 'components/Link'
 import useDialogInteraction from 'hooks/useDialogInteraction'
+import EmptyState from 'components/EmptyState'
 
 const COURSE_STATUS = {
     complete: { className: 'bg-[#2f9b4b]', label: '已完成' },
@@ -36,6 +37,7 @@ const CourseProgressDetail = ({ detail }) => (
                     </tr>
                 </thead>
                 <tbody>
+                    {!detail.rows.length && <tr><td colSpan={2}><EmptyState /></td></tr>}
                     {detail.rows.map(({ label, statuses }) => (
                         <tr
                             key={label}
@@ -114,6 +116,7 @@ const CreditOverviewDetail = ({ detail }) => (
                     </tr>
                 </thead>
                 <tbody>
+                    {!detail.rows.length && <tr><td colSpan={Math.max(1, detail.columns.length)}><EmptyState /></td></tr>}
                     {detail.rows.map((row, rowIndex) => (
                         <tr
                             key={`${row[0]}-${row[1]}-${rowIndex}`}
@@ -278,7 +281,7 @@ const NotificationDetailDialog = ({ notice, onClose }) => {
                         sandbox="allow-popups allow-popups-to-escape-sandbox"
                         referrerPolicy="no-referrer"
                         className="mt-3 min-h-[400px] w-full border-0 bg-white"
-                        srcDoc={`<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; form-action 'none'; base-uri 'none'"><base target="_blank"><style>body{font:14px/1.7 sans-serif;color:#405a78;overflow-wrap:anywhere}table{max-width:100%;border-collapse:collapse}a{color:#1769d2}</style></head><body>${notice.htmlBody}</body></html>`}
+                        srcDoc={`<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; form-action 'none'; base-uri 'none'"><base target="_blank"><style>body{font:14px/1.7 sans-serif;color:#405a78;overflow-wrap:anywhere}table{max-width:100%;border-collapse:collapse}a{color:#1769d2}a:hover,a:focus-visible{color:#b45309;text-decoration:underline}a:focus-visible{outline:2px solid #1769d2;outline-offset:3px}a::after{content:" (\u53e6\u958b\u8996\u7a97)";font-size:12px}</style></head><body>${notice.htmlBody}</body></html>`}
                     />}
 
                     {notice.sections?.length > 0 && (

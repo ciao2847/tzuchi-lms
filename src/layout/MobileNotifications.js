@@ -6,8 +6,9 @@ import useBodyScrollLock from 'hooks/useBodyScrollLock'
 import { DashboardContext } from 'contexts/DashboardProvider'
 import { LoginContext } from 'contexts/LoginProvider'
 import DashboardStatus from 'components/DashboardStatus'
+import Spinner from 'components/Spinner'
 
-const NoticeSection = ({ items, onSelect, title, tone }) => (
+export const NoticeSection = ({ items, onSelect, title, tone, status }) => (
     <section className="overflow-hidden rounded-[8px] border border-solid border-[#dfe7f1] bg-white [box-shadow:0_2px_10px_rgba(9,58,123,0.06)]">
         <header className="flex h-12 items-center justify-between border-b border-solid border-[#e6ecf4] px-4">
             <h2 className="text-[16px] font-bold text-primary">
@@ -25,8 +26,8 @@ const NoticeSection = ({ items, onSelect, title, tone }) => (
             </button> */}
         </header>
 
-        <ul className="divide-y divide-[#edf1f6] px-4 md:max-h-[380px] md:overflow-y-auto md:overscroll-contain">
-            {!items.length && <li className="py-4 text-[13px] text-gray-500">目前沒有資料</li>}
+        {status === 'loading' || status === 'idle' ? <Spinner block /> : <ul className="divide-y divide-[#edf1f6] px-4 md:max-h-[380px] md:overflow-y-auto md:overscroll-contain">
+            {status === 'success' && !items.length && <li role="status" className="py-4 text-[13px] text-gray-500">暫無資料</li>}
             {items.map((item, index) => (
                 <li key={item.id} className={`h-[76px] ${index >= 3 ? 'hidden md:block' : ''}`}>
                     <button
@@ -53,18 +54,19 @@ const NoticeSection = ({ items, onSelect, title, tone }) => (
                     </button>
                 </li>
             ))}
-        </ul>
+        </ul>}
     </section>
 )
 
 const MobileNotifications = () => {
     const { pathname, search } = useLocation()
     const { isLogin } = useContext(LoginContext)
-    const { data } = useContext(DashboardContext)
+    const { data, status, markRead } = useContext(DashboardContext)
     const [isOpen, setIsOpen] = useState(false)
     const hasUnread = data.messages.some(item => item.isUnread)
     const [isNavigationOpen, setIsNavigationOpen] = useState(false)
     const [selectedNotice, setSelectedNotice] = useState(null)
+    const selectNotice = notice => { setSelectedNotice(notice); markRead?.(notice) }
     useBodyScrollLock(isOpen, `${pathname}${search}`)
 
     const closeNotifications = () => {
@@ -87,7 +89,7 @@ const MobileNotifications = () => {
 
     useEffect(() => {
         closeNotifications()
-    }, [pathname, search, data])
+    }, [pathname, search, status])
 
     useEffect(() => {
         const closeOnEscape = ({ key }) => {
@@ -175,16 +177,18 @@ const MobileNotifications = () => {
                         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-3 pb-[calc(env(safe-area-inset-bottom)+16px)]">
                             <DashboardStatus />
                             <NoticeSection
+                                status={status}
                                 title="通知信"
                                 items={data.messages}
                                 tone="blue"
-                                onSelect={setSelectedNotice}
+                                onSelect={selectNotice}
                             />
                             <NoticeSection
+                                status={status}
                                 title="系統公告"
                                 items={data.announcements}
                                 tone="red"
-                                onSelect={setSelectedNotice}
+                                onSelect={selectNotice}
                             />
                         </div>
                     </div>

@@ -37,11 +37,11 @@ const Select = forwardRef(
         const [menuStyle, setMenuStyle] = useState(null)
         const options = React.Children.toArray(children)
             .filter(React.isValidElement)
-            .map((option) => ({
-                value: String(option.props.value ?? option.props.children),
-                label: option.props.children,
-                title: option.props.title,
-                disabled: Boolean(option.props.disabled)
+            .map(({ props: { value: optionValue, children: label, title, disabled: optionDisabled } }) => ({
+                value: String(optionValue ?? label),
+                label,
+                title,
+                disabled: Boolean(optionDisabled)
             }))
         const selectedIndex = options.findIndex(
             (option) => option.value === String(value)

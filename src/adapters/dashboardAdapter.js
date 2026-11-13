@@ -2,25 +2,26 @@ const list = (value) => Array.isArray(value) ? value : []
 const object = (value) => value && typeof value === 'object' && !Array.isArray(value)
 
 const adaptCourse = (course, fallbackStatus) => {
-    const rawStatus = fallbackStatus === 'coming' ? 'coming' : course.status || fallbackStatus
+    const { id, title, name, start, end, classroom, status: courseStatus } = course
+    const rawStatus = fallbackStatus === 'coming' ? 'coming' : courseStatus || fallbackStatus
     const status = rawStatus === 'yat' ? 'yet' : rawStatus
     return {
-        id: String(course.id),
-        title: course.title || course.name || '',
-        start: String(course.start || '').replace(' ', 'T'),
-        end: course.end ? String(course.end).replace(' ', 'T') : undefined,
-        classroom: course.classroom || '',
+        id: String(id),
+        title: title || name || '',
+        start: String(start || '').replace(' ', 'T'),
+        end: end ? String(end).replace(' ', 'T') : undefined,
+        classroom: classroom || '',
         status,
         tone: status === 'coming' ? 'registered' : status === 'pass' ? 'complete' : 'pending'
     }
 }
 
-export const getCalendarEvents = (data) => [...data.coming, ...data.history]
+export const getCalendarEvents = ({ coming, history }) => [...coming, ...history]
     .filter(course => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(course.start))
     .map(course => ({
         id: `${course.status}-${course.id}`,
         title: course.title,
-        url: `https://nlms.tzuchi.com.tw/tzuchi/edurd/register_course/course_opration.php?id=${encodeURIComponent(course.id)}`,
+        url: `${process.env.BASE_PATH || ''}/course/${encodeURIComponent(course.id)}`,
         start: course.start.slice(0, 10),
         allDay: true,
         extendedProps: { tone: course.tone, sortTime: course.start, course }
@@ -37,16 +38,16 @@ export const adaptDashboard = (data) => {
     // History contains every past course, regardless of its completion status.
     const historyCourses = Array.isArray(history) ? history.map(course => adaptCourse(course, 'yet')) :
         Object.entries(history).flatMap(([status, courses]) => list(courses).map(course => adaptCourse(course, status)))
-    const program = (item) => ({ id: String(item.id), title: item.title || item.name || '' })
-    const announcements = data.announcement.map((item) => ({
-        id: String(item.id), type: 'announcement', title: item.title || '',
-        date: item.date || '', publishedAt: item.date || '', isUnread: false,
-        content: [], branch: item.branch
+    const program = ({ id, title, name }) => ({ id: String(id), title: title || name || '' })
+    const announcements = data.announcement.map(({ id, title, date, read, branch }) => ({
+        id: String(id), type: 'announcement', title: title || '',
+        date: date || '', publishedAt: date || '', isUnread: String(read ?? '0') === '0',
+        content: [], branch
     }))
-    const messages = data.mail.map((item) => ({
-        id: String(item.id), type: 'message', title: item.subject || '',
-        date: item.created || '', publishedAt: item.created || '',
-        isUnread: String(item.read) === '0', htmlBody: String(item.body || ''), content: []
+    const messages = data.mail.map(({ id, subject, created, read, body }) => ({
+        id: String(id), type: 'message', title: subject || '',
+        date: created || '', publishedAt: created || '',
+        isUnread: String(read) === '0', htmlBody: String(body || ''), content: []
     }))
     return {
         announcements,

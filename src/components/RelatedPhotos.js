@@ -1,18 +1,20 @@
+import EmptyState from 'components/EmptyState'
 import React, { useContext } from 'react'
 import { translate } from 'components/I18N'
 import ThumbFrame from 'components/ThumbFrame'
 import { useLocale } from 'hooks'
 import { PhotoSwipeContext } from 'contexts/PhotoSwipeProvider'
 
-const RelatedPhotos = ({ data, className }) => {
+const RelatedPhotos = ({ data = [], className }) => {
     const { setPhotoSwipeData } = useContext(PhotoSwipeContext)
     const lang = useLocale()
+    if (!data.length) return <EmptyState />
     return (
         <ul className={`grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-1 ${className}`}>
             {data.map((img, i) => (
                 <li key={i}>
                     <a
-                        className="hover-thumb-scale"
+                        className="block hover-thumb-scale transition-opacity hover:opacity-80"
                         href={img.url}
                         title={`${img.title}${translate('另開視窗', lang)}`}
                         target="_blank"

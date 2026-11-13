@@ -1,7 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { DashboardContext } from 'contexts/DashboardProvider'
-import DashboardStatus from 'components/DashboardStatus'
-import NotificationDetailDialog from 'components/NotificationDetailDialog'
+import React, { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { LoginContext } from 'contexts/LoginProvider'
 import EntranceSection from './EntranceSection'
 import LoginSection from './LoginSection'
@@ -11,10 +9,8 @@ import FeaturedVideoSection from './FeaturedVideoSection'
 import CategoryVideoSection from './CategoryVideoSection'
 
 const Page = () => {
+    const navigate = useNavigate()
     const { isLogin, login, user } = useContext(LoginContext)
-    const { data, status } = useContext(DashboardContext)
-    const [selectedNotice, setSelectedNotice] = useState(null)
-    useEffect(() => setSelectedNotice(null), [data, isLogin])
 
     return (
         <div className="bg-light pt-[var(--header-height)]">
@@ -32,21 +28,16 @@ const Page = () => {
                             className="lg:order-2"
                         />
                     ) : (
-                        <LoginSection className="lg:order-2" onLogin={login} />
+                        <LoginSection className="lg:order-2" onLogin={login} onForgotPassword={() => navigate('/forgot-password')} />
                     )}
                     <AnnouncementSection
                         className="h-full lg:order-1"
-                        announcements={isLogin ? data.announcements.map((item) => ({ ...item, category: '最新公告', description: item.date })) : undefined}
-                        loading={isLogin && status !== 'success' && status !== 'error'}
-                        statusContent={isLogin && status === 'error' ? <DashboardStatus /> : null}
-                        onSelect={isLogin ? setSelectedNotice : undefined}
                     />
                 </div>
             </section>
             <EntranceSection />
             <FeaturedVideoSection />
             <CategoryVideoSection />
-            {selectedNotice && isLogin && status === 'success' && <NotificationDetailDialog notice={selectedNotice} onClose={() => setSelectedNotice(null)} />}
         </div>
     )
 }

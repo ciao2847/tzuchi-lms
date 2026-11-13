@@ -22,7 +22,7 @@ const SocialShareBlk = ({ title, className }) => {
                     rel="noopener noreferrer"
                 >
                     <i className="icon icon-facebook"></i>
-                    <div className="sr-only">分享到 facebook</div>
+                    <div className="sr-only">分享到 facebook（另開視窗）</div>
                 </a>
             </li>
             <li className="mr-1 last:mr-0">
@@ -37,7 +37,7 @@ const SocialShareBlk = ({ title, className }) => {
                     rel="noopener noreferrer"
                 >
                     <i className="icon icon-line"></i>
-                    <div className="sr-only">分享到 line</div>
+                    <div className="sr-only">分享到 line（另開視窗）</div>
                 </a>
             </li>
             <li className="mr-1 last:mr-0">
@@ -52,7 +52,7 @@ const SocialShareBlk = ({ title, className }) => {
                     rel="noopener noreferrer"
                 >
                     <i className="icon icon-twitter"></i>
-                    <div className="sr-only">分享到 twitter</div>
+                    <div className="sr-only">分享到 twitter（另開視窗）</div>
                 </a>
             </li>
             <li className="mr-1 last:mr-0">

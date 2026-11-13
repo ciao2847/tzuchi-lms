@@ -20,6 +20,7 @@ const Card = ({ data, isLinkOut }) => {
             {...(isLinkOut
                 ? {
                       target: '_blank',
+                      'aria-label': `${title || name}（另開視窗）`,
                       rel: 'noopener noreferrer'
                   }
                 : null)}

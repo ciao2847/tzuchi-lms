@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useId, useState } from 'react'
 import { LoginContext } from 'contexts/LoginProvider'
 import { adaptLoginUser } from 'adapters/authAdapter'
 import { login as requestLogin } from 'api/auth'
+import Spinner from 'components/Spinner'
 
 const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
     const sectionId = useId()
@@ -66,7 +67,7 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                 </p>
             </div>
             {sessionExpired && <p role="alert" className="mb-4 text-[13px] text-danger">登入時效已過期，請重新登入。</p>}
-            {sessionStatus === 'checking' && <p role="status" className="mb-4 text-[13px] text-primary">正在確認登入狀態…</p>}
+            {sessionStatus === 'checking' && <Spinner block className="mb-4" />}
             {sessionStatus === 'error' && <div role="alert" className="mb-4 text-[13px] text-danger">
                 <p>{sessionError}</p>
                 <button type="button" className="mt-1 text-secondary underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary" onClick={retrySession}>重新確認登入狀態</button>
@@ -160,6 +161,7 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                             type="checkbox"
                             name="remember"
                             value="1"
+                            defaultChecked
                             className="h-4 w-4 appearance-auto accent-primary"
                         />
                         保持登入

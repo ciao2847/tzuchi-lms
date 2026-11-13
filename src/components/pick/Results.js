@@ -208,7 +208,7 @@ const Table = ({ data }) => {
                                 onKeyDown={(event) => {
                                     if (event.key === 'Enter' && event.target === event.currentTarget) {
                                         event.preventDefault()
-                                        navigate(`/pick/${id}`)
+                                        navigate(`/course/${id}`)
                                     }
                                 }}
                                 onClick={(event) => {
@@ -218,7 +218,7 @@ const Table = ({ data }) => {
                                     ) {
                                         return
                                     }
-                                    navigate(`/pick/${id}`)
+                                    navigate(`/course/${id}`)
                                 }}
                                 className="cursor-pointer border-b border-solid border-[#e5ebf3] transition-colors hover:bg-[#eaf3ff] focus-within:bg-[#eaf3ff] focus-visible:bg-[#eaf3ff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary last:border-b-0"
                             >
@@ -231,7 +231,7 @@ const Table = ({ data }) => {
                                 </td>
                                 <td className="px-3 py-3 font-semibold">
                                     <Link
-                                        href={`/pick/${id}`}
+                                        href={`/course/${id}`}
                                         tabIndex={-1}
                                         className="block rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                                         aria-label={`查看課程：${title}`}
@@ -272,7 +272,7 @@ const Results = ({ data, viewMode }) =>
             {data.map(({ id, ...course }) => (
                 <li key={id}>
                     <Link
-                        href={`/pick/${id}`}
+                        href={`/course/${id}`}
                         className="group block h-full rounded-[7px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                         aria-label={`查看課程：${course.title}`}
                     >

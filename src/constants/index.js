@@ -9,7 +9,7 @@ export const MENU_CONFIG = [
     {
         id: 'quick-course',
         title: '快速選課',
-        url: '/pick',
+        url: '/course',
         mobileIcon: 'pencil',
         indicator: 'right'
     },

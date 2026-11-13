@@ -50,6 +50,10 @@ const testReact = {
     }
 }
 const Routes = load('src/Routes.js', {
+    'views/pick': () => {
+        mountedPages.push('pick')
+        return React.createElement('div', { role: 'status', 'aria-busy': true }, 'Quick course shell')
+    },
     react: testReact,
     'react-router-dom': testRouter,
     'components/RequireLogin': RequireLogin,
@@ -70,11 +74,24 @@ function render(location, login, basename = '/') {
 }
 
 const protectedLocations = [
-    ['/pick', 'pick'], ['/pick/85453', 'pick-detail'], ['/calendar', 'calendar'],
+    ['/change-password', 'change-password'],
+    ['/change-password?embed=1', 'change-password'],
+    ['/course', 'pick'], ['/course/85453', 'pick-detail'], ['/calendar', 'calendar'],
     ['/external-training-data', 'external-training'], ['/tree', 'menu-page'],
     ['/edu-service', 'menu-page'], ['/edu-service-country', 'menu-page'], ['/404', 'not-found'],
-    ['/pick?embed=1&keyword=test#courses', 'pick'], ['/tree?embed=1#external-training-form', 'menu-page']
+    ['/course?embed=1&keyword=test#courses', 'pick'], ['/tree?embed=1#external-training-form', 'menu-page']
 ]
+for (const [oldPath, newPath] of [
+    ['/pick', '/course'],
+    ['/pick/85308?embed=1#info', '/course/85308?embed=1#info']
+]) {
+    assert.deepEqual(render(oldPath, verified).redirects,
+        [{ to: newPath, replace: true, href: newPath }])
+    assert.deepEqual(render(oldPath, guest).redirects,
+        [{ to: '/#login', replace: true, href: '/#login' }])
+    assert.deepEqual(render(`/tzuchi/react${oldPath}`, verified, '/tzuchi/react').redirects,
+        [{ to: newPath, replace: true, href: `/tzuchi/react${newPath}` }])
+}
 for (const [location, page] of protectedLocations) {
     for (const login of [guest, unavailable, expired, { isLogin: true, sessionStatus: 'idle' }]) {
         const result = render(location, login)
@@ -83,9 +100,10 @@ for (const [location, page] of protectedLocations) {
         assert(!result.html.includes(`Page: ${page}`))
     }
     const pending = render(location, checking)
-    assert.deepEqual(pending.pages, [], 'Session verification must not mount protected pages')
+    assert.deepEqual(pending.pages, page === 'pick' ? ['pick'] : [], 'Only the public course shell may mount during session checking')
     assert.deepEqual(pending.redirects, [], 'Wait for verification rather than flashing the login page')
     assert(pending.html.includes('role="status"') && pending.html.includes('aria-busy="true"'))
+    assert(!pending.html.includes('正在確認登入狀態'))
     const success = render(location, verified)
     assert.deepEqual(success.pages, [page])
     assert.deepEqual(success.redirects, [])
@@ -104,6 +122,7 @@ assert.deepEqual(based.pages, [])
 assert.deepEqual(based.redirects,
     [{ to: '/#login', replace: true, href: '/tzuchi/react#login' }])
 assert.deepEqual(render('/tzuchi/react/calendar', verified, '/tzuchi/react').pages, ['calendar'])
+assert.deepEqual(render('/tzuchi/react/change-password', verified, '/tzuchi/react').pages, ['change-password'])
 // Simulate session loss on the currently open page, not only direct entry.
 assert.deepEqual(render('/calendar', verified).pages, ['calendar'])
 assert.deepEqual(render('/calendar', expired).pages, [])
@@ -113,6 +132,25 @@ assert(routeConfig, 'The real route definitions must have been rendered')
 // Outbound links remain real external hrefs for guests; no auth guard is
 // attached to the shared link components or their targets.
 const Link = load('src/components/Link.js').default
+const { ChangePasswordItem } = load('src/layout/MainNav.js', {
+    'components/I18N': ({ children }) => children,
+    'components/Link': Link,
+    'components/BtnMenu': () => null,
+    'contexts/LoginProvider': { LoginContext },
+    'hooks/useMedia': () => true,
+    'hooks/useBodyScrollLock': () => {},
+    constants: { MENU_CONFIG: [] },
+    sweetalert: () => {}
+})
+for (const mobile of [false, true]) {
+    let closed = false
+    const item = ChangePasswordItem({ mobile, onNavigate: () => { closed = true } })
+    item.props.onClick()
+    assert.equal(closed, true)
+    const html = renderToStaticMarkup(React.createElement(StaticRouter, { location: '/tzuchi/react/calendar?embed=1', basename: '/tzuchi/react' }, item))
+    assert(html.includes('href="/tzuchi/react/change-password"'))
+    assert(!html.includes('disabled'))
+}
 const AutoSwitchLink = load('src/components/AutoSwitchLink.js', {
     'components/Link': Link,
     hooks: { useLocale: () => 'zh-tw' },

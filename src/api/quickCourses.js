@@ -1,5 +1,20 @@
-import { apiClient, ApiError } from 'lib/apiClient'
+import { apiClient, ApiError, requireApiSuccess } from 'lib/apiClient'
 import { AUTH_API_BASE, AUTH_API_KEY } from 'constants/auth'
+
+export const getCourseCategories = async (signal) => {
+    const result = await apiClient(`${AUTH_API_BASE}/course/category`, {
+        method: 'GET', credentials: 'include', cache: 'no-store', signal,
+        headers: { Accept: 'application/json', 'X-API-Key': AUTH_API_KEY }
+    })
+    requireApiSuccess(result, '無法取得課程屬性。')
+    if (!Array.isArray(result.data) || result.data.some(item =>
+        !item || !['string', 'number'].includes(typeof item.id) || !String(item.id).trim() ||
+        typeof item.branch !== 'string' || !item.branch.trim() ||
+        typeof item.name !== 'string' || !item.name.trim())) {
+        throw new ApiError(502, '課程屬性回應格式異常。', result)
+    }
+    return result.data.map(item => ({ id: String(item.id), branch: item.branch, name: item.name }))
+}
 
 const dateLabel = timestamp => {
     if (!timestamp || !Number.isFinite(Number(timestamp))) return ''
@@ -9,7 +24,7 @@ const dateLabel = timestamp => {
 
 export const getQuickCourses = async (filters = {}, signal) => {
     const params = {
-        oldcourse: 0, branch: 'all', category: '', type: 'all', program: 'all', keyword: '',
+        oldcourse: 0, branch: '', category: '', type: 'all', program: 'all', keyword: '',
         ...filters,
         page: Math.max(1, Math.trunc(Number(filters.page) || 1)),
         pagesize: Math.min(500, Math.max(1, Math.trunc(Number(filters.pagesize) || 20)))
@@ -24,21 +39,25 @@ export const getQuickCourses = async (filters = {}, signal) => {
         throw new ApiError(code === 'SESSION_EXPIRED' ? 401 : 400,
             result?.error?.message || result?.message || '無法取得快速選課清單。', result)
     }
-    const data = result.data
+    const { data } = result
     if (!Array.isArray(data?.courselist) || !Number.isFinite(Number(data.total)) || Number(data.total) < 0) {
         throw new Error('快速選課回應格式異常。')
     }
     return {
+        branch: typeof data.branch === 'string' ? data.branch.trim() : '',
         total: Number(data.total),
-        courses: data.courselist.map(course => ({
-            id: String(course.id), campus: course.branchname || '', type: course.typename || '',
-            title: course.coursename || '', lecturer: course.teacher || '',
-            date: [dateLabel(course.coursedate), course.coursetime].filter(Boolean).join(' '),
-            isToday: dateLabel(course.coursedate) === new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Taipei' }).format(new Date()),
-            enrollment: `${course.applynum || '0'}/${course.applylimit || '0'}`,
-            programs: Array.isArray(course.programlist) ? course.programlist : [],
-            isApplied: String(course.isapply) === '1', isSelected: String(course.isselect) === '1',
-            isRegistrationOpen: String(course.isreg) === '1'
+        courses: data.courselist.map(({
+            id, branchname, typename, coursename, teacher, coursedate, coursetime,
+            applynum, applylimit, programlist, isapply, isselect, isreg
+        }) => ({
+            id: String(id), campus: branchname || '', type: typename || '',
+            title: coursename || '', lecturer: teacher || '',
+            date: [dateLabel(coursedate), coursetime].filter(Boolean).join(' '),
+            isToday: dateLabel(coursedate) === new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Taipei' }).format(new Date()),
+            enrollment: `${applynum || '0'}/${applylimit || '0'}`,
+            programs: Array.isArray(programlist) ? programlist : [],
+            isApplied: String(isapply) === '1', isSelected: String(isselect) === '1',
+            isRegistrationOpen: String(isreg) === '1'
         }))
     }
 }

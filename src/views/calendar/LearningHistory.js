@@ -1,11 +1,14 @@
-import React, { useMemo, useState } from 'react'
-import I18N from 'components/I18N'
-import PaginatedList from 'components/PaginatedList'
-import ViewModeToggle from 'components/ViewModeToggle'
+import { filterLearningHistory, getLearningHistoryYears } from 'adapters/learningHistoryAdapter'
 import DashboardStatus from 'components/DashboardStatus'
+import I18N from 'components/I18N'
+import Link from 'components/Link'
+import { useNavigate } from 'react-router-dom'
+import MoreOptionsSelector from 'components/MoreOptionsSelector'
+import PaginatedList from 'components/PaginatedList'
 import Select from 'components/Select'
+import ViewModeToggle from 'components/ViewModeToggle'
 import useMedia from 'hooks/useMedia'
-import { getLearningHistoryYears, filterLearningHistory } from 'adapters/learningHistoryAdapter'
+import React, { useMemo, useState } from 'react'
 
 const formatTime = (value) => value ? String(value).replace('T', ' ').slice(0, 16) : '—'
 const HEADINGS = ['類型', '課程名稱', '狀態', '上課日期', '簽到時間', '通過時間']
@@ -22,7 +25,9 @@ const CourseStatus = ({ value }) => {
     </span>
 }
 
-const HistoryTable = ({ data }) => (
+const HistoryTable = ({ data }) => {
+    const navigate = useNavigate()
+    return (
     <div role="region" aria-label="學習歷程列表，可左右捲動查看完整欄位" tabIndex={0}
         className="overflow-x-auto rounded-[10px] border border-solid border-[#dce5f0] bg-white text-primary [box-shadow:0_2px_10px_rgba(9,58,123,0.05)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary">
         <table className="w-full min-w-[1080px] table-fixed border-collapse text-left text-[12px] leading-[18px] xl:text-[14px] xl:leading-5">
@@ -35,9 +40,10 @@ const HistoryTable = ({ data }) => (
                 {HEADINGS.map(title => <th key={title} scope="col" className="px-3 pb-2 pt-4 font-semibold"><I18N>{title}</I18N></th>)}
             </tr></thead>
             <tbody>{data.map(course => <tr key={`${course.status}-${course.id}-${course.start}`}
-                className="border-b border-solid border-[#e5ebf3] transition-colors last:border-b-0 hover:bg-[#eaf3ff]">
+                onClick={event => { if (!event.target.closest('a') && !window.getSelection()?.toString()) navigate(`/course/${encodeURIComponent(course.id)}`) }}
+                className="cursor-pointer border-b border-solid border-[#e5ebf3] transition-colors last:border-b-0 hover:bg-[#eaf3ff] focus-within:bg-[#eaf3ff]">
                 <td className="px-3 py-3"><CourseType value={course.type} /></td>
-                <td className="px-3 py-3 font-semibold"><span title={course.title} className="break-words xl:overflow-hidden xl:[display:-webkit-box] xl:[-webkit-box-orient:vertical] xl:[-webkit-line-clamp:2]">{course.title}</span></td>
+                <td className="px-3 py-3 font-semibold"><Link href={`/course/${encodeURIComponent(course.id)}`} title={course.title} className="break-words hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary xl:overflow-hidden xl:[display:-webkit-box] xl:[-webkit-box-orient:vertical] xl:[-webkit-line-clamp:2]">{course.title}</Link></td>
                 <td className="px-3 py-3"><CourseStatus value={course.status} /></td>
                 <td className="whitespace-nowrap px-3 py-3 text-[#486785]"><time dateTime={course.start || undefined}>{formatTime(course.start)}</time></td>
                 <td className="whitespace-nowrap px-3 py-3 text-[#486785]"><time dateTime={course.signedAt || undefined}>{formatTime(course.signedAt)}</time></td>
@@ -46,6 +52,7 @@ const HistoryTable = ({ data }) => (
         </table>
     </div>
 )
+}
 
 const HistoryMeta = ({ title, value }) => (
     <div className="flex min-w-0 items-start gap-2 text-[11px] leading-[17px] text-[#486785] md:text-[12px] xl:text-[14px] xl:leading-5">
@@ -57,6 +64,7 @@ const HistoryMeta = ({ title, value }) => (
 const HistoryCards = ({ data }) => (
     <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
         {data.map(course => <li key={`${course.status}-${course.id}-${course.start}`}>
+            <Link href={`/course/${encodeURIComponent(course.id)}`} aria-label={course.title} className="block h-full rounded-[7px] transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary">
             <article className="flex h-full min-h-[124px] flex-col rounded-[7px] border border-solid border-[#dce5f0] bg-white px-4 py-3 xl:min-h-[135px] xl:px-5">
                 <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
                     <CourseType value={course.type} /><CourseStatus value={course.status} />
@@ -68,6 +76,7 @@ const HistoryCards = ({ data }) => (
                     <HistoryMeta title="通過時間" value={course.passedAt} />
                 </div>
             </article>
+            </Link>
         </li>)}
     </ul>
 )
@@ -75,56 +84,42 @@ const HistoryCards = ({ data }) => (
 export const LearningHistoryResults = ({ data, viewMode }) => viewMode === 'list'
     ? <HistoryTable data={data} /> : <HistoryCards data={data} />
 
-const LearningHistory = ({ courses, status }) => {
+const LearningHistory = ({ courses, status, year, onYearChange, statusContent, label = '學習歷程', resultsComponent = LearningHistoryResults }) => {
     const isDesktopLayout = useMedia('(min-width: 1200px)')
     const [selectedYear, setSelectedYear] = useState(null)
     const [selectedViewMode, setSelectedViewMode] = useState(null)
     const years = useMemo(() => getLearningHistoryYears(courses), [courses])
-    const activeYear = years.includes(selectedYear) ? selectedYear : years[0]
-    const data = useMemo(() => filterLearningHistory(courses, activeYear), [courses, activeYear])
+    const activeYear = year ?? (years.includes(selectedYear) ? selectedYear : years[0])
+    const changeYear = onYearChange || setSelectedYear
+    const data = useMemo(() => year ? courses : filterLearningHistory(courses, activeYear), [courses, activeYear, year])
     const viewMode = selectedViewMode || (isDesktopLayout ? 'list' : 'card')
-    if (status !== 'success') return <div className="mt-3"><DashboardStatus /></div>
-    return <section className="pt-3 md:pt-4" aria-label="學習歷程">
+    if (status !== 'success' && !onYearChange) return <div className="mt-3"><DashboardStatus /></div>
+    return <section aria-label={label}>
+        <div className="py-3 md:px-1">
         <Select
             wrapperClassName="md:hidden"
-            aria-label="學習歷程年份"
+            aria-label={`${label}年份`}
             value={activeYear ?? ''}
-            onChange={event => setSelectedYear(Number(event.target.value))}
-            className="!h-[42px] !rounded-full !border-[#1769d2] !bg-[#edf3fc] !px-5 !text-[14px] !text-[#0755cf]"
+            onChange={event => changeYear(Number(event.target.value))}
+            className="!h-[42px] !rounded-full !border-[#1769d2] !bg-[#edf3fc] !px-5 !text-[13px] !text-[#0755cf]"
         >
             {years.map(year => <option key={year} value={year}>{year} 年</option>)}
         </Select>
-        <div className="hidden flex-wrap items-center gap-2 py-1 md:flex" role="group" aria-label="學習歷程年份">
-            {years.slice(0, 5).map(year => <button key={year} type="button" aria-pressed={activeYear === year}
-                onClick={() => setSelectedYear(year)}
-                className={`inline-flex h-9 min-w-[68px] shrink-0 items-center justify-center rounded-full border border-solid px-4 text-[13px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary xl:text-[14px] ${activeYear === year ? 'border-blue bg-[#eaf3ff] text-blue ring-2 ring-blue/15' : 'border-[#d8e1ee] bg-white text-[#486785] hover:border-secondary hover:bg-[#f3f7fd]'}`}>
-                {year}
-            </button>)}
-            {years.length > 5 && <details className="relative"
-                onBlur={({ currentTarget, relatedTarget }) => { if (!currentTarget.contains(relatedTarget)) currentTarget.open = false }}
-                onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus() } }}>
-                <summary title="更多年份" className={`flex h-9 cursor-pointer list-none items-center justify-center gap-2 rounded-full border border-solid px-4 text-[13px] font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary xl:text-[14px] [&::-webkit-details-marker]:hidden ${years.slice(0, 5).includes(activeYear) ? 'border-[#d8e1ee] bg-white text-[#486785] hover:border-secondary hover:bg-[#f3f7fd]' : 'border-blue bg-[#eaf3ff] text-blue ring-2 ring-blue/15'}`}>
-                    {years.slice(0, 5).includes(activeYear) ? '更多' : activeYear}
-                    <i className="icon icon-arrow-down text-[9px]" aria-hidden="true" />
-                </summary>
-                <div className="absolute left-0 top-full z-20 mt-2 max-h-60 min-w-[120px] overflow-y-auto rounded-[8px] border border-solid border-[#d8e1ee] bg-white py-1 shadow-lg" role="group" aria-label="更多學習歷程年份">
-                    {years.slice(5).map(year => <button key={year} type="button" aria-pressed={activeYear === year}
-                        className={`block w-full px-4 py-2 text-left text-[13px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-secondary xl:text-[14px] ${activeYear === year ? 'bg-[#eaf3ff] font-bold text-blue' : 'text-primary hover:bg-[#f3f7fd]'}`}
-                        onClick={event => { setSelectedYear(year); event.currentTarget.closest('details').open = false }}>
-                        {year}
-                    </button>)}
-                </div>
-            </details>}
+        <MoreOptionsSelector options={years.map(year => ({ value: year, label: year }))}
+            value={activeYear} onChange={changeYear} ariaLabel={`${label}年份`}
+            moreLabel="更多年份" emptyText="目前沒有更多年份" className="hidden md:grid" />
         </div>
-        <div className="mb-3 mt-4 flex flex-wrap items-center justify-between gap-3 md:mb-4 md:mt-5">
+        {status !== 'success' ? statusContent || <DashboardStatus /> : <>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3 md:mb-4">
             <h2 className="text-[13px] font-bold leading-5 text-primary md:text-[15px] xl:text-[17px] xl:leading-6">
                 <I18N>課程數</I18N>：{data.length} <I18N>筆</I18N>
             </h2>
-            <ViewModeToggle ariaLabel="學習歷程顯示方式" value={viewMode} onChange={setSelectedViewMode} />
+            <ViewModeToggle ariaLabel={`${label}顯示方式`} value={viewMode} onChange={setSelectedViewMode} />
         </div>
-        <PaginatedList data={data} component={LearningHistoryResults} componentProps={{ viewMode }}
-            resetKey={activeYear} emptyText="此年度沒有學習歷程"
+        <PaginatedList data={data} component={resultsComponent} componentProps={{ viewMode }}
+            resetKey={activeYear} emptyText="暫無資料"
             emptyClassName="rounded-[10px] border border-solid border-[#dce5f0] bg-white py-10 text-center text-[14px] text-[#8292a7]" />
+        </>}
     </section>
 }
 export default LearningHistory

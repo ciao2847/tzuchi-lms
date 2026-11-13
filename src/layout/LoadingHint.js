@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import Spinner from 'components/Spinner'
 import { LoadingContext } from 'contexts/LoadingProvider'
 
-const LoadingHint = (props) => {
+const LoadingHint = () => {
     const { isLoading } = useContext(LoadingContext)
 
     return (

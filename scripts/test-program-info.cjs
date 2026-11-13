@@ -10,7 +10,7 @@ function load(file, mocks = {}) {
     mod.filename = path.resolve(file)
     mod.paths = module.paths
     const original = mod.require.bind(mod)
-    mod.require = id => mocks[id] || original(id)
+    mod.require = id => mocks[id] || (id === 'components/Spinner' ? load('src/components/Spinner.js').default : original(id))
     mod._compile(babel.transformFileSync(file).code, mod.filename)
     return mod.exports
 }
@@ -72,6 +72,8 @@ const { ProgramDetails, CourseProgressTable, ProgressCourseList } = load('src/vi
     'api/dashboard': { getProgramInfo: (id, signal) => new Promise((resolve, reject) => requests.push({ id, signal, resolve, reject })) },
     'adapters/dashboardAdapter': {},
     './LearningHistory': () => null,
+    './AnnualLearningHistory': () => null,
+    './ExternalHistory': () => null,
     './SearchableProgramSelector': () => null,
     'components/DashboardStatus': () => null,
     '@fullcalendar/react': () => null,
@@ -88,8 +90,8 @@ const { ProgramDetails, CourseProgressTable, ProgressCourseList } = load('src/vi
 const markup = component => renderToStaticMarkup(component)
 const courses = adapted.categories[0].courses
 const list = markup(React.createElement(ProgressCourseList, { courses, emptyText: 'Empty' }))
-assert(list.includes('course_opration.php?id=1"') && list.includes('course_opration.php?id=2"') && list.includes('course_opration.php?id=5"'))
-assert(!list.includes('course_opration.php?id=3"') && !list.includes('course_opration.php?id=4"') && !list.includes('id=undefined'))
+assert(list.includes('/course/1"') && list.includes('/course/2"') && list.includes('/course/5"'))
+assert(!list.includes('/course/3"') && !list.includes('/course/4"') && !list.includes('id=undefined'))
 const table = markup(React.createElement(CourseProgressTable, { categories: adapted.categories }))
 assert.equal((table.match(/<button\b/g) || []).length, adapted.categories.length, 'Category and progress share one keyboard-focusable button')
 assert(/colspan="2"/i.test(table) && table.includes('修課情況：'))
@@ -138,7 +140,7 @@ function render(id = '3324', runEffect = true) {
     assert(requests.length === 5)
     requests[4].resolve({ ...adapted, categories: [] })
     await flush()
-    assert(markup(render('3327')).includes('目前沒有學程類別'))
+    assert(markup(render('3327')).includes('暫無資料'))
     login = { ...login, user: { id: 'u2' } }
     assert(markup(render('3327')).includes('aria-busy="true"'))
     effectSlot?.cleanup?.()
