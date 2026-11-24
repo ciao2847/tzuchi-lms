@@ -47,7 +47,7 @@ const MoreOptionsSelector = load('src/components/MoreOptionsSelector.js').defaul
 const { default: LearningHistory, LearningHistoryResults } = load('src/views/calendar/LearningHistory.js', {
     react: fakeReact,
     'components/I18N': I18N,
-    'components/Link': ({ href, children, ...props }) => React.createElement('a', { href, ...props }, children),
+    'components/AutoSwitchLink': ({ href, children, ...props }) => React.createElement('a', { href, ...props }, children),
     'react-router-dom': { useNavigate: () => () => {} },
     'components/PaginatedList': PageList,
     'components/ViewModeToggle': Toggle,

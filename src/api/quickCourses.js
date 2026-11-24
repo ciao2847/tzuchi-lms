@@ -1,10 +1,10 @@
-import { apiClient, ApiError, requireApiSuccess } from 'lib/apiClient'
-import { AUTH_API_BASE, AUTH_API_KEY } from 'constants/auth'
+import { apiClient, ApiError, requireApiSuccess, requireUserKey } from 'lib/apiClient'
+import { AUTH_API_BASE } from 'constants/auth'
 
-export const getCourseCategories = async (signal) => {
+export const getCourseCategories = async (signal, userkey) => {
     const result = await apiClient(`${AUTH_API_BASE}/course/category`, {
         method: 'GET', credentials: 'include', cache: 'no-store', signal,
-        headers: { Accept: 'application/json', 'X-API-Key': AUTH_API_KEY }
+        headers: { Accept: 'application/json', 'X-API-Key': requireUserKey(userkey) }
     })
     requireApiSuccess(result, '無法取得課程屬性。')
     if (!Array.isArray(result.data) || result.data.some(item =>
@@ -22,7 +22,7 @@ const dateLabel = timestamp => {
     return Number.isNaN(date.getTime()) ? '' : new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Taipei' }).format(date)
 }
 
-export const getQuickCourses = async (filters = {}, signal) => {
+export const getQuickCourses = async (filters = {}, signal, userkey) => {
     const params = {
         oldcourse: 0, branch: '', category: '', type: 'all', program: 'all', keyword: '',
         ...filters,
@@ -31,7 +31,7 @@ export const getQuickCourses = async (filters = {}, signal) => {
     }
     const result = await apiClient(`${AUTH_API_BASE}/course/quick`, {
         method: 'POST', credentials: 'include', cache: 'no-store', signal,
-        headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-API-Key': AUTH_API_KEY },
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-API-Key': requireUserKey(userkey) },
         body: JSON.stringify(params)
     })
     if (result?.success !== true) {

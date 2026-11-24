@@ -43,7 +43,7 @@ const DashboardProvider = ({ children }) => {
         }
         const controller = new AbortController()
         setResult({ data: EMPTY, status: 'loading', error: '' })
-        getDashboard(controller.signal).then((data) => {
+        getDashboard(controller.signal, user.userkey).then((data) => {
             if (!controller.signal.aborted) {
                 setResult({ data: applyReadNotices(data, readNotices(user.id)), status: 'success', error: '', owner: user.id })
             }
@@ -58,7 +58,7 @@ const DashboardProvider = ({ children }) => {
                     error.data?.error?.message || error.message || '無法取得學習歷程。' })
         })
         return () => controller.abort()
-    }, [isLogin, user.id, expireSession, revision])
+    }, [isLogin, user.id, user.userkey, expireSession, revision])
 
     const current = !isLogin ? { data: EMPTY, status: 'idle', error: '' } :
         result.owner !== user.id && result.status !== 'loading' ?

@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { DashboardContext } from 'contexts/DashboardProvider'
 import DashboardStatus from 'components/DashboardStatus'
 import I18N from 'components/I18N'
-import Link from 'components/Link'
+import AutoSwitchLink from 'components/AutoSwitchLink'
 
 const LearningSummarySection = ({
     user = {},
@@ -107,7 +107,7 @@ const LearningSummarySection = ({
             </article>
 
             <div className={actionsClass}>
-                <Link
+                <AutoSwitchLink
                     href="/calendar"
                     className="inline-flex min-h-10 items-center justify-center gap-2 rounded-[6px] bg-main px-3 py-2 text-center text-[13px] font-bold leading-5 text-white transition-colors hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
@@ -116,8 +116,8 @@ const LearningSummarySection = ({
                         aria-hidden="true"
                     />
                     <I18N>我的學習行事曆</I18N>
-                </Link>
-                <Link
+                </AutoSwitchLink>
+                <AutoSwitchLink
                     href="/course"
                     className="inline-flex min-h-10 items-center justify-center gap-2 rounded-[6px] border border-solid border-main bg-white px-3 py-2 text-center text-[13px] font-bold leading-5 text-main transition-colors hover:bg-main hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
@@ -126,7 +126,7 @@ const LearningSummarySection = ({
                         aria-hidden="true"
                     />
                     <I18N>快速選課</I18N>
-                </Link>
+                </AutoSwitchLink>
             </div>
         </section>
     )

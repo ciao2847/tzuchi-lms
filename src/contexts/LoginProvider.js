@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { logout as requestLogout, requestModLogin, checkSession } from 'api/auth'
+import { requireUserKey } from 'lib/apiClient'
 
 const LOGIN_STORAGE_KEY = 'tzuchi-lms-login'
 const BROWSER_SESSION_COOKIE = 'tzuchi_lms_session'
@@ -51,7 +52,8 @@ const saveLoginState = (loginState) => {
     // Unremembered profiles need the browser marker; remembered ones may be
     // restored after a restart. Neither bypasses server /session validation.
     setBrowserSession(true)
-    window.localStorage.setItem(LOGIN_STORAGE_KEY, JSON.stringify(loginState))
+    const { userkey, ...profile } = loginState.user
+    window.localStorage.setItem(LOGIN_STORAGE_KEY, JSON.stringify({ ...loginState, user: profile }))
     window.sessionStorage.removeItem(LOGIN_STORAGE_KEY)
 }
 
@@ -114,12 +116,27 @@ const LoginProvider = ({ children }) => {
         setSessionStatus('checking')
         setSessionError('')
         try {
-            await checkSession(controller.signal)
+            const { data } = await checkSession(controller.signal)
             if (controller.signal.aborted || version !== sessionVersion.current) return
-            saveLoginState(storedLogin)
-            setLoginState(storedLogin)
+            if (data?.id && data.id !== storedLogin.user.id) {
+                expireSession()
+                return
+            }
+            const user = { ...storedLogin.user }
+            user.userkey = requireUserKey(data?.userkey)
+            if (typeof data?.name === 'string' && data.name) user.name = data.name
+            if (typeof data?.depname === 'string') user.department = data.depname
+            if (typeof data?.mail === 'string') user.mail = data.mail
+            if (typeof data?.branch === 'string') user.branch = data.branch
+            if (data?.changepassword === 'Y' || data?.changepassword === 'N') {
+                user.changepassword = data.changepassword
+            }
+            const nextState = { ...storedLogin, user }
+            saveLoginState(nextState)
+            setLoginState(nextState)
             setSessionExpired(false)
             setSessionStatus('success')
+            void requestModLogin(data?.modurl)
         } catch (error) {
             if (controller.signal.aborted || version !== sessionVersion.current) return
             if (error.status === 401) { expireSession(); return }
@@ -185,7 +202,7 @@ const LoginProvider = ({ children }) => {
         }
         const nextState = {
             isLogin: true,
-            user,
+            user: { ...user, userkey: requireUserKey(user.userkey) },
             remember: remember === true
         }
 
@@ -239,6 +256,13 @@ const LoginProvider = ({ children }) => {
         sessionError,
         retrySession,
         expireSession,
+        markPasswordChanged: (userId) => {
+            const storedLogin = getInitialLoginState()
+            if (storedLogin.user.id !== userId) return
+            const nextState = { ...storedLogin, user: { ...storedLogin.user, changepassword: 'N' } }
+            saveLoginState(nextState)
+            setLoginState({ ...nextState, user: { ...nextState.user, userkey: loginState.user.userkey } })
+        },
         isLoggingOut,
         login,
         logout,

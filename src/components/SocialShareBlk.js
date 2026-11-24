@@ -1,5 +1,6 @@
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import React, { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import I18N, { translate } from 'components/I18N'
 
 const SocialShareBlk = ({ title, className }) => {
@@ -11,49 +12,49 @@ const SocialShareBlk = ({ title, className }) => {
             className={`flex text-[24px] justify-center content-center ${className} `}
         >
             <li className="mr-1 last:mr-0">
-                <a
+                <AutoSwitchLink
                     className="btn btn-light w-5 h-5 text-[24px] rounded"
                     href={`https://www.facebook.com/sharer/sharer.php?u=${url}`}
                     title={`${translate('分享到 facebook', lang)}(${translate(
                         '另開視窗',
                         lang
                     )})`}
-                    target="_blank"
+                    isLinkOut
                     rel="noopener noreferrer"
                 >
                     <i className="icon icon-facebook"></i>
                     <div className="sr-only">分享到 facebook（另開視窗）</div>
-                </a>
+                </AutoSwitchLink>
             </li>
             <li className="mr-1 last:mr-0">
-                <a
+                <AutoSwitchLink
                     className="btn btn-light w-5 h-5 text-[24px] rounded"
                     href={`http://line.naver.jp/R/msg/text/?${title}%20${url}`}
                     title={`${translate('分享到 line', lang)}(${translate(
                         '另開視窗',
                         lang
                     )})`}
-                    target="_blank"
+                    isLinkOut
                     rel="noopener noreferrer"
                 >
                     <i className="icon icon-line"></i>
                     <div className="sr-only">分享到 line（另開視窗）</div>
-                </a>
+                </AutoSwitchLink>
             </li>
             <li className="mr-1 last:mr-0">
-                <a
+                <AutoSwitchLink
                     className="btn btn-light w-5 h-5 text-[24px] rounded"
                     href={`https://twitter.com/home/?status=${title}%20${url}`}
                     title={`${translate('分享到 twitter', lang)}(${translate(
                         '另開視窗',
                         lang
                     )})`}
-                    target="_blank"
+                    isLinkOut
                     rel="noopener noreferrer"
                 >
                     <i className="icon icon-twitter"></i>
                     <div className="sr-only">分享到 twitter（另開視窗）</div>
-                </a>
+                </AutoSwitchLink>
             </li>
             <li className="mr-1 last:mr-0">
                 <button

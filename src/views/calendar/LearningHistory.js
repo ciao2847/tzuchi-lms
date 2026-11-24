@@ -1,7 +1,7 @@
 import { filterLearningHistory, getLearningHistoryYears } from 'adapters/learningHistoryAdapter'
 import DashboardStatus from 'components/DashboardStatus'
 import I18N from 'components/I18N'
-import Link from 'components/Link'
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import { useNavigate } from 'react-router-dom'
 import MoreOptionsSelector from 'components/MoreOptionsSelector'
 import PaginatedList from 'components/PaginatedList'
@@ -43,7 +43,7 @@ const HistoryTable = ({ data }) => {
                 onClick={event => { if (!event.target.closest('a') && !window.getSelection()?.toString()) navigate(`/course/${encodeURIComponent(course.id)}`) }}
                 className="cursor-pointer border-b border-solid border-[#e5ebf3] transition-colors last:border-b-0 hover:bg-[#eaf3ff] focus-within:bg-[#eaf3ff]">
                 <td className="px-3 py-3"><CourseType value={course.type} /></td>
-                <td className="px-3 py-3 font-semibold"><Link href={`/course/${encodeURIComponent(course.id)}`} title={course.title} className="break-words hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary xl:overflow-hidden xl:[display:-webkit-box] xl:[-webkit-box-orient:vertical] xl:[-webkit-line-clamp:2]">{course.title}</Link></td>
+                <td className="px-3 py-3 font-semibold"><AutoSwitchLink href={`/course/${encodeURIComponent(course.id)}`} title={course.title} className="break-words hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary xl:overflow-hidden xl:[display:-webkit-box] xl:[-webkit-box-orient:vertical] xl:[-webkit-line-clamp:2]">{course.title}</AutoSwitchLink></td>
                 <td className="px-3 py-3"><CourseStatus value={course.status} /></td>
                 <td className="whitespace-nowrap px-3 py-3 text-[#486785]"><time dateTime={course.start || undefined}>{formatTime(course.start)}</time></td>
                 <td className="whitespace-nowrap px-3 py-3 text-[#486785]"><time dateTime={course.signedAt || undefined}>{formatTime(course.signedAt)}</time></td>
@@ -64,7 +64,7 @@ const HistoryMeta = ({ title, value }) => (
 const HistoryCards = ({ data }) => (
     <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
         {data.map(course => <li key={`${course.status}-${course.id}-${course.start}`}>
-            <Link href={`/course/${encodeURIComponent(course.id)}`} aria-label={course.title} className="block h-full rounded-[7px] transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary">
+            <AutoSwitchLink href={`/course/${encodeURIComponent(course.id)}`} aria-label={course.title} className="block h-full rounded-[7px] transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary">
             <article className="flex h-full min-h-[124px] flex-col rounded-[7px] border border-solid border-[#dce5f0] bg-white px-4 py-3 xl:min-h-[135px] xl:px-5">
                 <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
                     <CourseType value={course.type} /><CourseStatus value={course.status} />
@@ -76,7 +76,7 @@ const HistoryCards = ({ data }) => (
                     <HistoryMeta title="通過時間" value={course.passedAt} />
                 </div>
             </article>
-            </Link>
+            </AutoSwitchLink>
         </li>)}
     </ul>
 )

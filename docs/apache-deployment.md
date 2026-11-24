@@ -1,7 +1,7 @@
 # Apache 前端路由部署
 
-React 使用 BrowserRouter，部署路徑為 `/tzuchi/react/`。重新整理或直接開啟
-`/tzuchi/react/calendar` 時，Apache 必須回傳 React 的 `index.html`。
+React 使用 BrowserRouter，部署路徑為 `/tzuchi/elearning/`。重新整理或直接開啟
+`/tzuchi/elearning/calendar` 時，Apache 必須回傳 React 的 `index.html`。
 
 Build 會將 `public/.htaccess` 複製到 `dist/.htaccess`。部署時將此檔案與
 `index.html` 一起上傳到網站的 `react` 實體目錄；注意上傳工具可能隱藏點開頭檔案。
@@ -16,9 +16,9 @@ Apache 2.4 需啟用 `mod_rewrite`，並允許這個實體目錄使用 rewrite �
 
 部署後驗證：
 
-- 直接開啟並重新整理 `/tzuchi/react/calendar`，應回傳 HTTP 200 並顯示行事曆。
-- `/tzuchi/react/course/123` 應能進入 React 路由。
-- 實際 JS、CSS 與 `/tzuchi/react/api/academic-videos.php` 應正常回應。
-- 不存在的 `/tzuchi/react/js/missing.js` 應保持 404，不能回傳 HTML。
+- 直接開啟並重新整理 `/tzuchi/elearning/calendar`，應回傳 HTTP 200 並顯示行事曆。
+- `/tzuchi/elearning/course/123` 應能進入 React 路由。
+- 實際 JS、CSS 與 `/tzuchi/elearning/api/academic-videos.php` 應正常回應。
+- 不存在的 `/tzuchi/elearning/js/missing.js` 應保持 404，不能回傳 HTML。
 
 若上傳後出現 500，請檢查 Apache error log，確認模組及 AllowOverride 權限。

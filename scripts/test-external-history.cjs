@@ -27,26 +27,30 @@ async function main() {
         return { ok: true, json: async () => ({ success: true, data: [record] }) }
     }
     const controller = new AbortController()
-    assert.deepEqual(await api.getExternalHistory(2026, controller.signal), [record])
+    assert.deepEqual(await api.getExternalHistory(2026, controller.signal, 'session-key'), [record])
     assert.equal(request.url, '/api/course/outerHistory/2026')
     assert.equal(request.method, 'GET')
     assert.equal(request.credentials, 'include')
     assert.equal(request.cache, 'no-store')
     assert.equal(request.signal, controller.signal)
-    assert.equal(request.headers['X-API-Key'], 'test-key')
-    for (const year of [0, '2026', 2026.5, NaN]) await assert.rejects(api.getExternalHistory(year))
+    assert.equal(request.headers['X-API-Key'], 'session-key')
+    for (const year of [0, '2026', 2026.5, NaN]) await assert.rejects(api.getExternalHistory(year, undefined, 'session-key'))
     for (const data of [{}, [null], [{ id: '1' }]]) {
         global.fetch = async () => ({ ok: true, json: async () => ({ success: true, data }) })
-        await assert.rejects(api.getExternalHistory(2026), error => error.status === 502)
+        await assert.rejects(api.getExternalHistory(2026, undefined, 'session-key'), error => error.status === 502)
     }
     global.fetch = async () => ({ ok: true, json: async () => ({ success: true, data: [] }) })
-    assert.deepEqual(await api.getExternalHistory(2025), [])
+    assert.deepEqual(await api.getExternalHistory(2025, undefined, 'session-key'), [])
     global.fetch = async () => ({ ok: false, status: 404, json: async () => ({ errorMessage: 'Not found.' }) })
-    await assert.rejects(api.getExternalHistory(2026), error => error.status === 404)
+    await assert.rejects(api.getExternalHistory(2026, undefined, 'session-key'), error => error.status === 404)
     global.fetch = async () => ({ ok: true, json: async () => ({ success: false, error: { code: 'SESSION_EXPIRED' } }) })
-    await assert.rejects(api.getExternalHistory(2026), error => error.status === 401)
+    await assert.rejects(api.getExternalHistory(2026, undefined, 'session-key'), error => error.status === 401)
     global.window = { location: { origin: 'http://localhost' } }
-    const view = load('src/views/calendar/ExternalHistory.js', { 'api/externalHistory': api, './AnnualLearningHistory': () => null })
+    const view = load('src/views/calendar/ExternalHistory.js', {
+        'api/externalHistory': api,
+        './AnnualLearningHistory': () => null,
+        'components/AutoSwitchLink': ({ children }) => children
+    })
     assert.equal(view.displayDate('1970年01月01日'), '—')
     assert.equal(view.attachmentUrl('javascript:alert(1)'), null)
     assert.equal(view.attachmentUrl({ url: '/file/1' }), 'http://localhost/file/1')

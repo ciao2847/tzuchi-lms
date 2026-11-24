@@ -1,11 +1,11 @@
-import { apiClient, ApiError, requireApiSuccess } from 'lib/apiClient'
-import { AUTH_API_BASE, AUTH_API_KEY } from 'constants/auth'
+import { apiClient, ApiError, requireApiSuccess, requireUserKey } from 'lib/apiClient'
+import { AUTH_API_BASE } from 'constants/auth'
 
-export const getLearningHistory = async (year, signal) => {
+export const getLearningHistory = async (year, signal, userkey) => {
     if (!Number.isInteger(year) || year < 1 || year > 9999) throw new Error('請選擇有效的西元年份。')
     const result = await apiClient(`${AUTH_API_BASE}/course/history/${year}`, {
         method: 'GET', credentials: 'include', cache: 'no-store', signal,
-        headers: { Accept: 'application/json', 'X-API-Key': AUTH_API_KEY }
+        headers: { Accept: 'application/json', 'X-API-Key': requireUserKey(userkey) }
     })
     requireApiSuccess(result, '無法取得學習歷程。')
     if (!Array.isArray(result.data) || result.data.some(item => !item || !item.id || typeof item.coursename !== 'string')) {

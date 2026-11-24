@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import Link from 'components/Link'
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import Spinner from 'components/Spinner'
 import { DashboardContext } from 'contexts/DashboardProvider'
 import { LoginContext } from 'contexts/LoginProvider'
@@ -15,7 +15,7 @@ const DashboardStatus = () => {
     if (status === 'loading') return <Spinner block />
     return (
         <div className="rounded border border-gray-200 bg-white p-4 text-[14px] text-primary" aria-busy={status === 'loading'} role={status === 'error' || sessionExpired ? 'alert' : 'status'}>
-            {status === 'idle' ? <Link href="/#login">{sessionExpired ? '登入時效已過期，請重新登入。' : '請先登入以查看個人學習歷程。'}</Link> :
+            {status === 'idle' ? <AutoSwitchLink href="/#login">{sessionExpired ? '登入時效已過期，請重新登入。' : '請先登入以查看個人學習歷程。'}</AutoSwitchLink> :
                 <>{error}<button type="button" onClick={reload} className="ml-3 text-secondary underline">重新載入</button></>}
         </div>
     )

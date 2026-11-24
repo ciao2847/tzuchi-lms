@@ -29,12 +29,14 @@ export const MENU_CONFIG = [
             {
                 id: 'resident-learning-history',
                 title: '住院醫師學習歷程',
-                url: 'https://nlms.tzuchi.com.tw/eportfolio/login.php'
+                url: 'https://nlms.tzuchi.com.tw/eportfolio/login.php',
+                isLinkOut: true
             },
             {
                 id: 'medical-staff-learning-history',
                 title: '醫事職類學習歷程',
-                url: 'https://nlms.tzuchi.com.tw/portfolio/index.html'
+                url: 'https://nlms.tzuchi.com.tw/portfolio/index.html',
+                isLinkOut: true
             },
             {
                 id: 'intern-learning-history',
@@ -56,12 +58,14 @@ export const MENU_CONFIG = [
             {
                 id: 'medical-education',
                 title: '醫療科',
-                url: 'https://nlms.tzuchi.com.tw/eportfolio/login.php'
+                url: 'https://nlms.tzuchi.com.tw/eportfolio/login.php',
+                isLinkOut: true
             },
             {
                 id: 'medical-profession',
                 title: '醫事職類',
-                url: 'https://nlms.tzuchi.com.tw/epcbme/login.php'
+                url: 'https://nlms.tzuchi.com.tw/epcbme/login.php',
+                isLinkOut: true
             },
             {
                 id: 'external-training-group',
@@ -72,12 +76,14 @@ export const MENU_CONFIG = [
                 id: 'external-training-data',
                 title: '外訓資料',
                 // Temporarily use the existing service; keep the local page and dialogs for later.
-                url: 'https://nlms.tzuchi.com.tw/tzuchi/edurd/training/'
+                url: 'https://nlms.tzuchi.com.tw/tzuchi/edurd/training/',
+                isLinkOut: true
             },
             {
                 id: 'external-training-form',
                 title: '填寫外訓資料',
-                url: 'https://nlms.tzuchi.com.tw/tzuchi/edurd/training/#addOuter'
+                url: 'https://nlms.tzuchi.com.tw/tzuchi/edurd/training/#addOuter',
+                isLinkOut: true
             }
         ]
     },
@@ -97,22 +103,26 @@ export const MENU_CONFIG = [
             {
                 id: 'program-planning',
                 title: '學程規劃',
-                url: 'http://10.2.10.236:8064/tzuchi/edurd/program_manage/'
+                url: 'http://10.2.10.236:8064/tzuchi/edurd/program_manage/',
+                isLinkOut: true
             },
             {
                 id: 'course-opening',
                 title: '開課',
-                url: 'http://10.2.10.236:8064/tzuchi/edurd/course/'
+                url: 'http://10.2.10.236:8064/tzuchi/edurd/course/',
+                isLinkOut: true
             },
             {
                 id: 'teaching-history',
                 title: '教學歷程',
-                url: 'http://10.2.10.236:8064/tzuchi/edurd/teach_history/'
+                url: 'http://10.2.10.236:8064/tzuchi/edurd/teach_history/',
+                isLinkOut: true
             },
             {
                 id: 'cfd-teacher-review',
                 title: 'CFD教師評核',
-                url: 'http://10.2.10.236:8064/tzuchi/edurd/teacher_judge/'
+                url: 'http://10.2.10.236:8064/tzuchi/edurd/teacher_judge/',
+                isLinkOut: true
             },
             {
                 id: 'application-service-group',
@@ -122,12 +132,14 @@ export const MENU_CONFIG = [
             {
                 id: 'digital-course-application',
                 title: '數位課程申請',
-                url: 'http://10.2.10.236:8064/tzuchi/edurd/extjs/app/ui/usr/'
+                url: 'http://10.2.10.236:8064/tzuchi/edurd/extjs/app/ui/usr/',
+                isLinkOut: true
             },
             {
                 id: 'colleague-teaching-reward-review',
                 title: '同仁教學獎勵審核 - 大林',
-                url: 'http://10.2.10.236:8064/tzuchi/edurd/extjs/app/ui/usr/'
+                url: 'http://10.2.10.236:8064/tzuchi/edurd/extjs/app/ui/usr/',
+                isLinkOut: true
             },
             {
                 id: 'equipment-reservation',

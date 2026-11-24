@@ -1,12 +1,12 @@
-import { apiClient, ApiError, requireApiSuccess } from 'lib/apiClient'
-import { AUTH_API_BASE, AUTH_API_KEY } from 'constants/auth'
+import { apiClient, ApiError, requireApiSuccess, requireUserKey } from 'lib/apiClient'
+import { AUTH_API_BASE } from 'constants/auth'
 
-export const getCourseInfo = async (courseId, signal) => {
+export const getCourseInfo = async (courseId, signal, userkey) => {
     const id = String(courseId ?? '').trim()
     if (!id) throw new ApiError(400, '課程 ID 不可為空。')
     const result = await apiClient(`${AUTH_API_BASE}/course/courseInfo/${encodeURIComponent(id)}`, {
         method: 'GET', credentials: 'include', cache: 'no-store', signal,
-        headers: { Accept: 'application/json', 'X-API-Key': AUTH_API_KEY }
+        headers: { Accept: 'application/json', 'X-API-Key': requireUserKey(userkey) }
     })
     requireApiSuccess(result, '無法取得課程資訊。')
     const { data } = result

@@ -9,7 +9,7 @@ mod.filename = file; mod.paths = module.paths
 let dialogs = [], confirmed = false, requests = []
 const original = mod.require.bind(mod)
 mod.require = id => ({
-    react: { ...React, useContext: () => ({ user: { mail: 'user@example.com', account: 'user' } }), useId: () => 'change-test', useState: value => [value, () => {}] },
+    react: { ...React, useContext: () => ({ user: { mail: 'user@example.com', id: 'user', account: 'login-account', userkey: 'session-key' } }), useId: () => 'change-test', useState: value => [value, () => {}] },
     'api/auth': { changePassword: async payload => { requests.push(payload) } },
     sweetalert: async options => { dialogs.push(options); return confirmed },
     'contexts/LoginProvider': { LoginContext: {} },
@@ -34,6 +34,8 @@ async function main() {
     const html = renderToStaticMarkup(tree)
     assert(html.includes('user@example.com'))
     assert.equal((html.match(/type="password"/g) || []).length, 3)
+    assert.equal((html.match(/<input\b/g) || []).length, 4)
+    assert(!/captcha|加總|總和/i.test(html))
     const submit = find(tree, 'form').props.onSubmit
     const previousFormData = global.FormData
     global.FormData = class { constructor(form) { return Object.entries(form.values) } }
@@ -55,7 +57,7 @@ async function main() {
         await submit(event)
         assert.equal(dialogs.length, 2)
         assert.equal(dialogs[1].icon, 'success')
-        assert.deepEqual(requests, [{ uid: 'user', oldpwd: valid.oldPassword, newpwd: valid.newPassword }])
+        assert.deepEqual(requests, [{ uid: 'user', oldpwd: valid.oldPassword, newpwd: valid.newPassword, userkey: 'session-key' }])
         assert.equal(resets, 1)
     } finally { global.FormData = previousFormData }
     console.log('PASS: password fields, notification email, validation, confirmation/cancel and API success')

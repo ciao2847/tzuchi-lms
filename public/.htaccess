@@ -1,6 +1,6 @@
-# React BrowserRouter fallback for /tzuchi/react/.
+# React BrowserRouter fallback for /tzuchi/elearning/.
 RewriteEngine On
-RewriteBase /tzuchi/react/
+RewriteBase /tzuchi/elearning/
 
 # Keep real files, directories, API endpoints and asset paths on Apache.
 RewriteCond %{REQUEST_FILENAME} -f [OR]

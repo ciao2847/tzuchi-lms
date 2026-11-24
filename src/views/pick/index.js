@@ -85,7 +85,7 @@ const Page = () => {
         }
         const controller = new AbortController()
         setCategories({ status: 'loading', items: [], owner: user.id })
-        getCourseCategories(controller.signal).then(items => {
+        getCourseCategories(controller.signal, user.userkey).then(items => {
             if (!controller.signal.aborted) setCategories({ status: 'success', items, owner: user.id })
         }).catch(error => {
             if (controller.signal.aborted) return
@@ -94,7 +94,7 @@ const Page = () => {
                 message: error instanceof TypeError ? '無法連線至課程屬性服務。' : error.message })
         })
         return () => controller.abort()
-    }, [isVerified, user.id, expireSession, categoryRevision])
+    }, [isVerified, user.id, user.userkey, expireSession, categoryRevision])
     useEffect(() => {
         if (!isVerified) return
         if (searchOwner.current === null) {
@@ -127,7 +127,7 @@ const Page = () => {
         }
         const controller = new AbortController()
         setResult({ status: 'loading', owner: user.id, courses: [], total: 0 })
-        getQuickCourses({ ...filters, page, pagesize: pageSize }, controller.signal).then(data => {
+        getQuickCourses({ ...filters, page, pagesize: pageSize }, controller.signal, user.userkey).then(data => {
             if (controller.signal.aborted) return
             const apiBranch = normalizeCampus(data.branch)
             if (!initialCampusApplied.current && CAMPUS_OPTIONS.some(option => option.id === apiBranch) && !(apiBranch === 'all' && userCampus)) {
@@ -144,7 +144,7 @@ const Page = () => {
             setResult({ status: 'error', owner: user.id, courses: [], total: 0, message: error.status === 401 ? '登入時效已過期，請重新登入。' : error instanceof TypeError ? '無法連線至快速選課服務，請稍後重試。' : error.message })
         })
         return () => controller.abort()
-    }, [isVerified, filters, page, pageSize, revision, user.id, userCampus, expireSession])
+    }, [isVerified, filters, page, pageSize, revision, user.id, user.userkey, userCampus, expireSession])
     const [selectedViewMode, setSelectedViewMode] = useState(null)
     const viewMode = selectedViewMode || (isDesktopLayout ? 'list' : 'card')
     const isLoadingCourses = sessionStatus === 'checking' || (isVerified &&

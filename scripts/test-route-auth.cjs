@@ -89,8 +89,8 @@ for (const [oldPath, newPath] of [
         [{ to: newPath, replace: true, href: newPath }])
     assert.deepEqual(render(oldPath, guest).redirects,
         [{ to: '/#login', replace: true, href: '/#login' }])
-    assert.deepEqual(render(`/tzuchi/react${oldPath}`, verified, '/tzuchi/react').redirects,
-        [{ to: newPath, replace: true, href: `/tzuchi/react${newPath}` }])
+    assert.deepEqual(render(`/tzuchi/elearning${oldPath}`, verified, '/tzuchi/elearning').redirects,
+        [{ to: newPath, replace: true, href: `/tzuchi/elearning${newPath}` }])
 }
 for (const [location, page] of protectedLocations) {
     for (const login of [guest, unavailable, expired, { isLogin: true, sessionStatus: 'idle' }]) {
@@ -117,12 +117,12 @@ assert.deepEqual(render('/missing-page?embed=1#anything', guest).redirects,
     [{ to: '/#login', replace: true, href: '/#login' }])
 assert.deepEqual(render('/missing-page', verified).redirects,
     [{ to: '/404', replace: true, href: '/404' }])
-const based = render('/tzuchi/react/calendar?embed=1', guest, '/tzuchi/react')
+const based = render('/tzuchi/elearning/calendar?embed=1', guest, '/tzuchi/elearning')
 assert.deepEqual(based.pages, [])
 assert.deepEqual(based.redirects,
-    [{ to: '/#login', replace: true, href: '/tzuchi/react#login' }])
-assert.deepEqual(render('/tzuchi/react/calendar', verified, '/tzuchi/react').pages, ['calendar'])
-assert.deepEqual(render('/tzuchi/react/change-password', verified, '/tzuchi/react').pages, ['change-password'])
+    [{ to: '/#login', replace: true, href: '/tzuchi/elearning#login' }])
+assert.deepEqual(render('/tzuchi/elearning/calendar', verified, '/tzuchi/elearning').pages, ['calendar'])
+assert.deepEqual(render('/tzuchi/elearning/change-password', verified, '/tzuchi/elearning').pages, ['change-password'])
 // Simulate session loss on the currently open page, not only direct entry.
 assert.deepEqual(render('/calendar', verified).pages, ['calendar'])
 assert.deepEqual(render('/calendar', expired).pages, [])
@@ -132,9 +132,14 @@ assert(routeConfig, 'The real route definitions must have been rendered')
 // Outbound links remain real external hrefs for guests; no auth guard is
 // attached to the shared link components or their targets.
 const Link = load('src/components/Link.js').default
+const AutoSwitchLink = load('src/components/AutoSwitchLink.js', {
+    'components/Link': Link,
+    hooks: { useLocale: () => 'zh-tw' },
+    'components/I18N': { translate: value => value }
+}).default
 const { ChangePasswordItem } = load('src/layout/MainNav.js', {
     'components/I18N': ({ children }) => children,
-    'components/Link': Link,
+    'components/AutoSwitchLink': AutoSwitchLink,
     'components/BtnMenu': () => null,
     'contexts/LoginProvider': { LoginContext },
     'hooks/useMedia': () => true,
@@ -147,15 +152,11 @@ for (const mobile of [false, true]) {
     const item = ChangePasswordItem({ mobile, onNavigate: () => { closed = true } })
     item.props.onClick()
     assert.equal(closed, true)
-    const html = renderToStaticMarkup(React.createElement(StaticRouter, { location: '/tzuchi/react/calendar?embed=1', basename: '/tzuchi/react' }, item))
-    assert(html.includes('href="/tzuchi/react/change-password"'))
+    const html = renderToStaticMarkup(React.createElement(StaticRouter, { location: '/tzuchi/elearning/calendar', basename: '/tzuchi/elearning' }, item))
+    assert(html.includes('href="/tzuchi/elearning/change-password"'))
     assert(!html.includes('disabled'))
 }
-const AutoSwitchLink = load('src/components/AutoSwitchLink.js', {
-    'components/Link': Link,
-    hooks: { useLocale: () => 'zh-tw' },
-    'components/I18N': { translate: value => value }
-}).default
+
 for (const [Component, props] of [
     [Link, { href: 'https://nlms.tzuchi.com.tw/tzuchi/' }],
     [AutoSwitchLink, { href: 'https://example.org/help', isLinkOut: true }]

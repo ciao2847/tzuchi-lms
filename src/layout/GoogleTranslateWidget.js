@@ -1,5 +1,6 @@
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import React, { useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { loadScripts } from 'constants/utils'
 
 const isDev = process.env.NODE_ENV === 'development'

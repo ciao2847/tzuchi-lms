@@ -19,10 +19,11 @@ export const validatePasswordChange = ({ oldPassword, newPassword, confirmPasswo
 }
 
 const ChangePassword = () => {
-    const { user, expireSession } = useContext(LoginContext)
+    const { user, expireSession, markPasswordChanged } = useContext(LoginContext)
     const sectionId = useId()
     const [error, setError] = useState('')
     const [confirming, setConfirming] = useState(false)
+    const [status, setStatus] = useState('')
     const handleSubmit = async event => {
         event.preventDefault()
         if (confirming) return
@@ -30,6 +31,7 @@ const ChangePassword = () => {
         const values = Object.fromEntries(new FormData(form))
         const message = validatePasswordChange(values)
         setError(message)
+        setStatus('')
         setConfirming(true)
         try {
             if (message) {
@@ -41,12 +43,16 @@ const ChangePassword = () => {
                 icon: 'warning', buttons: { cancel: '返回檢查', confirm: '確認修改' }, dangerMode: false
             })
             if (confirmed) {
-                if (!user.account) throw new Error('缺少登入帳號，請重新登入。')
-                await changePassword({ uid: user.account, oldpwd: values.oldPassword, newpwd: values.newPassword })
+                if (!user.id) throw new Error('缺少登入身分資料，請重新登入。')
+                setStatus('正在修改密碼…')
+                await changePassword({ uid: user.id, oldpwd: values.oldPassword, newpwd: values.newPassword, userkey: user.userkey })
+                setStatus('密碼已修改，下次登入請使用新密碼。')
+                markPasswordChanged?.(user.id)
                 form.reset()
                 await swal({ title: '密碼已修改', text: '下次登入請使用新密碼。', icon: 'success', button: '我知道了' })
             }
         } catch (error) {
+            setStatus('')
             setError(error instanceof TypeError ? '無法連線，請稍後再試。' : error.message || '密碼修改失敗。')
             if (error.status === 401 || error.code === 'SESSION_EXPIRED') expireSession()
         } finally { setConfirming(false) }
@@ -75,6 +81,7 @@ const ChangePassword = () => {
                         </div>
                     </div>)}
                     {error && <p id={`${sectionId}-error`} role="alert" className="text-[13px] leading-5 text-danger">{error}</p>}
+                    {status && <p role="status" className="text-[13px] leading-5 text-secondary">{status}</p>}
                     <button type="submit" disabled={confirming} className="flex h-10 w-full items-center justify-center rounded bg-main text-[16px] font-bold leading-6 text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-main disabled:cursor-wait disabled:opacity-60">確認修改</button>
                 </form>
             </div>

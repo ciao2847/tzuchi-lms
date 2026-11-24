@@ -5,7 +5,7 @@ import { translate } from 'components/I18N'
 const AutoSwitchLink = forwardRef(
     ({ children, isLinkOut, title, className, ...props }, ref) => {
         const lang = useLocale()
-        const LinkComp = isLinkOut ? 'a' : Link
+        const LinkComp = isLinkOut || props.href?.startsWith('#') ? 'a' : Link
         return (
             <LinkComp
                 className={`transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary ${className || ''}`}

@@ -1,13 +1,13 @@
 # 學術演講 Proxy 部署
 
-網頁只請求同來源的 `/tzuchi/react/api/academic-videos.php`。PHP 在伺服器端
+網頁只請求同來源的 `/tzuchi/elearning/api/academic-videos.php`。PHP 在伺服器端
 讀取 `https://nlms.tzuchi.com.tw/speech/sp.json`，驗證回應為 JSON 陣列後回傳。
 縮圖及演講頁面的連結仍使用正式站。
 
 ## 部署
 
 1. 執行 production build，將 `dist` 的全部內容放到主機 `react` 目錄，包含
-   `api/academic-videos.php` 與 `api/cacert.pem`。網站 URL 需對應 `/tzuchi/react/`。
+   `api/academic-videos.php` 與 `api/cacert.pem`。網站 URL 需對應 `/tzuchi/elearning/`。
 2. 主機必須能執行 PHP 7 或以上，並啟用 PHP cURL。若使用 IIS，必須已設定
    PHP FastCGI handler；單純的靜態檔案主機不能執行這個 Proxy。
 3. 主機需能連線到正式站的 HTTPS 443。Proxy 會透過 `CURLOPT_CAINFO` 使用
@@ -16,7 +16,7 @@
 4. 網站的路由重寫規則需保留實際 PHP 檔案，不能將 `/api/academic-videos.php`
    重寫成 React 的 `index.html`。
 
-部署後，在瀏覽器 Network 確認 `/tzuchi/react/api/academic-videos.php` 回傳
+部署後，在瀏覽器 Network 確認 `/tzuchi/elearning/api/academic-videos.php` 回傳
 HTTP 200 與 JSON 陣列，再檢查學術演講卡片。
 
 ## 錯誤判斷

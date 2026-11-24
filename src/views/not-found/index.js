@@ -1,5 +1,5 @@
 import I18N, { translate } from 'components/I18N'
-import Link from 'components/Link'
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import { useLocale } from 'hooks'
 import React from 'react'
 
@@ -22,7 +22,7 @@ const NotFound = () => {
                         <I18N>本頁面網址不存在喔！</I18N>
                     </div>
                 </div>
-                <Link
+                <AutoSwitchLink
                     className="flex text-main border-2 border-main bg-white rounded-full px-5 py-[12px] text-[20px] transition-all duration-300 hover:bg-[#FFF6DE]"
                     href="/"
                     title={translate('回首頁', lang)}
@@ -33,7 +33,7 @@ const NotFound = () => {
                         className="inline align-middle icon icon-arrow-right text-[16px] ml-[4px]"
                         aria-hidden="true"
                     ></i>
-                </Link>
+                </AutoSwitchLink>
             </div>
         </div>
     )

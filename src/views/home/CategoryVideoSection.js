@@ -13,6 +13,7 @@ const CATEGORY_VIDEO_CONFIG = [
     },
     {
         id: 'one-minute',
+        hidden: true,
         title: '一分鐘知識',
         videos: [
             {
@@ -58,7 +59,7 @@ const CategoryVideoSection = ({ categories }) => {
         useAcademicVideos({ enabled: !categories })
     const resolvedCategories =
         categories ||
-        CATEGORY_VIDEO_CONFIG.map((category) =>
+        CATEGORY_VIDEO_CONFIG.filter(({ hidden }) => !hidden).map((category) =>
             category.id === ACADEMIC_CATEGORY_ID
                 ? { ...category, videos: academicVideos }
                 : category

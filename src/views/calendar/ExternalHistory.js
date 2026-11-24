@@ -1,3 +1,4 @@
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import React from 'react'
 import { getExternalHistory } from 'api/externalHistory'
 import AnnualLearningHistory from './AnnualLearningHistory'
@@ -51,7 +52,7 @@ const Attachments = ({ files }) => {
     const links = (Array.isArray(files) ? files : []).map(file => ({ file, url: attachmentUrl(file) })).filter(item => item.url)
     return links.length ? <div className="flex flex-wrap gap-2">{links.map(({ file, url }, index) => {
         const label = file?.filename || file?.name || `下載附件 ${index + 1}`
-        return <a key={`${url}-${index}`} href={url} target="_blank" rel="noopener noreferrer" aria-label={`${label}（另開視窗）`} title={`${label}（另開視窗）`} className="inline-flex h-9 w-9 items-center justify-center rounded-full text-secondary transition-colors hover:bg-[#eaf3ff] hover:text-main focus-visible:text-main focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary"><i className="icon icon-download text-[18px]" aria-hidden="true" /></a>
+        return <AutoSwitchLink key={`${url}-${index}`} href={url} isLinkOut rel="noopener noreferrer" aria-label={`${label}（另開視窗）`} title={`${label}（另開視窗）`} className="inline-flex h-9 w-9 items-center justify-center rounded-full text-secondary transition-colors hover:bg-[#eaf3ff] hover:text-main focus-visible:text-main focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary"><i className="icon icon-download text-[18px]" aria-hidden="true" /></AutoSwitchLink>
     })}</div> : '—'
 }
 const columns = [

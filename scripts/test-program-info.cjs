@@ -80,7 +80,7 @@ const { ProgramDetails, CourseProgressTable, ProgressCourseList } = load('src/vi
     '@fullcalendar/react/daygrid': {},
     '@fullcalendar/react/themes/classic': {},
     'components/I18N': ({ children }) => children,
-    'components/Link': ({ href, children, ...props }) => React.createElement('a', { href, ...props }, children),
+    'components/AutoSwitchLink': ({ href, children, ...props }) => React.createElement('a', { href, ...props }, children),
     'components/NotificationDetailDialog': () => null,
     'components/Select': () => null,
     'components/TitleBlk': () => null,

@@ -3,7 +3,7 @@ export const adaptLoginUser = (data, account) => {
         typeof data.name !== 'string' || !data.name) {
         throw new Error('登入回應資料不完整，請稍後再試。')
     }
-    const { id, name, depname, mail, modurl, branch } = data
+    const { id, name, depname, mail, modurl, branch, changepassword, userkey } = data
     return {
         id,
         account,
@@ -11,6 +11,8 @@ export const adaptLoginUser = (data, account) => {
         department: depname || '',
         mail: mail || '',
         modurl: modurl || '',
-        branch: branch || ''
+        branch: branch || '',
+        changepassword,
+        userkey
     }
 }

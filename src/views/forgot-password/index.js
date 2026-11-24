@@ -1,5 +1,7 @@
-import React, { useId, useRef, useState } from 'react'
+import AutoSwitchLink from 'components/AutoSwitchLink'
+import React, { useContext, useId, useRef, useState } from 'react'
 import { forgetPassword } from 'api/auth'
+import { LoginContext } from 'contexts/LoginProvider'
 
 const CONTACTS = [
     { campus: '花蓮', extension: '13643' },
@@ -10,6 +12,8 @@ const CONTACTS = [
 const inputClass = 'block h-10 w-full min-w-0 rounded border border-gray-200 bg-transparent px-3 py-2 text-[14px] leading-5 text-primary outline-none placeholder:text-gray-400 focus:border-secondary focus:ring-2 focus:ring-secondary/20'
 
 const ForgotPassword = () => {
+    const { isLogin, user, sessionStatus, expireSession } = useContext(LoginContext)
+    const canSubmit = isLogin && Boolean(user.userkey)
     const sectionId = useId()
     const pending = useRef(false)
     const [submitting, setSubmitting] = useState(false)
@@ -17,7 +21,7 @@ const ForgotPassword = () => {
     const [sent, setSent] = useState(false)
     const handleSubmit = async event => {
         event.preventDefault()
-        if (pending.current) return
+        if (pending.current || !canSubmit) return
         const form = event.currentTarget
         const uid = String(new FormData(form).get('uid') || '').trim()
         setError('')
@@ -26,10 +30,11 @@ const ForgotPassword = () => {
         pending.current = true
         setSubmitting(true)
         try {
-            await forgetPassword({ uid })
+            await forgetPassword({ uid, userkey: user.userkey })
             form.reset()
             setSent(true)
         } catch (error) {
+            if (error.status === 401) expireSession()
             setError(error instanceof TypeError ? '無法連線，請稍後再試。' : error.message || '寄信失敗，請稍後再試。')
         } finally { pending.current = false; setSubmitting(false) }
     }
@@ -44,13 +49,13 @@ const ForgotPassword = () => {
                 </div>
                 <div className="mb-6 space-y-2 text-[14px] leading-6 text-primary">
                     <p>親愛的使用者您好：</p>
-                    <p>請輸入您的身分證字號，系統將寄發通知信至您登錄的信箱。</p>
+                    {canSubmit && <p>請輸入您的身分證字號，系統將寄發通知信至您登錄的信箱。</p>}
                 </div>
                 <aside aria-labelledby={`${sectionId}-reminder`} className="mb-6 rounded-[12px] border border-solid border-secondary/20 bg-secondary/5 p-4">
                     <h2 id={`${sectionId}-reminder`} className="mb-2 flex items-center gap-2 text-[14px] font-bold leading-5 text-primary"><i className="icon icon-info text-[16px]" aria-hidden="true" />提醒</h2>
                     <p className="text-[13px] leading-6 text-primary">請確定您的 Notes 信箱
-                        <a href="https://nlms.tzuchi.com.tw/tzuchi/index/mail_pic.png" target="_blank" rel="noopener noreferrer"
-                            className="mx-1 text-success underline underline-offset-2 transition-colors hover:text-main focus-visible:outline focus-visible:outline-2 focus-visible:outline-success">有對外<span className="sr-only">（另開視窗）</span></a>
+                        <AutoSwitchLink href="https://nlms.tzuchi.com.tw/tzuchi/index/mail_pic.png" isLinkOut rel="noopener noreferrer"
+                            className="mx-1 text-success underline underline-offset-2 transition-colors hover:text-main focus-visible:outline focus-visible:outline-2 focus-visible:outline-success">有對外</AutoSwitchLink>
                         ，若無，請您聯絡您院區的教學部協助取回密碼。</p>
                     <div className="mt-4 overflow-hidden rounded-[8px] border border-solid border-gray-200">
                         <table className="w-full table-fixed border-collapse text-center text-[12px] leading-5 text-primary sm:text-[13px]">
@@ -64,7 +69,7 @@ const ForgotPassword = () => {
                         </table>
                     </div>
                 </aside>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-5" aria-busy={submitting}>
+                {canSubmit ? <form onSubmit={handleSubmit} className="flex flex-col gap-5" aria-busy={submitting}>
                     <div>
                         <label htmlFor={`${sectionId}-account`} className="mb-2 block text-[16px] font-medium leading-5 text-primary">身分證字號</label>
                         <div className="relative">
@@ -75,7 +80,9 @@ const ForgotPassword = () => {
                     {error && <p id={`${sectionId}-error`} role="alert" className="text-[13px] text-danger">{error}</p>}
                     {sent && <p role="status" className="text-[14px] text-primary">已寄信，請至您登錄的信箱查看通知。</p>}
                     <button type="submit" disabled={submitting} className="flex h-10 w-full items-center justify-center rounded bg-main text-[16px] font-bold text-white disabled:opacity-60">{submitting ? '寄送中…' : '寄送通知信'}</button>
-                </form>
+                </form> : <p role="status" className="text-[14px] leading-6 text-primary">
+                    {sessionStatus === 'checking' ? '正在確認登入狀態…' : '寄送通知信需要有效的登入狀態。若無法登入，請聯絡上方所列的院區教學部。'}
+                </p>}
             </div>
         </section>
     </main>

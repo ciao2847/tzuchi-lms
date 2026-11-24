@@ -1,3 +1,4 @@
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import LoadingProvider from 'contexts/LoadingProvider'
 import PhotoSwipeProvider from 'contexts/PhotoSwipeProvider'
 import React, { Suspense, useEffect } from 'react'
@@ -37,14 +38,14 @@ const Layout = ({ children }) => {
         <LoadingProvider>
             <PhotoSwipeProvider>
                 <div className="flex min-h-[100dvh] flex-col">
-                <a
+                <AutoSwitchLink
                     href="#main-content"
                     className="acc-show-at-focus"
                     title="跳到主要內容區塊"
                     id="btn-main-content"
                 >
                     跳到主要內容區塊
-                </a>
+                </AutoSwitchLink>
                 <span
                     className="pointer-events-none absolute left-0 top-0 h-px w-px overflow-hidden"
                     id="top"

@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import I18N from 'components/I18N'
-import Link from 'components/Link'
+import AutoSwitchLink from 'components/AutoSwitchLink'
 
 const Tag = ({ children, tone = 'blue' }) => {
     const colorClass =
@@ -230,14 +230,14 @@ const Table = ({ data }) => {
                                     </ul>
                                 </td>
                                 <td className="px-3 py-3 font-semibold">
-                                    <Link
+                                    <AutoSwitchLink
                                         href={`/course/${id}`}
                                         tabIndex={-1}
                                         className="block rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                                         aria-label={`查看課程：${title}`}
                                     >
                                         <CellText>{title}</CellText>
-                                    </Link>
+                                    </AutoSwitchLink>
                                 </td>
                                 <td className="px-3 py-3 text-[#486785]">
                                     <CellText>{date}</CellText>
@@ -271,13 +271,13 @@ const Results = ({ data, viewMode }) =>
         <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
             {data.map(({ id, ...course }) => (
                 <li key={id}>
-                    <Link
+                    <AutoSwitchLink
                         href={`/course/${id}`}
                         className="group block h-full rounded-[7px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                         aria-label={`查看課程：${course.title}`}
                     >
                         <Card course={course} />
-                    </Link>
+                    </AutoSwitchLink>
                 </li>
             ))}
         </ul>

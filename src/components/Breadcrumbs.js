@@ -1,5 +1,5 @@
 import I18N from 'components/I18N'
-import Link from 'components/Link'
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import { useLocale } from 'hooks'
 import React from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -22,7 +22,7 @@ const Breadcrumbs = ({ data, className, contained = true }) => {
                         : ''
                 }`}
             >
-                <a
+                <AutoSwitchLink
                     accessKey="C"
                     href="#"
                     title="中間定位點(C)"
@@ -32,15 +32,15 @@ const Breadcrumbs = ({ data, className, contained = true }) => {
                     }}
                 >
                     :::
-                </a>
+                </AutoSwitchLink>
                 <ol className="flex min-w-max items-center">
                     <li className="flex crumb items-center ml-1">
-                        <Link
+                        <AutoSwitchLink
                             href={lang === 'zh-tw' ? '/' : `/${lang}`}
                             className={`text-inherit hover:text-primary`}
                         >
                             <I18N>首頁</I18N>
-                        </Link>
+                        </AutoSwitchLink>
                     </li>
                     {!!data?.length &&
                         data.map(({ title, url }, index) => (
@@ -54,12 +54,12 @@ const Breadcrumbs = ({ data, className, contained = true }) => {
                                 }
                             >
                                 {!!url ? (
-                                    <Link
+                                    <AutoSwitchLink
                                         className={`text-inherit hover:text-primary`}
                                         href={url}
                                     >
                                         <I18N>{title}</I18N>
-                                    </Link>
+                                    </AutoSwitchLink>
                                 ) : (
                                     <I18N>{title}</I18N>
                                 )}

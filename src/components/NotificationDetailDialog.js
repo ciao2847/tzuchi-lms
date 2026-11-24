@@ -1,7 +1,7 @@
 import React, { useId, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import I18N from 'components/I18N'
-import Link from 'components/Link'
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import useDialogInteraction from 'hooks/useDialogInteraction'
 import EmptyState from 'components/EmptyState'
 
@@ -312,13 +312,13 @@ const NotificationDetailDialog = ({ notice, onClose }) => {
 
                 {notice.action && (
                     <footer className="flex shrink-0 justify-end border-t border-solid border-[#dce5f0] bg-white px-4 py-3 md:px-7 md:py-4">
-                        <Link
+                        <AutoSwitchLink
                             href={notice.action.href}
                             className="ml-auto flex min-h-10 w-full items-center justify-center rounded-[6px] bg-blue px-6 text-[13px] font-bold text-white transition-colors hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue md:w-auto md:min-w-[150px] md:text-[14px]"
                             onClick={onClose}
                         >
                             {notice.action.label}
-                        </Link>
+                        </AutoSwitchLink>
                     </footer>
                 )}
             </section>

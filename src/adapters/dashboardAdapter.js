@@ -30,10 +30,10 @@ export const getCalendarEvents = ({ coming, history }) => [...coming, ...history
 export const adaptDashboard = (data) => {
     if (!object(data) || !Array.isArray(data.announcement) ||
         !Array.isArray(data.mail) || !object(data.programs) ||
-        !object(data.calendarInfo || data.courses)) {
+        !object(data.courses || data.calendarInfo)) {
         throw new Error('學習歷程回應格式異常，請稍後再試。')
     }
-    const calendar = data.calendarInfo || data.courses
+    const calendar = data.courses || data.calendarInfo
     const history = calendar.usrhistory || calendar.usrhistroy || {}
     // History contains every past course, regardless of its completion status.
     const historyCourses = Array.isArray(history) ? history.map(course => adaptCourse(course, 'yet')) :

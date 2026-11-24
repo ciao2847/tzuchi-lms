@@ -9,6 +9,13 @@ export class ApiError extends Error {
     }
 }
 
+export const requireUserKey = (userkey) => {
+    if (typeof userkey !== 'string' || !userkey.trim()) {
+        throw new ApiError(401, '登入時效已過期或尚未登入，請重新登入')
+    }
+    return userkey
+}
+
 const getErrorMessage = (status, data) => {
     if (typeof data === 'string') return data
     return data?.error?.message || data?.message || data?.errorMessage ||

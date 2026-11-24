@@ -76,11 +76,11 @@ async function main() {
     const programAdapter = load('src/adapters/programAdapter.js')
     const api = load('src/api/dashboard.js', { 'lib/apiClient': client, 'adapters/dashboardAdapter': adapter, 'adapters/programAdapter': programAdapter, 'constants/auth': auth })
     global.fetch = async () => ({ ok: true, json: async () => ({ success: false, error: { code: 'SESSION_EXPIRED' } }) })
-    await assert.rejects(api.getProgramInfo('3324'), error => error.status === 401)
+    await assert.rejects(api.getProgramInfo('3324', undefined, 'session-key'), error => error.status === 401)
     global.fetch = async (url, options) => {
         assert(url.endsWith('/dashboard/programInfo/3324'))
         assert.equal(options.credentials, 'include')
-        assert.equal(options.headers['X-API-Key'], auth.AUTH_API_KEY)
+        assert.equal(options.headers['X-API-Key'], 'session-key')
         return { ok: true, json: async () => ({ success: true, data: {
             programCategory: { '14818': { name: 'Category', credit: '2',
                 status: ['p', 'q', 'w', 'd.', 'o'],
@@ -88,7 +88,7 @@ async function main() {
             totalCredit: 5, passCredit: 2, passRealCredit: 1
         } }) }
     }
-    const program = await api.getProgramInfo('3324')
+    const program = await api.getProgramInfo('3324', undefined, 'session-key')
     assert.deepEqual(program.categories[0].states, ['complete', 'overdueComplete', 'inProgress', 'failed', 'notStarted'])
     assert.equal(program.categories[0].courses[0].status, '')
     assert.equal(program.passRealCredit, 1)
@@ -97,16 +97,16 @@ async function main() {
         request = { url, options }
         return { ok: true, json: async () => ({ success: true, data: fixture }) }
     }
-    await api.getDashboard(new AbortController().signal)
+    await api.getDashboard(new AbortController().signal, 'session-key')
     assert(request.url.endsWith('/api/dashboard'))
     assert.equal(request.options.method, 'GET')
     assert.equal(request.options.credentials, 'include')
     assert.equal(request.options.cache, 'no-store')
     assert(!('body' in request.options))
     global.fetch = async () => ({ ok: false, status: 401, json: async () => ({ success: false }) })
-    await assert.rejects(api.getDashboard(), error => error.status === 401)
+    await assert.rejects(api.getDashboard(undefined, 'session-key'), error => error.status === 401)
     global.fetch = async () => ({ ok: true, json: async () => ({ success: false, error: { message: 'Unavailable' } }) })
-    await assert.rejects(api.getDashboard(), /Unavailable/)
+    await assert.rejects(api.getDashboard(undefined, 'session-key'), /Unavailable/)
 
     // Render components with real React to catch missing variables and mock fallbacks.
     const DashboardContext = React.createContext({ data, status: 'success' })
@@ -114,7 +114,7 @@ async function main() {
         'contexts/DashboardProvider': { DashboardContext },
         'components/DashboardStatus': () => null,
         'components/I18N': ({ children }) => children,
-        'components/Link': ({ href, children, ...props }) => React.createElement('a', { href, ...props }, children)
+        'components/AutoSwitchLink': ({ href, children, ...props }) => React.createElement('a', { href, ...props }, children)
     }).default
     const summary = renderToStaticMarkup(React.createElement(Summary, { user: { name: 'Test user' } }))
     assert(summary.includes('Upcoming course'))
@@ -179,7 +179,7 @@ async function main() {
         '@fullcalendar/react/daygrid': {},
         '@fullcalendar/react/themes/classic': {},
         'components/I18N': ({ children }) => children,
-        'components/Link': ({ href, children, ...props }) => React.createElement('a', { href, ...props }, children),
+        'components/AutoSwitchLink': ({ href, children, ...props }) => React.createElement('a', { href, ...props }, children),
         'components/Select': ({ children }) => React.createElement('select', null, children),
         'components/NotificationDetailDialog': () => null,
         'components/TitleBlk': () => null,

@@ -14,7 +14,7 @@ const AnnualLearningHistory = ({ fetchHistory = getLearningHistory, label = '學
         if (!verified) return undefined
         const controller = new AbortController()
         setResult({ status: 'loading', courses: [], year, owner: user.id })
-        fetchHistory(year, controller.signal).then(courses => {
+        fetchHistory(year, controller.signal, user.userkey).then(courses => {
             if (!controller.signal.aborted) setResult({ status: 'success', courses, year, owner: user.id })
         }).catch(error => {
             if (controller.signal.aborted) return
@@ -22,7 +22,7 @@ const AnnualLearningHistory = ({ fetchHistory = getLearningHistory, label = '學
             setResult({ status: 'error', courses: [], year, owner: user.id })
         })
         return () => controller.abort()
-    }, [verified, user.id, year, expireSession, fetchHistory])
+    }, [verified, user.id, user.userkey, year, expireSession, fetchHistory])
     const current = verified && result.owner === user.id && result.year === year
     const status = current ? result.status : 'loading'
     return <LearningHistory label={label} resultsComponent={resultsComponent} courses={current ? result.courses : []} year={year} onYearChange={setYear} status={status}

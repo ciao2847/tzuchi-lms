@@ -24,22 +24,22 @@ async function main() {
         ] }) }
     }
     const controller = new AbortController()
-    const courses = await getLearningHistory(2026, controller.signal)
+    const courses = await getLearningHistory(2026, controller.signal, 'session-key')
     assert.equal(request.url, '/api/course/history/2026')
     assert.equal(request.method, 'GET')
     assert.equal(request.credentials, 'include')
-    assert.equal(request.headers['X-API-Key'], 'test-key')
+    assert.equal(request.headers['X-API-Key'], 'session-key')
     assert.equal(request.signal, controller.signal)
     assert.deepEqual(courses[0], { id: '35844', title: '數位課程', type: '數位', status: 'yet', start: '2026-09-18 13:51', signedAt: '2026-09-18 13:51', passedAt: '' })
     assert.equal(courses[1].status, 'pass')
     assert.equal(courses[1].type, '實體')
-    for (const year of [0, NaN, 2026.5, '2026']) await assert.rejects(getLearningHistory(year))
+    for (const year of [0, NaN, 2026.5, '2026']) await assert.rejects(getLearningHistory(year, undefined, 'session-key'))
     global.fetch = async () => ({ ok: true, json: async () => ({ success: true, data: [] }) })
-    assert.deepEqual(await getLearningHistory(2025), [])
+    assert.deepEqual(await getLearningHistory(2025, undefined, 'session-key'), [])
     global.fetch = async () => ({ ok: true, json: async () => ({ success: true, data: {} }) })
-    await assert.rejects(getLearningHistory(2026), error => error.status === 502)
+    await assert.rejects(getLearningHistory(2026, undefined, 'session-key'), error => error.status === 502)
     global.fetch = async () => ({ ok: false, status: 401, json: async () => ({ success: false, error: { code: 'SESSION_EXPIRED' } }) })
-    await assert.rejects(getLearningHistory(2026), error => error.status === 401)
+    await assert.rejects(getLearningHistory(2026, undefined, 'session-key'), error => error.status === 401)
     const React = require('react')
     const slots = [], pending = [], requests = []
     let cursor = 0, expired = 0

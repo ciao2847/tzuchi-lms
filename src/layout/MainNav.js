@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Link as RouterLink, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import I18N from 'components/I18N'
-import Link from 'components/Link'
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import BtnMenu from 'components/BtnMenu'
 import { LoginContext } from 'contexts/LoginProvider'
 import useMedia from 'hooks/useMedia'
@@ -98,9 +98,9 @@ const DesktopMenuItem = ({ item, pathname, openMenuId, setOpenMenuId }) => {
                     {triggerContent}
                 </button>
             ) : (
-                <Link href={url} className={triggerClassName}>
+                <AutoSwitchLink href={url} className={triggerClassName}>
                     {triggerContent}
-                </Link>
+                </AutoSwitchLink>
             )}
 
             {childCount > 0 && (
@@ -118,20 +118,15 @@ const DesktopMenuItem = ({ item, pathname, openMenuId, setOpenMenuId }) => {
                                         <I18N>{title}</I18N>
                                     </div>
                                 ) : (
-                                    <Link
+                                    <AutoSwitchLink
                                         href={url}
                                         className="block  px-5 py-3 text-[16px] leading-6 text-primary transition-colors last:border-b-0 hover:bg-primary/5 hover:text-main focus-visible:bg-primary/5 focus-visible:text-main focus-visible:outline-none"
                                         role="menuitem"
                                         onClick={closeMenu}
-                                        {...(isLinkOut
-                                            ? {
-                                                  target: '_blank',
-                                                  rel: 'noopener noreferrer'
-                                              }
-                                            : null)}
+                                        isLinkOut={isLinkOut}
                                     >
                                         <I18N>{title}</I18N>
-                                    </Link>
+                                    </AutoSwitchLink>
                                 )}
                             </li>
                         )
@@ -156,14 +151,14 @@ const MemberIdentity = ({ user }) => (
 )
 
 export const ChangePasswordItem = ({ mobile = false, onNavigate }) => (
-    <RouterLink
-        to="/change-password"
+    <AutoSwitchLink
+        href="/change-password"
         onClick={onNavigate}
         role={mobile ? undefined : 'menuitem'}
         className={`flex min-h-10 w-full items-center bg-white py-2 pr-4 text-left text-[13px] font-medium text-primary hover:bg-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary ${mobile ? 'pl-8' : 'pl-4'}`}
     >
         <I18N>修改密碼</I18N>
-    </RouterLink>
+    </AutoSwitchLink>
 )
 
 const DesktopMemberMenu = ({ onLogout, isLoggingOut, user = {} }) => {
@@ -261,9 +256,9 @@ const MobileMenuItem = ({ item, isActive, onClose, onToggle }) => {
                     {content}
                 </button>
             ) : (
-                <Link href={url} className={className} onClick={onClose}>
+                <AutoSwitchLink href={url} className={className} onClick={onClose}>
                     {content}
-                </Link>
+                </AutoSwitchLink>
             )}
             {hasChildren && isActive && (
                 <ul
@@ -289,7 +284,7 @@ const MobileMenuItem = ({ item, isActive, onClose, onToggle }) => {
                                         <I18N>{title}</I18N>
                                     </div>
                                 ) : (
-                                    <Link
+                                    <AutoSwitchLink
                                         href={url}
                                         className={`flex min-h-[44px] items-center gap-3 border-b border-solid border-gray-200 bg-white py-2 text-[13px] leading-5 text-primary transition-colors active:bg-[#f8fafc] focus-visible:bg-[#f8fafc] focus-visible:text-primary focus-visible:outline-none ${
                                             hasSectionTitles
@@ -297,12 +292,7 @@ const MobileMenuItem = ({ item, isActive, onClose, onToggle }) => {
                                                 : 'pl-8 pr-4'
                                         }`}
                                         onClick={onClose}
-                                        {...(isLinkOut
-                                            ? {
-                                                  target: '_blank',
-                                                  rel: 'noopener noreferrer'
-                                              }
-                                            : null)}
+                                        isLinkOut={isLinkOut}
                                     >
                                         {mobileIcon && (
                                             <MobileMenuIcon name={mobileIcon} />
@@ -311,7 +301,7 @@ const MobileMenuItem = ({ item, isActive, onClose, onToggle }) => {
                                             <I18N>{title}</I18N>
                                         </span>
                                         <NavIndicator />
-                                    </Link>
+                                    </AutoSwitchLink>
                                 )}
                             </li>
                         )
@@ -432,12 +422,12 @@ const MainNav = () => {
                             isLoggingOut={isLoggingOut}
                         />
                     ) : (
-                        <Link
+                        <AutoSwitchLink
                             href="/#login"
                             className="inline-flex h-8 items-center justify-center rounded-full bg-secondary px-4 text-[13px] font-bold text-white transition-colors hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                         >
                             <I18N>登入</I18N>
-                        </Link>
+                        </AutoSwitchLink>
                     )}
                 </div>
             </nav>
@@ -463,7 +453,7 @@ const MainNav = () => {
                     } mobile-scroll-wrapper absolute inset-0 z-10 flex h-full w-full flex-col bg-white transition-transform duration-300`}
                 >
                     <div className="flex h-[var(--header-height)] shrink-0 items-center border-b border-solid border-gray-200 px-5 pr-16 md:px-10 md:pr-20">
-                        <Link
+                        <AutoSwitchLink
                             href="/"
                             className="block h-[40px] w-[147px] max-w-full bg-contain bg-left bg-no-repeat"
                             style={{
@@ -474,7 +464,7 @@ const MainNav = () => {
                             <span className="sr-only">
                                 <I18N>慈濟醫療志業學習網</I18N>
                             </span>
-                        </Link>
+                        </AutoSwitchLink>
                     </div>
 
                     {isLogin ? (
@@ -522,13 +512,13 @@ const MainNav = () => {
                         </div>
                     ) : (
                         <div className="shrink-0 border-b border-solid border-gray-200 px-3 py-2">
-                            <Link
+                            <AutoSwitchLink
                                 href="/#login"
                                 className="inline-flex h-7 items-center justify-center rounded-full bg-main px-4 text-[11px] font-bold text-white transition-colors hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
                                 onClick={closeMenu}
                             >
                                 <I18N>登入</I18N>
-                            </Link>
+                            </AutoSwitchLink>
                         </div>
                     )}
 

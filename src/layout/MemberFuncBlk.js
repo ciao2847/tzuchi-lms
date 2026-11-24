@@ -1,5 +1,6 @@
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import React, { useState, useRef, useContext } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import swal from 'sweetalert'
 import { LoginContext } from 'contexts/LoginProvider'
 import { LoadingContext } from 'contexts/LoadingProvider'
@@ -75,15 +76,15 @@ const MemberFuncBlk = () => {
                     <ul>
                         {MEMBER_FUNC_CONFIG.map(({ id, label, url }) => (
                             <li className="mb-1 last:mb-0" key={id}>
-                                <Link
+                                <AutoSwitchLink
                                     className="block w-full text-default hover:text-primary transition-all duration-300"
-                                    to={url}
+                                    href={url}
                                     onClick={() => {
                                         toggle(false)
                                     }}
                                 >
                                     {label}
-                                </Link>
+                                </AutoSwitchLink>
                             </li>
                         ))}
                         <li className="mb-1 last:mb-0">

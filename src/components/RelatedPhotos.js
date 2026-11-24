@@ -1,3 +1,4 @@
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import EmptyState from 'components/EmptyState'
 import React, { useContext } from 'react'
 import { translate } from 'components/I18N'
@@ -13,11 +14,11 @@ const RelatedPhotos = ({ data = [], className }) => {
         <ul className={`grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-1 ${className}`}>
             {data.map((img, i) => (
                 <li key={i}>
-                    <a
+                    <AutoSwitchLink
                         className="block hover-thumb-scale transition-opacity hover:opacity-80"
                         href={img.url}
-                        title={`${img.title}${translate('另開視窗', lang)}`}
-                        target="_blank"
+                        title={img.title}
+                        isLinkOut
                         rel="noopener noreferrer"
                         onClick={(e) => {
                             e.preventDefault()
@@ -42,7 +43,7 @@ const RelatedPhotos = ({ data = [], className }) => {
                             roundedSize="16px"
                             priority={true}
                         />
-                    </a>
+                    </AutoSwitchLink>
                 </li>
             ))}
         </ul>

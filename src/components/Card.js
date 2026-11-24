@@ -1,5 +1,5 @@
 import React from 'react'
-import Link from 'components/Link'
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import ThumbFrame from 'components/ThumbFrame'
 import I18N from 'components/I18N'
 import { TAGS_CONFIG } from 'constants'
@@ -14,16 +14,10 @@ const Card = ({ data, isLinkOut }) => {
     )
     const clx = !!tag && TAGS_CONFIG.find(({ id }) => tag.id === id).clx
     return (
-        <Link
+        <AutoSwitchLink
             className="flex md:flex-col items-center w-full text-default bg-white rounded hover:bg-primary/10 transition-all duration-300"
             href={url}
-            {...(isLinkOut
-                ? {
-                      target: '_blank',
-                      'aria-label': `${title || name}（另開視窗）`,
-                      rel: 'noopener noreferrer'
-                  }
-                : null)}
+            isLinkOut={isLinkOut}
         >
             <div className="shrink-0 w-[150px] md:w-full relative">
                 {!!tag && (
@@ -50,7 +44,7 @@ const Card = ({ data, isLinkOut }) => {
                     </div>
                 )}
             </div>
-        </Link>
+        </AutoSwitchLink>
     )
 }
 

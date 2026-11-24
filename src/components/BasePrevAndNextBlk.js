@@ -2,7 +2,7 @@ import React from 'react'
 import { useLocale } from 'hooks'
 import I18N, { translate } from 'components/I18N'
 import PrevNextLink from 'components/PrevNextLink'
-import Link from 'components/Link'
+import AutoSwitchLink from 'components/AutoSwitchLink'
 
 const BasePrevAndNextBlk = ({ prevURL, nextURL, listURL, className }) => {
     const lang = useLocale()
@@ -23,13 +23,13 @@ const BasePrevAndNextBlk = ({ prevURL, nextURL, listURL, className }) => {
                         <I18N>上一則</I18N>
                     </div>
                 )}
-                <Link
+                <AutoSwitchLink
                     className="btn flex-1 px-2 text-[16px] h-6"
                     href={listURL}
                     title={`${translate('回列表', lang)}`}
                 >
                     <I18N>回列表</I18N>
-                </Link>
+                </AutoSwitchLink>
                 {nextURL ? (
                     <PrevNextLink
                         url={nextURL}

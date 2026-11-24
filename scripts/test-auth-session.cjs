@@ -36,6 +36,7 @@ const cookieJar = () => {
     })
     return { document, writes }
 }
+const sessionData = { userkey: 'session-key' }
 const storedUser = { id: 'original', name: 'Original user' }
 function mount(stored = false, options = {}) {
     const listeners = new Map()
@@ -52,7 +53,7 @@ function mount(stored = false, options = {}) {
     }
     global.window = browser
     if (options.marker === true || stored && options.marker !== false) browser.document.cookie = 'tzuchi_lms_session=1; Path=/; SameSite=Lax'
-    if (stored) window.localStorage.setItem('tzuchi-lms-login', JSON.stringify({ isLogin: true, user: storedUser }))
+    if (stored) window.localStorage.setItem('tzuchi-lms-login', JSON.stringify({ isLogin: true, user: { ...storedUser, ...sessionData } }))
     let slots = [], cursor = 0, effects = [], checks = [], modurls = [], logoutCalls = 0
     let logoutResult = async () => ({ success: true, data: { modurl: 'https://moodle.example/logout' } })
     const same = (first, second) => first && second && first.length === second.length && first.every((item, index) => Object.is(item, second[index]))
@@ -83,6 +84,7 @@ function mount(stored = false, options = {}) {
     }
     const exports = load('src/contexts/LoginProvider.js', {
         react: fakeReact,
+        'lib/apiClient': load('src/lib/apiClient.js'),
         'api/auth': {
             checkSession: signal => new Promise((resolve, reject) => checks.push({ signal, resolve, reject })),
             logout: () => { logoutCalls++; return logoutResult() },
@@ -114,7 +116,7 @@ async function main() {
     assert.equal(context.sessionStatus, 'checking')
     assert.deepEqual(context.user, {})
     assert.equal(app.checks.length, 1)
-    app.checks[0].resolve({ success: true, data: {} }); await flush()
+    app.checks[0].resolve({ success: true, data: sessionData }); await flush()
     context = app.render()
     assert.equal(context.isLogin, true)
     assert.equal(context.user.id, 'original')
@@ -138,11 +140,11 @@ async function main() {
     assert(app.browser.document.cookie.includes('tzuchi_lms_session=1'))
     const retry = context.retrySession()
     assert.equal(app.render().sessionStatus, 'checking')
-    app.checks[1].resolve({ success: true }); await retry
+    app.checks[1].resolve({ success: true, data: sessionData }); await retry
     assert.equal(app.render().isLogin, true)
 
     app = mount(true); context = app.render()
-    await context.login({ user: { id: 'new', name: 'New user', modurl: 'https://moodle.example/login' }, remember: false })
+    await context.login({ user: { ...sessionData, id: 'new', name: 'New user', modurl: 'https://moodle.example/login' }, remember: false })
     assert.equal(app.checks[0].signal.aborted, true)
     app.checks[0].reject(Object.assign(new Error('Old expired session'), { status: 401 })); await flush()
     context = app.render()
@@ -166,7 +168,7 @@ async function main() {
 
     app = mount(false); context = app.render()
     assert.equal(app.checks.length, 0)
-    await context.login({ user: storedUser })
+    await context.login({ user: { ...storedUser, ...sessionData } })
     app.setLogoutResult(async () => { throw new TypeError('Network') })
     await assert.rejects(app.render().logout(), /Network/)
     assert.equal(app.render().isLogin, true)
@@ -178,11 +180,11 @@ async function main() {
 
     for (const staleFailure of [false, true]) {
         app = mount(false); context = app.render()
-        await context.login({ user: storedUser })
+        await context.login({ user: { ...storedUser, ...sessionData } })
         let resolveLogout, rejectLogout
         app.setLogoutResult(() => new Promise((resolve, reject) => { resolveLogout = resolve; rejectLogout = reject }))
         const pendingLogout = app.render().logout()
-        await app.render().login({ user: { id: 'replacement', name: 'Replacement user' } })
+        await app.render().login({ user: { ...sessionData, id: 'replacement', name: 'Replacement user' } })
         if (staleFailure) rejectLogout(Object.assign(new Error('Old session expired'), { status: 401 }))
         else resolveLogout({ success: true, data: { modurl: 'https://moodle.example/old-logout' } })
         await pendingLogout
@@ -196,30 +198,30 @@ async function main() {
     }
 
     app = mount(false); context = app.render()
-    await context.login({ user: storedUser })
+    await context.login({ user: { ...storedUser, ...sessionData } })
     let resolveLogout
     app.setLogoutResult(() => new Promise(resolve => { resolveLogout = resolve }))
     const pendingLogout = app.render().logout()
     const recheck = app.render().retrySession()
-    app.checks[0].resolve({ success: true }); await recheck
+    app.checks[0].resolve({ success: true, data: sessionData }); await recheck
     resolveLogout({ success: true, data: {} }); await pendingLogout
     assert.equal(app.render().isLogin, false, 'A session recheck must not invalidate logout for the same login')
 
     app = mount(false); context = app.render()
-    await context.login({ user: storedUser })
+    await context.login({ user: { ...storedUser, ...sessionData } })
     app.setLogoutResult(() => new Promise(resolve => { resolveLogout = resolve }))
     const finalLogout = app.render().logout()
     const lateRecheck = app.render().retrySession()
     resolveLogout({ success: true, data: {} }); await finalLogout
     assert.equal(app.checks[0].signal.aborted, true)
-    app.checks[0].resolve({ success: true }); await lateRecheck
+    app.checks[0].resolve({ success: true, data: sessionData }); await lateRecheck
     assert.equal(app.render().isLogin, false, 'A late session recheck cannot restore a successful logout')
     assert.equal(window.sessionStorage.getItem('tzuchi-lms-login'), null)
 
     // A tab close only cancels requests. Cached profile supports another tab;
     // the API Session, rather than that cache, determines whether it is signed in.
     app = mount(false); context = app.render()
-    await context.login({ user: storedUser, remember: false })
+    await context.login({ user: { ...storedUser, ...sessionData }, remember: false })
     const sharedStorage = app.browser.localStorage
     const sharedCookies = app.cookies
     const savedProfile = sharedStorage.getItem('tzuchi-lms-login')
@@ -238,7 +240,7 @@ async function main() {
     assert.equal(context.isLogin, false)
     assert.deepEqual(context.user, {})
     assert.equal(newTab.checks.length, 1)
-    newTab.checks[0].resolve({ success: true, data: {} }); await flush()
+    newTab.checks[0].resolve({ success: true, data: sessionData }); await flush()
     context = newTab.render()
     assert.equal(context.isLogin, true)
     assert.equal(context.user.id, storedUser.id)
@@ -252,7 +254,7 @@ async function main() {
     assert.equal(context.isLogin, false)
     assert.equal(app.browser.localStorage.getItem('tzuchi-lms-login'), null)
     assert.equal(legacyStorage.getItem('tzuchi-lms-login'), savedProfile)
-    app.checks[0].resolve({ success: true }); await flush()
+    app.checks[0].resolve({ success: true, data: sessionData }); await flush()
     assert.equal(app.render().isLogin, true)
     assert.equal(app.browser.localStorage.getItem('tzuchi-lms-login'), savedProfile)
     assert.equal(legacyStorage.getItem('tzuchi-lms-login'), null)
@@ -284,7 +286,7 @@ async function main() {
     }
 
     app = mount(false, { protocol: 'http:' }); context = app.render()
-    await context.login({ user: storedUser, remember: true })
+    await context.login({ user: { ...storedUser, ...sessionData }, remember: true })
     assert.equal(JSON.parse(app.browser.localStorage.getItem('tzuchi-lms-login')).remember, true)
     const httpMarker = app.cookies.writes.findLast(value => /^tzuchi_lms_session=1(?:;|$)/.test(value))
     assert(httpMarker && !/secure/i.test(httpMarker))
@@ -297,7 +299,7 @@ async function main() {
     assert.equal(context.isLogin, false, 'A remembered profile still requires API validation')
     assert.deepEqual(context.user, {})
     assert.equal(app.checks.length, 1)
-    app.checks[0].resolve({ success: true }); await flush()
+    app.checks[0].resolve({ success: true, data: sessionData }); await flush()
     context = app.render()
     assert.equal(context.isLogin, true)
     assert.equal(context.user.id, storedUser.id)
@@ -305,7 +307,7 @@ async function main() {
     assert.deepEqual(app.modurls, [])
 
     // A fresh opt-out login overwrites a previously remembered profile.
-    await context.login({ user: storedUser, remember: false })
+    await context.login({ user: { ...storedUser, ...sessionData }, remember: false })
     assert.equal(JSON.parse(rememberedStorage.getItem('tzuchi-lms-login')).remember, false)
     app.unmount()
     app = mount(false, { localStorage: rememberedStorage })
@@ -333,7 +335,7 @@ async function main() {
             assert.equal(context.sessionStatus, 'error')
             assert.equal(JSON.parse(persistent.getItem('tzuchi-lms-login')).remember, true)
             const revalidate = context.retrySession()
-            app.checks[1].resolve({ success: true }); await revalidate
+            app.checks[1].resolve({ success: true, data: sessionData }); await revalidate
             assert.equal(app.render().isLogin, true)
             await app.render().logout()
             assert.equal(persistent.getItem('tzuchi-lms-login'), null)
@@ -343,7 +345,7 @@ async function main() {
     }
 
     app = mount(true); app.render()
-    app.checks[0].resolve({ success: true }); await flush()
+    app.checks[0].resolve({ success: true, data: sessionData }); await flush()
     assert.equal(app.render().isLogin, true)
     const replacementProfile = JSON.stringify({ isLogin: true, user: { id: 'other-tab', name: 'Other tab user' } })
     app.browser.localStorage.setItem('tzuchi-lms-login', replacementProfile)
@@ -356,7 +358,7 @@ async function main() {
     assert.equal(context.sessionStatus, 'checking')
     assert.equal(context.isLogin, false)
     assert.equal(app.checks.length, 2)
-    app.checks[1].resolve({ success: true }); await flush()
+    app.checks[1].resolve({ success: true, data: sessionData }); await flush()
     assert.equal(app.render().user.id, 'other-tab')
     app.browser.localStorage.removeItem('tzuchi-lms-login')
     app.emitStorage({ key: 'tzuchi-lms-login', oldValue: replacementProfile, newValue: null })
@@ -373,7 +375,7 @@ async function main() {
     app.browser.localStorage.removeItem('tzuchi-lms-login')
     app.emitStorage({ key: null, newValue: null })
     assert.equal(app.checks[0].signal.aborted, true)
-    app.checks[0].resolve({ success: true }); await flush()
+    app.checks[0].resolve({ success: true, data: sessionData }); await flush()
     assert.equal(app.render().isLogin, false)
     assert.equal(app.browser.localStorage.getItem('tzuchi-lms-login'), null)
     assert.equal(app.logoutCalls, 0)
@@ -384,14 +386,14 @@ async function main() {
     app.emitStorage({ key: 'tzuchi-lms-login', newValue: null })
     assert.equal(app.browser.localStorage.getItem('tzuchi-lms-login'), replacementProfile)
     assert.equal(app.checks.length, 2)
-    app.checks[1].resolve({ success: true }); await flush()
+    app.checks[1].resolve({ success: true, data: sessionData }); await flush()
     assert.equal(app.render().user.id, 'other-tab')
 
     // A page restored from Back/Forward cache must verify its Session before
     // exposing the saved user, while a normal pageshow must not duplicate it.
     for (const expired of [false, true]) {
         app = mount(true); app.render()
-        app.checks[0].resolve({ success: true }); await flush()
+        app.checks[0].resolve({ success: true, data: sessionData }); await flush()
         assert.equal(app.render().isLogin, true)
         app.emitPageShow(false)
         assert.equal(app.checks.length, 1)
@@ -403,7 +405,7 @@ async function main() {
         assert.equal(context.isLogin, false)
         assert.deepEqual(context.user, {})
         if (expired) app.checks[1].reject(Object.assign(new Error('Expired'), { status: 401 }))
-        else app.checks[1].resolve({ success: true })
+        else app.checks[1].resolve({ success: true, data: sessionData })
         await flush()
         context = app.render()
         assert.equal(context.isLogin, !expired)
@@ -424,16 +426,103 @@ async function main() {
         assert.equal(app.checks.length, checkCount, 'Unmount must remove the pageshow listener')
     }
 
+    {
+        const missingKey = mount(true)
+        missingKey.render()
+        missingKey.checks[0].resolve({ success: true, data: {} })
+        await flush()
+        assert.equal(missingKey.render().isLogin, false)
+        await assert.rejects(missingKey.render().login({ user: storedUser }), { status: 401 })
+        missingKey.unmount()
+    }
+
     const LoginContext = React.createContext({})
+    {
+        const restored = mount(true)
+        restored.render()
+        restored.checks[0].resolve({
+            success: true,
+            data: { id: storedUser.id, name: 'Restored user', changepassword: 'Y', userkey: 'restored-key', modurl: 'https://moodle.example/restore' }
+        })
+        await flush()
+        assert.equal(restored.render().user.changepassword, 'Y')
+        assert.equal(restored.render().user.name, 'Restored user')
+        assert.equal(restored.render().user.userkey, 'restored-key')
+        assert(!restored.browser.localStorage.getItem('tzuchi-lms-login').includes('restored-key'))
+        assert.deepEqual(restored.modurls, ['https://moodle.example/restore'])
+        restored.render().markPasswordChanged(storedUser.id)
+        assert.equal(restored.render().user.changepassword, 'N')
+        assert.equal(restored.render().user.userkey, 'restored-key')
+        restored.unmount()
+
+        const { adaptLoginUser } = load('src/adapters/authAdapter.js')
+        const user = adaptLoginUser({ ...storedUser, changepassword: 'Y' }, 'account')
+        assert.equal(user.changepassword, 'Y')
+        const reminderUser = { ...user }
+        let pathname = '/'
+        const Reminder = load('src/components/PasswordReminder.js', {
+            'contexts/LoginProvider': { LoginContext },
+            'api/auth': {},
+            'react-router-dom': {
+                Link: ({ to, children }) => React.createElement('a', { href: to }, children),
+                useLocation: () => ({ pathname })
+            }
+        }).default
+        const renderReminder = (isLogin = true) => renderToStaticMarkup(React.createElement(
+            LoginContext.Provider, { value: { isLogin, user: reminderUser } }, React.createElement(Reminder)
+        ))
+        assert(renderReminder().includes('使用舊密碼'))
+        assert(renderReminder().includes('href="/change-password"'))
+        assert.equal(renderReminder(false), '')
+        pathname = '/change-password'
+        assert.equal(renderReminder(), '')
+        pathname = '/'
+        reminderUser.changepassword = 'N'
+        assert.equal(renderReminder(), '')
+
+        let requests = 0, refreshes = 0, resolveRequest
+        const reminderState = {
+            isLogin: true,
+            user: { ...storedUser, account: 'login-account', userkey: 'session-key', changepassword: 'Y' },
+            retrySession: async () => { refreshes++; reminderState.user.changepassword = 'N' }
+        }
+        const InteractiveReminder = load('src/components/PasswordReminder.js', {
+            react: {
+                ...React, useContext: () => reminderState, useEffect: () => {},
+                useRef: value => ({ current: value }), useId: () => 'reminder', useState: initial => [initial, () => {}]
+            },
+            'api/auth': {
+                keepPassword: (payload, signal) => {
+                    requests++
+                    assert.deepEqual(payload, { uid: storedUser.id, userkey: 'session-key' })
+                    assert.equal(signal.aborted, false)
+                    return new Promise(resolve => { resolveRequest = resolve })
+                }
+            },
+            'contexts/LoginProvider': { LoginContext },
+            'react-router-dom': { Link: 'a', useLocation: () => ({ pathname: '/' }) }
+        }).default
+        const reminder = InteractiveReminder()
+        const dialog = reminder.type(reminder.props)
+        const actions = React.Children.toArray(dialog.props.children).at(-1)
+        const keep = React.Children.toArray(actions.props.children).at(-1).props.onClick
+        const pending = keep()
+        await keep()
+        assert.equal(requests, 1)
+        assert.equal(refreshes, 0)
+        resolveRequest({ success: true })
+        await pending
+        assert.equal(refreshes, 1)
+        assert.equal(InteractiveReminder(), null)
+    }
     const LoginSection = load('src/views/home/LoginSection.js', {
-        'components/Spinner': load('src/components/Spinner.js').default,
         'contexts/LoginProvider': { LoginContext },
         'adapters/authAdapter': load('src/adapters/authAdapter.js'),
         'api/auth': { login: async () => ({ success: true }) }
     }).default
     let html = renderToStaticMarkup(React.createElement(LoginContext.Provider,
         { value: { sessionStatus: 'checking' } }, React.createElement(LoginSection)))
-    assert(!html.includes('正在確認登入狀態') && html.includes('role="status"') && html.includes('loading-animate'))
+    assert(html.includes('正在確認登入狀態…') && html.includes('role="status"') && !html.includes('loading-animate'))
     assert(html.includes('aria-busy="true"') && html.includes('type="submit" disabled=""'))
     const rememberInput = html.match(/<input\b[^>]*\bname="remember"[^>]*>/)?.[0]
     assert(rememberInput && html.includes('保持登入'))
@@ -461,7 +550,6 @@ async function main() {
         for (const remember of [false, true]) {
             let submitted, loginArguments
             const Form = load('src/views/home/LoginSection.js', {
-                'components/Spinner': load('src/components/Spinner.js').default,
                 react: {
                     ...React, useId: () => 'login-test', useContext: () => ({ sessionStatus: 'idle' }), useEffect: () => {},
                     useState: initial => [initial, () => {}]

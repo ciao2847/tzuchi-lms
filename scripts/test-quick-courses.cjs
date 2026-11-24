@@ -28,11 +28,11 @@ global.fetch = async (url, options) => {
 }
 ;(async () => {
     const controller = new AbortController()
-    const result = await api.getQuickCourses({ branch: 'dl', keyword: '抗生素 報告', pagesize: 999 }, controller.signal)
+    const result = await api.getQuickCourses({ branch: 'dl', keyword: '抗生素 報告', pagesize: 999 }, controller.signal, 'session-key')
     assert(request.url.endsWith('/course/quick'))
     assert.equal(request.method, 'POST')
     assert.equal(request.credentials, 'include')
-    assert.equal(request.headers['X-API-Key'], constants.AUTH_API_KEY)
+    assert.equal(request.headers['X-API-Key'], 'session-key')
     assert.equal(request.signal, controller.signal)
     assert.deepEqual(JSON.parse(request.body), { oldcourse: 0, branch: 'dl', category: '', type: 'all', program: 'all', keyword: '抗生素 報告', page: 1, pagesize: 500 })
     assert.equal(result.total, 737)
@@ -41,34 +41,38 @@ global.fetch = async (url, options) => {
     assert.equal(result.courses[0].isSelected, true)
     assert.match(result.courses[0].date, /^\d{4}-\d{2}-\d{2}$/)
     response = { success: true, data: { total: 0, courselist: [] } }
-    assert.deepEqual((await api.getQuickCourses()).courses, [])
+    assert.deepEqual((await api.getQuickCourses(undefined, undefined, 'session-key')).courses, [])
     assert.equal(JSON.parse(request.body).pagesize, 20)
     response = { success: true, data: {} }
-    await assert.rejects(api.getQuickCourses(), /回應格式異常/)
+    await assert.rejects(api.getQuickCourses(undefined, undefined, 'session-key'), /回應格式異常/)
     response = { success: false, error: { code: 'SESSION_EXPIRED' } }
-    await assert.rejects(api.getQuickCourses(), error => error.status === 401)
+    await assert.rejects(api.getQuickCourses(undefined, undefined, 'session-key'), error => error.status === 401)
     response = { success: true, data: [
         { id: '1', branch: 'dl', name: '晨間人文' },
         { id: '399', branch: 'hl', name: '衛生醫療法規 > 人工協助生殖管理辦法' }
     ] }
-    assert.deepEqual(await api.getCourseCategories(controller.signal), response.data)
+    assert.deepEqual(await api.getCourseCategories(controller.signal, 'session-key'), response.data)
     assert(request.url.endsWith('/course/category'))
     assert.equal(request.method, 'GET')
     assert.equal(request.body, undefined)
     assert.equal(request.credentials, 'include')
-    assert.equal(request.headers['X-API-Key'], constants.AUTH_API_KEY)
+    assert.equal(request.headers['X-API-Key'], 'session-key')
     assert.equal(request.signal, controller.signal)
     response = { success: true, data: [] }
-    assert.deepEqual(await api.getCourseCategories(), [])
+    assert.deepEqual(await api.getCourseCategories(undefined, 'session-key'), [])
     for (const data of [{}, [null], [{ id: '1', branch: 'dl' }]]) {
         response = { success: true, data }
-        await assert.rejects(api.getCourseCategories(), error => error.status === 502)
+        await assert.rejects(api.getCourseCategories(undefined, 'session-key'), error => error.status === 502)
     }
     response = { success: false, error: { code: 'SESSION_EXPIRED' } }
-    await assert.rejects(api.getCourseCategories(), error => error.status === 401)
+    await assert.rejects(api.getCourseCategories(undefined, 'session-key'), error => error.status === 401)
     const Results = load('src/components/pick/Results.js', {
         'components/I18N': ({ children }) => children,
-        'components/Link': load('src/components/Link.js').default
+        'components/AutoSwitchLink': load('src/components/AutoSwitchLink.js', {
+            'components/Link': load('src/components/Link.js').default,
+            hooks: { useLocale: () => 'zh-tw' },
+            'components/I18N': { translate: value => value }
+        }).default
     }).default
     const courses = [
         { id: '85453', title: '抗生素報告', programs: [] },

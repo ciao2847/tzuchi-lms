@@ -1,5 +1,6 @@
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import React from 'react'
-import { Link, useParams, useLocation } from 'react-router-dom'
+import { useParams, useLocation } from 'react-router-dom'
 import ThumbFrame from 'components/ThumbFrame'
 import BtnCollection from 'components/BtnCollection'
 
@@ -20,9 +21,9 @@ const PhotoCard = ({ data }) => {
 
 	return (
 		<div className="w-full relative">
-			<Link
+			<AutoSwitchLink
 				className="block w-full relative hover:shadow-lg rounded transition-all duration-300"
-				to={`${urlPrefix}${id}`}
+				href={`${urlPrefix}${id}`}
 			>
 				<ThumbFrame
 					src={src}
@@ -30,7 +31,7 @@ const PhotoCard = ({ data }) => {
 					ratio="1by1"
 					isRounded={true}
 				/>
-			</Link>
+			</AutoSwitchLink>
 			<BtnCollection className="m-[4px] absolute top-0 right-0" data={id} />
 		</div>
 	)

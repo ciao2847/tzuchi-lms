@@ -1,3 +1,4 @@
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import React, { useState, useRef } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import Captcha from 'components/Captcha'
@@ -141,16 +142,16 @@ const SchemaForm = ({ data, children, onSubmit, className }) => {
                                 >
                                     <div>
                                         我已詳閱「
-                                        <a
+                                        <AutoSwitchLink
                                             className="inline-block text-primary underline underline-offset-2 transition-colors hover:text-main focus-visible:text-main"
                                             href="/zh-tw/privacy"
-                                            target="_blank"
+                                            isLinkOut
                                             rel="noopener noreferrer"
                                             title="隱私權政策及個人資料使用宣告(另開視窗)"
                                         >
                                             隱私權政策及個人資料使用宣告
                                             <span className="sr-only">（另開視窗）</span>
-                                        </a>
+                                        </AutoSwitchLink>
                                         」文件內容，並完全同意其中各項規定
                                     </div>
                                 </label>

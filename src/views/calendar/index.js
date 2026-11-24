@@ -10,7 +10,7 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/react/daygrid'
 import classicThemePlugin from '@fullcalendar/react/themes/classic'
 import I18N from 'components/I18N'
-import Link from 'components/Link'
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import NotificationDetailDialog from 'components/NotificationDetailDialog'
 import Select from 'components/Select'
 import TitleBlk from 'components/TitleBlk'
@@ -265,12 +265,12 @@ export const ProgressCourseList = ({ courses, emptyText, showStatus = false }) =
                         </>
                     )}
                     {type && <span className="mr-1">【{type}】</span>}
-                    {!id || ["morning", "other", "[morning]", "[other]"].includes(status.trim().toLowerCase()) ? <span>{title}</span> : <Link
+                    {!id || ["morning", "other", "[morning]", "[other]"].includes(status.trim().toLowerCase()) ? <span>{title}</span> : <AutoSwitchLink
                         href={`/course/${encodeURIComponent(id)}`}
                         className="font-semibold text-secondary underline decoration-transparent underline-offset-2 hover:decoration-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary"
                     >
                         {title}
-                    </Link>}
+                    </AutoSwitchLink>}
                 </li>
             ))}
         </ul>
@@ -509,7 +509,7 @@ export const ProgramDetails = ({ programId }) => {
     useEffect(() => {
         const controller = new AbortController()
         setResult({ status: 'loading', programId, owner: user.id })
-        getProgramInfo(programId, controller.signal).then(data => {
+        getProgramInfo(programId, controller.signal, user.userkey).then(data => {
             if (!controller.signal.aborted) setResult({ status: 'success', data, programId, owner: user.id })
         }).catch(error => {
             if (controller.signal.aborted) return
@@ -522,13 +522,13 @@ export const ProgramDetails = ({ programId }) => {
                 ? '無法連線至學程服務，請確認網路後重試。' : error.message })
         })
         return () => controller.abort()
-    }, [programId, user.id, expireSession, revision])
+    }, [programId, user.id, user.userkey, expireSession, revision])
     if (result.programId !== programId || result.owner !== user.id || result.status === 'loading') return (
         <div role="status" aria-busy="true" className="flex h-[480px] items-center justify-center p-4 md:h-[640px]">
             <span aria-hidden="true"><Spinner size={12} color="#093a7b" /></span>
         </div>
     )
-    if (result.status === 'expired') return <p role="alert" className="min-h-[480px] p-4 md:min-h-[640px]"><Link href="/#login">登入時效已過期或尚未登入，請重新登入。</Link></p>
+    if (result.status === 'expired') return <p role="alert" className="min-h-[480px] p-4 md:min-h-[640px]"><AutoSwitchLink href="/#login">登入時效已過期或尚未登入，請重新登入。</AutoSwitchLink></p>
     if (result.status === 'error') return <div role="alert" className="min-h-[480px] p-4 md:min-h-[640px]">
         <p>{result.error}</p>
         <button type="button" className="mt-2 text-secondary underline" onClick={() => setRevision(value => value + 1)}>重新載入</button>

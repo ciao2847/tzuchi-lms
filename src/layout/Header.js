@@ -1,5 +1,5 @@
 import I18N from 'components/I18N'
-import Link from 'components/Link'
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import React, { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
@@ -39,7 +39,7 @@ const Header = () => {
             >
                 <div className="header flex h-full w-full items-center justify-between px-5 md:px-10">
                     <MainComp className="mr-auto z-10 relative shrink-0">
-                        <Link
+                        <AutoSwitchLink
                             className="main-logo block h-12 w-[176px] bg-contain bg-center bg-no-repeat md:h-16 md:w-[235px]"
                             href="/"
                             style={{
@@ -49,7 +49,7 @@ const Header = () => {
                             <div className="sr-only">
                                 <I18N>慈濟醫療志業學習網</I18N>
                             </div>
-                        </Link>
+                        </AutoSwitchLink>
                     </MainComp>
 
                     <MobileNotifications />

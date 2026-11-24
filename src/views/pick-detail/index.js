@@ -1,3 +1,4 @@
+import AutoSwitchLink from 'components/AutoSwitchLink'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import I18N from 'components/I18N'
@@ -40,15 +41,15 @@ const RegisterButton = ({ className = '', href, label }) => {
     const buttonClass = `${className} inline-flex h-11 w-full items-center justify-center rounded-[6px] bg-main px-6 text-[14px] font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:h-12 md:text-[15px] xl:text-[17px]`
 
     return href ? (
-        <a
+        <AutoSwitchLink
             href={href}
-            target="_blank"
+            isLinkOut
             rel="noopener noreferrer"
             className={buttonClass}
             aria-label={`${label}（另開視窗）`}
         >
             <I18N>{label}</I18N>
-        </a>
+        </AutoSwitchLink>
     ) : (
         <button type="button" disabled className={buttonClass}>
             <I18N>{label}</I18N>
@@ -59,8 +60,8 @@ const RegisterButton = ({ className = '', href, label }) => {
 export const RegistrationDetail = ({ course }) => {
     const fixedRegisterBarRef = useRef(null)
     const {
-        id, coursename: title, category, program, teacher, student, length,
-        startdate, starthh, startmm, enddate, endhh, endmm, classroomother,
+        moodle_courseid: moodleCourseId, coursename: title, category, program, teacher, student, length,
+        startdate, starthh, startmm, enddate, endhh, endmm, classroom,
         completion, contacter, signUpCheck, registerdate, outline, introduction, purpose, ps,
         year, type, limit
     } = course
@@ -71,13 +72,17 @@ export const RegistrationDetail = ({ course }) => {
     const duration = length != null ? `${length} 分鐘` : '—'
     const time = (date, hh, mm) => date ? `${date}${hh != null && mm != null ? ` ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}` : ''}` : '—'
     const date = `${time(startdate, starthh, startmm)} ～ ${time(enddate, endhh, endmm)}`
-    const location = classroomother || '—'
+    const location = String(classroom ?? '').trim() || '—'
     const rule = Array.isArray(completion) ? completion.join('、') || '—' : '—'
     const contact = contacter || '—'
     const check = signUpCheck || {}
     const canRegister = check.enterCourse === true || check.canRegister === true
     const actionLabel = check.enterCourse === true ? '進入課程' : '我要報名'
-    const registerUrl = canRegister ? `https://nlms.tzuchi.com.tw/tzuchi/edurd/register_course/course_opration.php?id=${encodeURIComponent(id)}` : null
+    const moodleUrl = typeof check.typeMes?.moodleUrl === 'string' ? check.typeMes.moodleUrl.trim() : ''
+    const courseId = String(moodleCourseId ?? '').trim()
+    const registerUrl = check.enterCourse === true
+        ? (/^[1-9][0-9]*$/.test(courseId) ? `http://10.2.10.236:8064/tzuchi/lms2/course/view.php?id=${courseId}` : null)
+        : check.canRegister === true && /^https?:\/\//i.test(moodleUrl) ? moodleUrl : null
     const registrationMessage = typeof check.message?.register === 'string' ? check.message.register : ''
 
     useEffect(() => {
@@ -303,7 +308,7 @@ const Page = () => {
         if (!isLogin) return undefined
         const controller = new AbortController()
         setResult({ status: 'loading', id, owner: user.id })
-        getCourseInfo(id, controller.signal).then(course => {
+        getCourseInfo(id, controller.signal, user.userkey).then(course => {
             if (!controller.signal.aborted) setResult({ status: 'success', course, id, owner: user.id })
         }).catch(error => {
             if (controller.signal.aborted) return
@@ -311,7 +316,7 @@ const Page = () => {
             setResult({ status: 'error', id, owner: user.id, message: error instanceof TypeError ? '無法連線至課程資訊服務。' : error.message })
         })
         return () => controller.abort()
-    }, [id, isLogin, user.id, expireSession, revision])
+    }, [id, isLogin, user.id, user.userkey, expireSession, revision])
     if (!isLogin) return <div className="pt-[var(--header-height)]"><DashboardStatus /></div>
     if (result.id !== id || result.owner !== user.id || result.status === 'loading') return <div className="flex flex-1 items-center justify-center pt-[var(--header-height)]"><Spinner block /></div>
     if (result.status === 'error') return <div role="alert" className="min-h-[50vh] px-4 pt-[calc(var(--header-height)+24px)] text-primary"><p>{result.message}</p><button type="button" className="mt-3 underline" onClick={() => setRevision(value => value + 1)}>重新載入</button></div>

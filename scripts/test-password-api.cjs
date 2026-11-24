@@ -22,31 +22,44 @@ async function main() {
         return { ok: status === 200, status, json: async () => response }
     }
     const signal = new AbortController().signal
-    await api.forgetPassword({ uid: ' TEST ' }, signal)
-    await api.changePassword({ uid: ' TEST ', oldpwd: ' old1 ', newpwd: ' new2 ' }, signal)
-    assert.equal(requests[0].url, '/api/course/forgetPassword')
-    assert.equal(requests[1].url, '/api/course/changePassword')
+    await api.forgetPassword({ uid: ' TEST ', userkey: 'session-key' }, signal)
+    await api.changePassword({ uid: ' TEST ', oldpwd: ' old1 ', newpwd: ' new2 ', userkey: 'session-key' }, signal)
+    await api.keepPassword({ uid: ' TEST ', userkey: 'session-key' }, signal)
+    assert.equal(requests[0].url, '/api/forgetPassword')
+    assert.equal(requests[1].url, '/api/changePassword')
+    assert.equal(requests[2].url, '/api/keepPassword')
     assert.deepEqual(JSON.parse(requests[0].body), { uid: 'TEST' })
     assert.deepEqual(JSON.parse(requests[1].body), { uid: 'TEST', oldpwd: ' old1 ', newpwd: ' new2 ' })
+    assert.deepEqual(JSON.parse(requests[2].body), { uid: 'TEST' })
     for (const request of requests) {
         assert.equal(request.method, 'POST')
         assert.equal(request.credentials, 'include')
         assert.equal(request.cache, 'no-store')
-        assert.equal(request.headers['X-API-Key'], 'test-key')
+        assert.equal(request.headers['X-API-Key'], 'session-key')
+        assert.equal(request.headers['Content-Type'], 'application/json')
         assert.equal(request.signal, signal)
     }
+    await assert.rejects(api.changePassword({ uid: 'TEST' }), { status: 401 })
+    await assert.rejects(api.keepPassword({ uid: 'TEST' }), { status: 401 })
+    await assert.rejects(api.forgetPassword({ uid: 'TEST' }), { status: 401 })
+    assert.equal(requests.length, 3)
     for (const code of ['DATA_EMPTY', 'LDAP_PWD_CHANGE_ERROR', 'PWD_CHANGE_ERROR', 'SESSION_USER_ERROR', 'SESSION_EXPIRED']) {
-        response = { success: false, error: { code, fields: {} } }
+        response = { success: false, error: { code, message: code === 'DATA_EMPTY' ? '無資料' : undefined, fields: {} } }
         for (status of [200, 403]) {
-            await assert.rejects(api.forgetPassword({ uid: 'TEST' }), error => error.code === code && !error.message.includes('HTTP') && (code !== 'SESSION_EXPIRED' || error.status === 401))
+            const request = code === 'DATA_EMPTY'
+                ? api.forgetPassword({ uid: 'TEST', userkey: 'session-key' })
+                : api.changePassword({ uid: 'TEST', oldpwd: 'old1', newpwd: 'new2', userkey: 'session-key' })
+            await assert.rejects(request, error => error.code === code && !error.message.includes('HTTP') && (code !== 'SESSION_EXPIRED' || error.status === 401) && (status !== 403 || code === 'SESSION_EXPIRED' || error.status === 403))
         }
     }
     let calls = 0, resolveRequest, resets = 0
     const state = []
+    let isLogin = false
     const Page = load('src/views/forgot-password/index.js', {
-        react: { ...React, useId: () => 'test', useRef: value => ({ current: value }), useState: value => [value, next => state.push(next)] },
-        'api/auth': { forgetPassword: payload => { calls++; assert.deepEqual(payload, { uid: 'TEST' }); return new Promise(resolve => { resolveRequest = resolve }) } },
-        'components/Link': () => null
+        react: { ...React, useContext: () => ({ isLogin, user: isLogin ? { userkey: 'session-key' } : {} }), useId: () => 'test', useRef: value => ({ current: value }), useState: value => [value, next => state.push(next)] },
+        'api/auth': { forgetPassword: payload => { calls++; assert.deepEqual(payload, { uid: 'TEST', userkey: 'session-key' }); return new Promise(resolve => { resolveRequest = resolve }) } },
+        'contexts/LoginProvider': { LoginContext: {} },
+        'components/AutoSwitchLink': () => null
     }).default
     function find(node) {
         if (!React.isValidElement(node)) return null
@@ -54,7 +67,13 @@ async function main() {
         for (const child of React.Children.toArray(node.props.children)) { const result = find(child); if (result) return result }
         return null
     }
-    const submit = find(Page()).props.onSubmit
+    assert.equal(find(Page()), null)
+    isLogin = true
+    const form = find(Page())
+    const html = require('react-dom/server').renderToStaticMarkup(form)
+    assert.equal((html.match(/<input\b/g) || []).length, 1)
+    assert(!/captcha|加總|總和/i.test(html))
+    const submit = form.props.onSubmit
     const originalFormData = global.FormData
     global.FormData = class { get() { return ' TEST ' } }
     try {

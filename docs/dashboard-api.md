@@ -6,7 +6,7 @@
 大綱、簡介、目的、備註、日期、時長、完成規範、聯絡人、報名截止日及報名人數。
 大綱、簡介、目的、備註沿用原版文字樣式，在頁面中依內容自動增高；將 HTML 清單、
 段落與換行等內容標籤轉成 React 元素，不複製 API 的屬性、樣式或網址，不使用 iframe。
-`classroom` 是代碼，尚無名稱對照；只顯示 `classroomother`，缺少時顯示「—」。
+上課地點顯示 API 回傳的 `classroom`，缺少時顯示「—」。
 `signUpCheck.enterCourse === true` 顯示進入課程，否則依 `canRegister === true` 顯示我要報名，
 兩者皆否則停用按鈕並顯示 API 訊息。桌機及手機操作一致。
 API 尚未提供報名操作端點與進入課程網址，按鈕沿用原 NLMS `course_opration.php?id=` 頁，
@@ -85,7 +85,7 @@ Session 標記不設定 `Max-Age`／`Expires`；瀏覽器的 Session 還原功�
 [MDN：Session Cookie 生命週期](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies)
 專案首頁以外的所有路由都由 `RequireLogin` 保護，包括直接開啟網址、課程詳細頁、
 外訓資料、功能選單頁、404 及未知路徑。未登入或 Session 驗證失敗時使用 replace 導向
-`/#login`（由 Router 套用部署的 `/tzuchi/react` 基底路徑）；驗證中只顯示登入確認提示，
+`/#login`（由 Router 套用部署的 `/tzuchi/elearning` 基底路徑）；驗證中只顯示登入確認提示，
 受保護頁面不會掛載或顯示資料欄位。登入區會捲入畫面並聚焦帳號欄。
 API 401、跨分頁登出後同樣會導回首頁；瀏覽器快取還原頁面時重新確認 Session。
 外部網址依原連結正常開啟，未加入登入攔截。驗證可執行 `node scripts/test-route-auth.cjs`。
@@ -95,7 +95,7 @@ API 401、跨分頁登出後同樣會導回首頁；瀏覽器快取還原頁面�
 
 本機執行 `npm run dev`，`/tzuchi-api` 由 webpack 代理到內網 API，讓瀏覽器共用
 同來源 Cookie。修改 webpack 設定後需重新啟動開發伺服器。正式版使用內網完整網址，
-建議部署在與 API 相同來源的 `/tzuchi/react/`。
+建議部署在與 API 相同來源的 `/tzuchi/elearning/`。
 
 驗證：`node scripts/test-dashboard.cjs`；production build 使用
 `npx cross-env NODE_ENV=production webpack --config config/webpack.prod.babel.js`。
