@@ -7,10 +7,12 @@ import LearningSummarySection from './LearningSummarySection'
 import AnnouncementSection from './AnnouncementSection'
 import FeaturedVideoSection from './FeaturedVideoSection'
 import CategoryVideoSection from './CategoryVideoSection'
+import useSdmVideos from 'api/useSdmVideos'
 
 const Page = () => {
     const navigate = useNavigate()
     const { isLogin, login, user } = useContext(LoginContext)
+    const { videos, status: sdmStatus } = useSdmVideos()
 
     return (
         <div className="bg-light pt-[var(--header-height)]">
@@ -36,7 +38,7 @@ const Page = () => {
                 </div>
             </section>
             <EntranceSection />
-            <FeaturedVideoSection />
+            <FeaturedVideoSection videos={videos} status={sdmStatus} />
             <CategoryVideoSection />
         </div>
     )

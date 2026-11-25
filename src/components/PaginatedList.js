@@ -38,6 +38,7 @@ const PaginatedList = ({
     emptyClassName = 'py-10 text-center text-[18px] text-info',
     resetKey = '',
     className = '',
+    pageSizeOptions = PAGE_SIZE_OPTIONS,
     pagination
 }) => {
     const pageSizeId = useId()
@@ -152,7 +153,7 @@ const PaginatedList = ({
                     <Select
                         id={pageSizeId}
                         value={String(normalizedPageSize)}
-                        wrapperClassName="w-[88px]"
+                        wrapperClassName="page-size-select w-[88px]"
                         className="h-9 px-2 text-[12px] md:h-10 md:text-[14px]"
                         onChange={({ target: { value } }) => {
                             if (pagination) { pagination.onPageSizeChange(Number(value)); return }
@@ -160,7 +161,7 @@ const PaginatedList = ({
                             setPage(1)
                         }}
                     >
-                        {PAGE_SIZE_OPTIONS.map((size) => (
+                        {pageSizeOptions.map((size) => (
                             <option key={size} value={size}>
                                 {size}筆
                             </option>

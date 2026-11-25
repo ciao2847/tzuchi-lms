@@ -67,6 +67,11 @@ export default merge(common, {
 
         proxy: [
             {
+                context: ['/tzuchi/sdm.json'],
+                target: 'http://10.2.10.236:8064',
+                changeOrigin: true
+            },
+            {
                 context: ['/tzuchi-api'],
                 target: 'http://10.2.10.236:8064',
                 pathRewrite: { '^/tzuchi-api': '/tzuchi/api' },

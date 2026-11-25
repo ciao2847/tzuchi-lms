@@ -46,17 +46,17 @@ const ReminderDialog = ({ user, retrySession, expireSession }) => {
             aria-labelledby={titleId}
             aria-describedby={descriptionId}
             onCancel={event => event.preventDefault()}
-            className="m-auto w-[min(92vw,480px)] rounded-xl bg-white p-6 text-primary shadow-xl backdrop:bg-black/40"
+            className="m-auto max-h-[90dvh] w-[min(92vw,480px)] overflow-y-auto rounded-xl bg-white p-6 text-primary shadow-xl backdrop:bg-black/40"
         >
-            <h2 id={titleId} className="text-lg font-bold">親愛的使用者您好</h2>
-            <p id={descriptionId} className="mt-3 text-sm leading-6">
-                基於保護您的資訊安全，建議定期六個月更新使用者密碼，
-                來維護您在「慈濟醫療志業學習網」上的學習資料，感恩 !!
-            </p>
+            <h2 id={titleId} className="text-lg font-bold">親愛的使用者您好：</h2>
+            <div id={descriptionId} className="mt-3 space-y-1 text-sm leading-6">
+                <p>基於保護您的資訊安全，建議定期六個月更新使用者密碼</p>
+                <p>來維護您在「慈濟醫療志業學習網」上的學習資料，感恩 !!</p>
+            </div>
             {error && (
                 <p role="alert" className="mt-3 text-sm text-danger">{error}</p>
             )}
-            <div className="mt-5 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-3 border-t border-solid border-gray-200 pt-4">
                 <Link to="/change-password" className="rounded bg-main px-4 py-2 text-sm font-bold text-white">
                     修改密碼
                 </Link>

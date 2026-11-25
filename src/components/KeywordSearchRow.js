@@ -14,6 +14,7 @@ const KeywordSearchRow = ({
     value
 }) => (
     <div
+        data-desktop-search={desktopSearch || undefined}
         className={`grid gap-2 ${inline ? 'grid-cols-[minmax(0,1fr)_auto] items-center' : 'md:gap-3 xl:grid-cols-[minmax(0,1fr)_280px] xl:items-end xl:gap-6'} ${desktopSearch ? 'xl:[&_label>span]:text-[12px] xl:[&_label>span]:font-normal xl:[&_label>span]:leading-4 xl:[&_input]:h-[42px] xl:[&_input]:rounded-[8px] xl:[&_input]:text-[13px] xl:[&_input]:placeholder:text-[#708399] xl:[&_button]:h-[42px] xl:[&_button]:rounded-[8px] xl:[&_button]:text-[13px] xl:[&_button[type=submit]]:bg-[#ff7938] xl:[&_button[type=submit]:hover]:bg-secondary xl:[&_button[type=button]]:px-6 xl:[&>div]:gap-3' : ''} ${className}`}
     >
         <label className="block min-w-0" htmlFor={id}>
@@ -31,13 +32,13 @@ const KeywordSearchRow = ({
                 }
             />
         </label>
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
+        <div className="keyword-search-actions grid grid-cols-[minmax(0,1fr)_auto] gap-2">
             <button
                 type="submit"
                 className={`${rounded ? 'rounded-full' : 'rounded-[5px]'} ${inline ? 'h-[42px] whitespace-nowrap bg-[#fa7637] px-3 text-[13px] md:px-6' : 'h-8 bg-main px-3 text-[12px] md:h-10 md:px-5 md:text-[13px] xl:text-[15px]'} inline-flex w-full items-center justify-center gap-2 font-bold text-white transition-colors hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`}
             >
                 <i
-                    className="icon icon-search h-4 w-4 text-[14px]"
+                    className="icon icon-search h-4 w-4 shrink-0 text-[14px]"
                     aria-hidden="true"
                 />
                 <I18N>開始查詢</I18N>

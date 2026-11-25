@@ -112,11 +112,11 @@ const CalendarLegend = () => {
 }
 
 const CalendarControls = ({ calendarTitle, onMove }) => (
-    <div className="flex min-w-0 flex-1 flex-col items-center gap-1.5 md:flex-row md:justify-end md:gap-3">
+    <div className="flex min-w-0 flex-1 flex-col items-center gap-1.5 md:flex-[1_1_auto] md:flex-row md:flex-wrap md:justify-end md:gap-3">
         <h2 className="whitespace-nowrap text-[20px] font-bold leading-6 text-blue md:text-[23px] xl:text-[27px] xl:leading-8">
             {calendarTitle}
         </h2>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
             <button
                 type="button"
                 className="inline-flex h-7 w-11 items-center justify-center rounded-[4px] bg-primary text-white transition-colors hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary md:h-9 md:w-14"
@@ -135,7 +135,8 @@ const CalendarControls = ({ calendarTitle, onMove }) => (
             </button>
             <button
                 type="button"
-                className="inline-flex h-7 items-center justify-center rounded-[4px] bg-[#8995aa] px-3 text-[12px] font-bold text-white transition-colors hover:bg-[#6e7d95] focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary md:h-9 md:px-4 md:text-[12px] xl:text-[14px]"
+                data-single-line
+                className="inline-flex min-h-7 items-center justify-center rounded-[4px] bg-[#8995aa] px-3 py-1 text-[12px] font-bold text-white transition-colors hover:bg-[#6e7d95] focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary md:min-h-9 md:px-4 md:text-[12px] xl:text-[14px]"
                 onClick={() => onMove('today')}
             >
                 回到今天
@@ -167,7 +168,7 @@ const HistoryTabs = ({ activeTab, onChange }) => (
                         >
                             {icon}
                         </span>
-                        <span className="truncate">
+                        <span className="history-tab-label min-w-0 truncate" title={title}>
                             <I18N>{title}</I18N>
                         </span>
                     </button>
@@ -623,7 +624,7 @@ const Page = () => {
                     <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_330px] xl:items-start xl:gap-3">
                         <div className="min-w-0">
                             <section className="overflow-visible rounded-[8px] border border-solid border-[#dce5f0] bg-white px-2 pb-3 pt-2 [box-shadow:0_2px_14px_rgba(9,58,123,0.035)] md:px-4 md:pb-5 md:pt-4">
-                                <div className="flex items-start gap-2 px-1 md:items-center md:px-2">
+                                <div className="flex items-start gap-2 px-1 md:flex-wrap md:items-center md:px-2">
                                     <CalendarLegend />
                                     <CalendarControls
                                         calendarTitle={calendarTitle}

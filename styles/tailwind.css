@@ -3,6 +3,140 @@
 @tailwind components;
 @tailwind utilities;
 
+:root[data-text-size="150"] .entrance-title-default {
+    display: none;
+}
+
+:root[data-text-size="150"] .entrance-title-large {
+    display: inline;
+    white-space: nowrap;
+}
+
+#main-content [data-single-line] {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:root[data-text-size="125"] :is(#main-content, [data-scalable-menu], [data-scalable-notice]) {
+    --lms-text-scale: 1.25;
+}
+
+:root[data-text-size="150"] :is(#main-content, [data-scalable-menu], [data-scalable-notice]) {
+    --lms-text-scale: 1.5;
+}
+
+:root:is([data-text-size="125"], [data-text-size="150"]) #main-content {
+    --lms-min-line-height: 1.25em;
+    font-size: calc(1rem * var(--lms-text-scale));
+    overflow-wrap: anywhere;
+}
+
+:root:is([data-text-size="125"], [data-text-size="150"])
+:is(#main-content, [data-scalable-menu], [data-scalable-notice]) .icon {
+    --lms-text-scale: 1;
+    --lms-min-line-height: 0em;
+}
+
+:root:is([data-text-size="125"], [data-text-size="150"])
+:is([data-scalable-menu], [data-scalable-notice]) {
+    --lms-min-line-height: 1.25em;
+    overflow-wrap: anywhere;
+}
+
+:root:is([data-text-size="125"], [data-text-size="150"])
+:is(#mobile-main-navigation, [data-scalable-notice]) .truncate {
+    white-space: normal;
+}
+
+:root:is([data-text-size="125"], [data-text-size="150"]) .desktop-primary-nav-items {
+    width: max-content;
+    gap: 1rem;
+}
+
+@media (1200px <= width < 1360px) {
+    :root[data-text-size="150"] .desktop-primary-nav {
+        display: none;
+    }
+
+    :root[data-text-size="150"] .compact-header-control {
+        display: block;
+    }
+}
+
+@media (min-width: 1200px) {
+    :root:is([data-text-size="125"], [data-text-size="150"]) #main-content
+    [data-desktop-search] {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    :root:is([data-text-size="125"], [data-text-size="150"]) #main-content
+    [data-desktop-search] .keyword-search-actions {
+        grid-template-columns: max-content max-content;
+    }
+
+    :root:is([data-text-size="125"], [data-text-size="150"]) #main-content
+    [data-desktop-search] .keyword-search-actions button {
+        white-space: nowrap;
+    }
+}
+
+#main-content .breadcrumb-access-key {
+    --lms-text-scale: 1;
+    --lms-min-line-height: 0em;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow-wrap: normal;
+}
+
+@media (max-width: 767px) {
+    :root:is([data-text-size="125"], [data-text-size="150"]) #main-content
+    :where(.truncate, .whitespace-nowrap, button, a):not([data-single-line]) {
+        white-space: normal;
+    }
+
+    :root:is([data-text-size="125"], [data-text-size="150"]) #main-content
+    .history-tab-label {
+        white-space: nowrap;
+    }
+
+    :root:is([data-text-size="125"], [data-text-size="150"]) #main-content
+    .page-size-select {
+        width: max-content;
+        min-width: 88px;
+    }
+
+    :root:is([data-text-size="125"], [data-text-size="150"]) #main-content
+    .page-size-select .truncate {
+        white-space: nowrap;
+    }
+
+    :root:is([data-text-size="125"], [data-text-size="150"]) #main-content
+    :where([class*="line-clamp"]:not(.announcement-title, .announcement-description)) {
+        -webkit-line-clamp: unset;
+    }
+
+    :root:is([data-text-size="125"], [data-text-size="150"]) #main-content
+    .announcement-title {
+        white-space: normal;
+    }
+
+    :root:is([data-text-size="125"], [data-text-size="150"]) #main-content
+    .announcement-backdrop {
+        background-image: linear-gradient(to right, #e7effb, rgb(231 239 251 / 88%));
+    }
+
+    :root:is([data-text-size="125"], [data-text-size="150"]) #main-content
+    :where(button:not(.carousel-arrow), input:not([type="checkbox"], [type="radio"]), select) {
+        min-block-size: calc(1.5em + 0.5rem);
+    }
+
+    :root:is([data-text-size="125"], [data-text-size="150"]) #main-content
+    button:not([aria-label]) {
+        block-size: auto;
+    }
+}
+
 @layer base {
     a:focus-visible {
         outline: 2px solid theme('colors.secondary');

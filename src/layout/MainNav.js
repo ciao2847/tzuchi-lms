@@ -8,8 +8,15 @@ import useMedia from 'hooks/useMedia'
 import useBodyScrollLock from 'hooks/useBodyScrollLock'
 import { MENU_CONFIG } from 'constants'
 import swal from 'sweetalert'
+import SiteLogo from './SiteLogo'
+import { readTextSize, TEXT_SIZE_KEY } from 'lib/textSize'
 
 const IS_STAGING = process.env.IS_STAGING === 'true'
+const TEXT_SIZES = [
+    { percent: 100, label: '標準' },
+    { percent: 125, label: '大' },
+    { percent: 150, label: '特大' }
+]
 
 const isMenuVisible = ({ stagOnly, start }) => {
     if (stagOnly && !IS_STAGING) return false
@@ -21,7 +28,9 @@ const isMenuVisible = ({ stagOnly, start }) => {
 const NavIndicator = ({ direction = 'right', isOpen = false }) => (
     <i
         className={`icon icon-arrow-right size-4 shrink-0 text-[14px] transition-transform xl:size-5 xl:text-[20px] ${
-            direction === 'down' ? (isOpen ? '-rotate-90' : 'rotate-90') : ''
+            direction === 'up' && !isOpen || direction === 'down' && isOpen
+                ? '-rotate-90'
+                : direction === 'right' ? '' : 'rotate-90'
         }`}
         aria-hidden="true"
     />
@@ -63,7 +72,7 @@ const DesktopMenuItem = ({ item, pathname, openMenuId, setOpenMenuId }) => {
         <>
             <I18N>{title}</I18N>
             {indicatorDirection && (
-                <NavIndicator direction={indicatorDirection} />
+                <NavIndicator direction={childCount ? 'up' : indicatorDirection} isOpen={isOpen} />
             )}
         </>
     )
@@ -71,7 +80,7 @@ const DesktopMenuItem = ({ item, pathname, openMenuId, setOpenMenuId }) => {
     return (
         <li
             key={id}
-            className="relative flex h-full items-center"
+            className="relative flex h-full min-w-0 items-center"
             onMouseEnter={() => setOpenMenuId(childCount > 0 ? id : null)}
             onMouseLeave={closeMenu}
             onFocus={() => setOpenMenuId(childCount > 0 ? id : null)}
@@ -155,13 +164,28 @@ export const ChangePasswordItem = ({ mobile = false, onNavigate }) => (
         href="/change-password"
         onClick={onNavigate}
         role={mobile ? undefined : 'menuitem'}
-        className={`flex min-h-10 w-full items-center bg-white py-2 pr-4 text-left text-[13px] font-medium text-primary hover:bg-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary ${mobile ? 'pl-8' : 'pl-4'}`}
+        className={`flex min-h-10 w-full items-center bg-white py-2 pr-4 text-left text-[13px] font-medium text-primary hover:bg-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary ${mobile ? 'border-b border-solid border-gray-200 pl-8' : 'pl-4'}`}
     >
         <I18N>修改密碼</I18N>
     </AutoSwitchLink>
 )
 
-const DesktopMemberMenu = ({ onLogout, isLoggingOut, user = {} }) => {
+const TextSizeItem = ({ textSize, onCycle, mobile = false }) => (
+    <button
+        type="button"
+        role={mobile ? undefined : 'menuitem'}
+        className={`flex min-h-[44px] w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 border-x-0 border-solid bg-white py-2 pr-4 text-left text-[13px] font-medium text-primary hover:bg-light focus-visible:bg-[#f8fafc] focus-visible:text-secondary focus-visible:outline-none ${mobile ? 'border-b border-t-0 border-gray-200 pl-8' : 'border-b-0 border-t border-[#e6ecf4] pl-4'}`}
+        onClick={onCycle}
+    >
+        <I18N>文字大小</I18N>
+        <span aria-live="polite">
+            <I18N>{TEXT_SIZES.find(({ percent }) => percent === textSize).label}</I18N>
+            {' (' + textSize + '%)'}
+        </span>
+    </button>
+)
+
+const DesktopMemberMenu = ({ onLogout, isLoggingOut, user = {}, textSize, onCycleTextSize }) => {
     const [isOpen, setIsOpen] = useState(false)
     const { name = '' } = user
 
@@ -181,7 +205,7 @@ const DesktopMemberMenu = ({ onLogout, isLoggingOut, user = {} }) => {
         >
             <button
                 type="button"
-                className="inline-flex h-8 items-center justify-center gap-1 rounded-full bg-secondary px-4 text-[13px] font-bold text-white transition-colors hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="inline-flex min-h-8 items-center justify-center gap-1 rounded-full bg-secondary px-4 text-[13px] font-bold text-white transition-colors hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 aria-haspopup="menu"
                 aria-expanded={isOpen}
                 aria-controls="desktop-member-menu"
@@ -203,6 +227,7 @@ const DesktopMemberMenu = ({ onLogout, isLoggingOut, user = {} }) => {
                         <MemberIdentity user={user} />
                     </div>
                     <ChangePasswordItem onNavigate={() => setIsOpen(false)} />
+                    <TextSizeItem textSize={textSize} onCycle={onCycleTextSize} />
                     <button
                         type="button"
                         className="flex min-h-10 w-full items-center gap-2 border-x-0 border-b-0 border-t border-solid border-[#e6ecf4] px-4 py-2 text-left text-[13px] font-medium text-primary transition-colors hover:bg-[#fff5f5] hover:text-danger focus-visible:bg-[#fff5f5] focus-visible:text-danger focus-visible:outline-none"
@@ -227,7 +252,7 @@ const MobileMenuItem = ({ item, isActive, onClose, onToggle }) => {
         ({ isSectionTitle }) => isSectionTitle
     )
     const className =
-        'flex h-[48px] w-full items-center gap-3 border-x-0 border-t-0 border-b border-solid border-gray-200 bg-white px-4 text-left text-[14px] leading-5 text-primary transition-colors active:bg-[#f8fafc] focus-visible:bg-[#f8fafc] focus-visible:text-primary focus-visible:outline-none'
+        'flex min-h-[48px] w-full items-center gap-3 border-x-0 border-t-0 border-b border-solid border-gray-200 bg-white px-4 py-2 text-left text-[14px] leading-5 text-primary transition-colors active:bg-[#f8fafc] focus-visible:bg-[#f8fafc] focus-visible:text-primary focus-visible:outline-none'
     const content = (
         <>
             {mobileIcon && <MobileMenuIcon name={mobileIcon} />}
@@ -313,9 +338,26 @@ const MobileMenuItem = ({ item, isActive, onClose, onToggle }) => {
 }
 
 const MainNav = () => {
-    const isLayoutXL = useMedia('(min-width: 1200px)')
     const { pathname, search } = useLocation()
     const { isLogin, logout, user, isLoggingOut } = useContext(LoginContext)
+    const [textSize, setTextSize] = useState(readTextSize)
+    const isLayoutXL = useMedia(textSize === 150 ? '(min-width: 1360px)' : '(min-width: 1200px)')
+
+    useEffect(() => {
+        document.documentElement.dataset.textSize = textSize
+        try {
+            window.localStorage.setItem(TEXT_SIZE_KEY, String(textSize))
+        } catch {
+            // The setting still applies for this visit if storage is unavailable.
+        }
+    }, [textSize])
+
+    const cycleTextSize = () => {
+        setTextSize(current => {
+            const index = TEXT_SIZES.findIndex(({ percent }) => percent === current)
+            return TEXT_SIZES[(index + 1) % TEXT_SIZES.length].percent
+        })
+    }
     const { name = '' } = user
     const visibleMenus = MENU_CONFIG.filter(isMenuVisible)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -393,17 +435,18 @@ const MainNav = () => {
     return (
         <>
             <BtnMenu
-                className="absolute right-5 top-[14px] z-[2000] md:right-10 md:top-[33px] xl:hidden"
+                className="compact-header-control absolute right-5 top-[14px] z-[2000] md:right-10 md:top-[33px] xl:hidden"
                 controlsId="mobile-main-navigation"
                 isOpen={isMenuOpen}
                 toggle={setIsMenuOpen}
             />
 
             <nav
-                className="hidden h-full items-center xl:flex"
+                className="desktop-primary-nav hidden h-full items-center xl:flex"
                 aria-label="主選單"
+                data-scalable-menu
             >
-                <ul className="flex h-full w-[800px] items-center justify-between">
+                <ul className="desktop-primary-nav-items flex h-full w-[800px] min-w-0 items-center justify-between gap-x-2">
                     {visibleMenus.map((item) => (
                         <DesktopMenuItem
                             key={item.id}
@@ -417,6 +460,8 @@ const MainNav = () => {
                 <div className="ml-5 shrink-0">
                     {isLogin ? (
                         <DesktopMemberMenu
+                            textSize={textSize}
+                            onCycleTextSize={cycleTextSize}
                             user={user}
                             onLogout={handleLogout}
                             isLoggingOut={isLoggingOut}
@@ -435,7 +480,7 @@ const MainNav = () => {
             <div
                 className={`${
                     isMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'
-                } main-nav-wrapper fixed inset-0 z-[1000] bg-black/30 transition-[visibility,opacity] duration-300 xl:hidden`}
+                } compact-header-control main-nav-wrapper fixed inset-0 z-[1000] bg-black/30 transition-[visibility,opacity] duration-300 xl:hidden`}
                 aria-hidden={!isMenuOpen}
             >
                 <button
@@ -448,23 +493,13 @@ const MainNav = () => {
 
                 <div
                     id="mobile-main-navigation"
+                    data-scalable-menu
                     className={`${
                         isMenuOpen ? 'translate-x-0' : 'translate-x-full'
                     } mobile-scroll-wrapper absolute inset-0 z-10 flex h-full w-full flex-col bg-white transition-transform duration-300`}
                 >
                     <div className="flex h-[var(--header-height)] shrink-0 items-center border-b border-solid border-gray-200 px-5 pr-16 md:px-10 md:pr-20">
-                        <AutoSwitchLink
-                            href="/"
-                            className="block h-[40px] w-[147px] max-w-full bg-contain bg-left bg-no-repeat"
-                            style={{
-                                backgroundImage: `url('${process.env.BASE_PATH}/images/global/main-logo.png')`
-                            }}
-                            onClick={closeMenu}
-                        >
-                            <span className="sr-only">
-                                <I18N>慈濟醫療志業學習網</I18N>
-                            </span>
-                        </AutoSwitchLink>
+                        <SiteLogo onClick={closeMenu} />
                     </div>
 
                     {isLogin ? (
@@ -481,7 +516,7 @@ const MainNav = () => {
                                     )
                                 }
                             >
-                                <span className="inline-flex h-7 items-center justify-center rounded-full bg-secondary px-4 text-[11px] font-bold text-white">
+                                <span className="inline-flex min-h-7 min-w-0 items-center justify-center rounded-full bg-secondary px-4 text-[11px] font-bold text-white">
                                     {name}
                                 </span>
                             </button>
@@ -489,15 +524,16 @@ const MainNav = () => {
                             {isMobileMemberOpen && (
                                 <div
                                     id="mobile-member-menu"
-                                    className="border-t border-solid border-[#e6ecf4] bg-[#f8fbff]"
+                                    className="border-t border-solid border-gray-200 bg-[#f8fbff]"
                                 >
-                                    <div className="border-b border-solid border-[#e6ecf4] px-8 py-3">
+                                    <div className="border-b border-solid border-gray-200 px-8 py-3">
                                         <MemberIdentity user={user} />
                                     </div>
                                     <ChangePasswordItem mobile onNavigate={closeMenu} />
+                                    <TextSizeItem mobile textSize={textSize} onCycle={cycleTextSize} />
                                     <button
                                         type="button"
-                                        className="flex min-h-[44px] w-full items-center gap-3 border-x-0 border-b-0 border-t-0 bg-white py-2 pl-8 pr-4 text-left text-[13px] font-medium text-primary transition-colors active:bg-[#fff5f5] focus-visible:bg-[#fff5f5] focus-visible:text-danger focus-visible:outline-none"
+                                        className="flex min-h-[44px] w-full items-center gap-3 bg-white py-2 pl-8 pr-4 text-left text-[13px] font-medium text-primary transition-colors active:bg-[#fff5f5] focus-visible:bg-[#fff5f5] focus-visible:text-danger focus-visible:outline-none"
                                         onClick={handleLogout}
                                         disabled={isLoggingOut}
                                         aria-busy={isLoggingOut}

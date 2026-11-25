@@ -3,53 +3,14 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import VideoCard from './VideoCard'
 import EmptyState from 'components/EmptyState'
-
-// 示範資料：正式影片的縮圖與連結可在這裡替換。
-const FEATURED_VIDEO_CONFIG = [
-    {
-        id: 'knee-treatment',
-        title: '退化性關節炎放射抗發炎治療',
-        image: `${process.env.BASE_PATH}/images/index/video-knee-placeholder.svg`,
-        link: '#'
-    },
-    {
-        id: 'medicine-guide',
-        title: '兒童糖漿配製教學｜日舒懸液',
-        image: `${process.env.BASE_PATH}/images/index/video-medicine-placeholder.svg`,
-        link: '#'
-    },
-    {
-        id: 'medicine-safety',
-        title: '用藥安全與衛教指引',
-        image: `${process.env.BASE_PATH}/images/index/video-medicine-placeholder.svg`,
-        link: '#'
-    },
-    {
-        id: 'medical-law',
-        title: '醫療事故之刑事責任分析',
-        image: `${process.env.BASE_PATH}/images/index/video-lecture-placeholder.svg`,
-        link: '#'
-    },
-    {
-        id: 'patient-safety',
-        title: '病人安全與照護實務',
-        image: `${process.env.BASE_PATH}/images/index/video-lecture-placeholder.svg`,
-        link: '#'
-    },
-    {
-        id: 'joint-health',
-        title: '關節保健與健康促進',
-        image: `${process.env.BASE_PATH}/images/index/video-knee-placeholder.svg`,
-        link: '#'
-    }
-]
+import Spinner from 'components/Spinner'
 
 const SLIDER_BREAKPOINTS = {
     768: { slidesPerView: 3, spaceBetween: 24 },
     1200: { slidesPerView: 3, spaceBetween: 24 }
 }
 
-const FeaturedVideoSection = ({ videos = FEATURED_VIDEO_CONFIG }) => {
+const FeaturedVideoSection = ({ videos, status }) => {
     const sectionId = useId()
     const swiperRef = useRef(null)
     const [navigation, setNavigation] = useState({
@@ -83,7 +44,9 @@ const FeaturedVideoSection = ({ videos = FEATURED_VIDEO_CONFIG }) => {
                 >
                     精選影片
                 </h2>
-                {!videos.length ? <EmptyState /> : <div className="relative">
+                {status === 'loading' ? <Spinner block /> : status === 'error' ? (
+                    <p role="status" className="text-center text-secondary">精選影片暫時無法載入。</p>
+                ) : !videos.length ? <EmptyState /> : <div className="relative">
                     <Swiper
                         id={`${sectionId}-slider`}
                         className="!-m-2 !p-2"
@@ -112,7 +75,7 @@ const FeaturedVideoSection = ({ videos = FEATURED_VIDEO_CONFIG }) => {
                         aria-controls={`${sectionId}-slider`}
                         disabled={isBeginning}
                         onClick={() => changeSlide('previous')}
-                        className="absolute left-0 top-[calc(50%-18px)] z-[1] flex h-10 w-10 -translate-x-1/3 -translate-y-1/2 items-center justify-center rounded-full bg-gray-200 text-[20px] text-primary transition-colors hover:bg-secondary hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary disabled:cursor-default disabled:opacity-40 xl:-translate-x-1/2"
+                        className="carousel-arrow absolute left-0 top-[calc(50%-18px)] z-[1] flex size-10 -translate-x-1/3 -translate-y-1/2 items-center justify-center rounded-full bg-gray-200 text-[20px] text-primary transition-colors hover:bg-secondary hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary disabled:cursor-default disabled:opacity-40 xl:-translate-x-1/2"
                     >
                         <i
                             className="icon icon-arrow-left"
@@ -125,7 +88,7 @@ const FeaturedVideoSection = ({ videos = FEATURED_VIDEO_CONFIG }) => {
                         aria-controls={`${sectionId}-slider`}
                         disabled={isEnd}
                         onClick={() => changeSlide('next')}
-                        className="absolute right-0 top-[calc(50%-18px)] z-[1] flex h-10 w-10 translate-x-1/3 -translate-y-1/2 items-center justify-center rounded-full bg-gray-200 text-[20px] text-primary transition-colors hover:bg-secondary hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary disabled:cursor-default disabled:opacity-40 xl:translate-x-1/2"
+                        className="carousel-arrow absolute right-0 top-[calc(50%-18px)] z-[1] flex size-10 translate-x-1/3 -translate-y-1/2 items-center justify-center rounded-full bg-gray-200 text-[20px] text-primary transition-colors hover:bg-secondary hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary disabled:cursor-default disabled:opacity-40 xl:translate-x-1/2"
                     >
                         <i
                             className="icon icon-arrow-right"

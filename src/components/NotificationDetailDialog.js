@@ -154,6 +154,8 @@ const NotificationDetail = ({ detail }) => {
 }
 
 const NotificationDetailDialog = ({ notice, onClose }) => {
+    const textSize = document.documentElement.dataset.textSize
+    const emailScale = textSize === '150' ? 1.5 : textSize === '125' ? 1.25 : 1
     const dialogId = useId()
     const dialogRef = useRef(null)
     const closeButtonRef = useRef(null)
@@ -180,6 +182,7 @@ const NotificationDetailDialog = ({ notice, onClose }) => {
             />
             <section
                 ref={dialogRef}
+                data-scalable-notice
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby={`${dialogId}-title`}
@@ -281,7 +284,7 @@ const NotificationDetailDialog = ({ notice, onClose }) => {
                         sandbox="allow-popups allow-popups-to-escape-sandbox"
                         referrerPolicy="no-referrer"
                         className="mt-3 min-h-[400px] w-full border-0 bg-white"
-                        srcDoc={`<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; form-action 'none'; base-uri 'none'"><base target="_blank"><style>body{font:14px/1.7 sans-serif;color:#405a78;overflow-wrap:anywhere}table{max-width:100%;border-collapse:collapse}a{color:#1769d2}a:hover,a:focus-visible{color:#b45309;text-decoration:underline}a:focus-visible{outline:2px solid #1769d2;outline-offset:3px}a::after{content:" (\u53e6\u958b\u8996\u7a97)";font-size:12px}</style></head><body>${notice.htmlBody}</body></html>`}
+                        srcDoc={`<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; form-action 'none'; base-uri 'none'"><base target="_blank"><style>html{zoom:${emailScale}}body{font:14px/1.7 sans-serif;color:#405a78;overflow-wrap:anywhere}table{max-width:100%;border-collapse:collapse}a{color:#1769d2}a:hover,a:focus-visible{color:#b45309;text-decoration:underline}a:focus-visible{outline:2px solid #1769d2;outline-offset:3px}a::after{content:" (\u53e6\u958b\u8996\u7a97)";font-size:12px}</style></head><body>${notice.htmlBody}</body></html>`}
                     />}
 
                     {notice.sections?.length > 0 && (

@@ -5,6 +5,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import tailwindcss from 'tailwindcss'
 import iconfont from 'webpack-iconfont-plugin-nodejs'
 import paths from './paths.babel'
+import textScale from './text-scale.cjs'
 
 const isDev = process.env.NODE_ENV === 'development'
 require('dotenv').config({
@@ -126,6 +127,12 @@ export default {
                         }
                     },
                     {
+                        loader: 'postcss-loader',
+                        options: {
+                            postcssOptions: { config: false, plugins: [textScale] }
+                        }
+                    },
+                    {
                         loader: 'sass-loader',
                         options: {
                             api: 'modern',
@@ -153,7 +160,7 @@ export default {
                         options: {
                             postcssOptions: {
                                 ident: 'postcss',
-                                plugins: [tailwindcss, autoprefixer]
+                                plugins: [tailwindcss, autoprefixer, textScale]
                             }
                         }
                     }

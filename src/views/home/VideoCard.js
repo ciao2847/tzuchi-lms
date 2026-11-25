@@ -23,6 +23,8 @@ const VideoCard = ({
                 className={`${thumbnailClassName} w-full rounded-[12px] drop-shadow`}
             />
             <h3
+                data-single-line={showDetails || undefined}
+                title={showDetails ? title : undefined}
                 className={`mt-3 truncate text-[16px] font-bold leading-6 text-secondary transition-colors group-hover:text-main md:text-[18px] ${
                     showDetails ? '' : 'text-center'
                 }`}
@@ -31,10 +33,10 @@ const VideoCard = ({
             </h3>
             {showDetails && (
                 <div className="mt-2 space-y-1 text-[12px] leading-5 text-secondary transition-colors group-hover:text-main md:text-[14px]">
-                    <p>
+                    <p data-single-line title={`日期：${date || ''}`}>
                         日期：<time dateTime={date}>{date}</time>
                     </p>
-                    <p>講師：{lecturer}</p>
+                    <p data-single-line title={`講師：${lecturer || ''}`}>講師：{lecturer}</p>
                 </div>
             )}
         </AutoSwitchLink>

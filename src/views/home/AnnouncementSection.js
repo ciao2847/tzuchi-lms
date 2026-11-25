@@ -33,8 +33,8 @@ const AnnouncementSection = ({
     className = ''
 }) => {
     const [activeIndex, setActiveIndex] = useState(0)
-    const { category, title, description, image, link, isLinkOut } =
-        announcements[activeIndex] || announcements[0] || {}
+    const currentIndex = activeIndex < announcements.length ? activeIndex : 0
+    const { image } = announcements[currentIndex] || {}
     const { length: announcementCount } = announcements
     const Action = onSelect ? 'button' : AutoSwitchLink
     const showNavigation = !loading && !statusContent && announcementCount > 1
@@ -69,8 +69,8 @@ const AnnouncementSection = ({
                     lazy={false}
                     className="!absolute inset-0 !h-full w-full !pb-0"
                 />}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#e7effb] via-[#e7effb]/90 to-transparent" />
-                <div className="relative z-[1] flex min-h-[320px] flex-col items-start justify-center px-8 py-12 lg:h-full lg:min-h-0 lg:px-10">
+                <div className="announcement-backdrop absolute inset-0 bg-gradient-to-r from-[#e7effb] via-[#e7effb]/90 to-transparent" />
+                <div className={`relative z-[1] flex min-h-[320px] flex-col items-start justify-center px-8 pt-12 lg:h-full lg:min-h-0 lg:px-10 ${showNavigation ? 'pb-0 md:pb-12' : 'pb-12'}`}>
                     {loading ? <div aria-hidden="true" className="flex h-[224px] w-full animate-pulse flex-col justify-center motion-reduce:animate-none sm:max-w-[65%]">
                         <div className="mb-5 h-6 w-20 rounded-full bg-primary/10" />
                         <div className="mb-3 h-7 w-full rounded bg-primary/10" />
@@ -79,47 +79,60 @@ const AnnouncementSection = ({
                         <div className="mb-5 h-4 w-3/4 rounded bg-primary/10" />
                         <div className="h-10 w-36 rounded-[6px] bg-primary/10" />
                     </div> : statusContent || (!announcementCount ? <p role="status" className="text-primary">暫無資料</p> : <div
-                        className="w-full sm:max-w-[65%]"
+                        className="grid w-full sm:max-w-[65%]"
                         aria-live="polite"
                         aria-atomic="true"
                     >
-                        <span className="mb-5 inline-block rounded-full bg-secondary/15 px-3 py-1 text-[12px] font-bold leading-4 text-primary">
-                            {category}
-                        </span>
-                        <h2 className="mb-4 line-clamp-2 whitespace-pre-line text-[24px] font-bold leading-snug text-primary md:text-[28px]">
-                            {title}
-                        </h2>
-                        <p className="mb-6 line-clamp-2 text-[14px] leading-6 text-primary">
-                            {description}
-                        </p>
-                        <Action
-                            {...(onSelect ? { type: 'button', onClick: () => onSelect(announcements[activeIndex] || announcements[0]) } : { href: link, isLinkOut })}
-                            className="inline-flex items-center gap-3 rounded-full border border-solid border-secondary px-4 py-2 text-[14px] font-bold leading-5 text-secondary transition-colors hover:bg-secondary hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary"
-                        >
-                            查看詳細內容
-                            <i
-                                className="icon icon-arrow-right text-[16px] leading-6"
-                                aria-hidden="true"
-                            />
-                        </Action>
+                        {announcements.map((announcement, index) => {
+                            const { id, category, title, description, link, isLinkOut } = announcement
+                            const isActive = index === currentIndex
+
+                            return (
+                                <div
+                                    key={id}
+                                    className={`col-start-1 row-start-1 min-w-0 self-center ${isActive ? '' : 'invisible md:hidden'}`}
+                                    aria-hidden={!isActive}
+                                >
+                                    <span className="mb-5 inline-block rounded-full bg-secondary/15 px-3 py-1 text-[12px] font-bold leading-4 text-primary">
+                                        {category}
+                                    </span>
+                                    <h2 className="announcement-title mb-4 line-clamp-2 whitespace-pre-line text-[24px] font-bold leading-snug text-primary md:text-[28px]">
+                                        {title}
+                                    </h2>
+                                    <p className="announcement-description mb-6 line-clamp-3 text-[14px] leading-6 text-primary md:line-clamp-2">
+                                        {description}
+                                    </p>
+                                    <Action
+                                        {...(onSelect ? { type: 'button', onClick: () => onSelect(announcement) } : { href: link, isLinkOut })}
+                                        className="inline-flex items-center gap-3 rounded-full border border-solid border-secondary px-4 py-2 text-[14px] font-bold leading-5 text-secondary transition-colors hover:bg-secondary hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary"
+                                    >
+                                        查看詳細內容
+                                        <i
+                                            className="icon icon-arrow-right text-[16px] leading-6"
+                                            aria-hidden="true"
+                                        />
+                                    </Action>
+                                </div>
+                            )
+                        })}
                     </div>)}
                 </div>
                 {showNavigation && (
-                    <div className="absolute inset-x-0 bottom-5 z-[1] flex justify-center gap-2">
+                    <div className="relative z-[1] mb-5 mt-4 flex justify-center gap-2 md:absolute md:inset-x-0 md:bottom-5 md:m-0">
                         {announcements.map(({ id }, index) => (
                             <button
                                 key={id}
                                 type="button"
                                 aria-label={`切換至第 ${index + 1} 則公告`}
                                 aria-current={
-                                    activeIndex === index ? 'true' : undefined
+                                    currentIndex === index ? 'true' : undefined
                                 }
                                 onClick={() => setActiveIndex(index)}
                                 className="flex h-6 w-8 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary"
                             >
                                 <span
                                     className={`h-2 w-6 rounded-full transition-colors ${
-                                        activeIndex === index
+                                        currentIndex === index
                                             ? 'bg-main'
                                             : 'bg-secondary/50'
                                     }`}
@@ -136,7 +149,7 @@ const AnnouncementSection = ({
                         type="button"
                         aria-label="上一則公告"
                         onClick={() => changeAnnouncement(-1)}
-                        className="absolute left-0 top-1/2 z-[2] flex h-10 w-10 -translate-x-1/3 -translate-y-1/2 items-center justify-center rounded-full bg-gray-200 text-primary transition-colors hover:bg-secondary hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary xl:-translate-x-1/2"
+                        className="carousel-arrow absolute left-0 top-1/2 z-[2] flex size-10 -translate-x-1/3 -translate-y-1/2 items-center justify-center rounded-full bg-gray-200 text-primary transition-colors hover:bg-secondary hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary xl:-translate-x-1/2"
                     >
                         <i
                             className="icon icon-arrow-left"
@@ -147,7 +160,7 @@ const AnnouncementSection = ({
                         type="button"
                         aria-label="下一則公告"
                         onClick={() => changeAnnouncement(1)}
-                        className="absolute right-0 top-1/2 z-[2] flex h-10 w-10 translate-x-1/3 -translate-y-1/2 items-center justify-center rounded-full bg-gray-200 text-primary transition-colors hover:bg-secondary hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary xl:translate-x-1/2"
+                        className="carousel-arrow absolute right-0 top-1/2 z-[2] flex size-10 translate-x-1/3 -translate-y-1/2 items-center justify-center rounded-full bg-gray-200 text-primary transition-colors hover:bg-secondary hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary xl:translate-x-1/2"
                     >
                         <i
                             className="icon icon-arrow-right"

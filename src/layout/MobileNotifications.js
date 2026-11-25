@@ -29,10 +29,10 @@ export const NoticeSection = ({ items, onSelect, title, tone, status }) => (
         {status === 'loading' || status === 'idle' ? <Spinner block /> : <ul className="divide-y divide-[#edf1f6] px-4 md:max-h-[380px] md:overflow-y-auto md:overscroll-contain">
             {status === 'success' && !items.length && <li role="status" className="py-4 text-[13px] text-gray-500">暫無資料</li>}
             {items.map((item, index) => (
-                <li key={item.id} className={`h-[76px] ${index >= 3 ? 'hidden md:block' : ''}`}>
+                <li key={item.id} className={`${index >= 3 ? 'hidden md:block' : ''}`}>
                     <button
                         type="button"
-                        className="flex h-full w-full items-start gap-3 rounded-[4px] py-3 text-left transition-colors hover:bg-[#f7f9fd] focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary"
+                        className="flex min-h-[76px] w-full items-start gap-3 rounded-[4px] py-3 text-left transition-colors hover:bg-[#f7f9fd] focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary"
                         aria-haspopup="dialog"
                         aria-label={`查看${item.title}`}
                         onClick={() => onSelect(item)}
@@ -122,7 +122,7 @@ const MobileNotifications = () => {
     if (!isLogin) return null
     return (
         <>
-            <div className="xl:hidden">
+            <div className="compact-header-control xl:hidden">
                 <button
                     type="button"
                     className={`absolute right-[60px] top-[14px] z-[2000] inline-flex size-8 items-center justify-center border-0 bg-transparent p-0 text-primary transition-opacity focus-visible:ring-2 focus-visible:ring-primary md:right-20 md:top-[33px] ${
@@ -149,6 +149,7 @@ const MobileNotifications = () => {
 
                 <div
                     id="mobile-notifications-panel"
+                    data-scalable-notice
                     className={`fixed inset-x-0 bottom-0 top-[var(--header-height)] z-[1200] bg-[#f5f8fd] transition-[visibility,opacity,transform] duration-300 ${
                         isOpen
                             ? 'visible translate-y-0 opacity-100'
@@ -157,13 +158,13 @@ const MobileNotifications = () => {
                     aria-hidden={!isOpen}
                 >
                     <div className="flex h-full flex-col">
-                        <div className="flex h-12 shrink-0 items-center justify-between border-y border-solid border-[#dfe7f1] bg-white px-4">
+                        <div className="flex min-h-12 shrink-0 items-center justify-between gap-2 border-y border-solid border-[#dfe7f1] bg-white px-4 py-1">
                             <h1 className="text-[17px] font-bold text-primary">
                                 <I18N>通知信與系統公告</I18N>
                             </h1>
                             <button
                                 type="button"
-                                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-primary focus-visible:ring-2 focus-visible:ring-primary"
+                                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-primary focus-visible:ring-2 focus-visible:ring-primary"
                                 aria-label="關閉通知信與系統公告"
                                 onClick={closeNotifications}
                             >

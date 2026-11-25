@@ -26,7 +26,7 @@ const Breadcrumbs = ({ data, className, contained = true }) => {
                     accessKey="C"
                     href="#"
                     title="中間定位點(C)"
-                    className="hidden xl:block ml-1 w-4 text-inherit"
+                    className="breadcrumb-access-key ml-1 hidden shrink-0 text-inherit xl:block"
                     onClick={(e) => {
                         e.preventDefault()
                     }}

@@ -38,9 +38,14 @@ const PROGRAM_OPTIONS = [
 
 const normalizeCampus = branch => typeof branch === 'string' ? branch.trim().toLowerCase() : ''
 
+const LIST_PAGE_SIZES = [10, 20, 50]
+const CARD_PAGE_SIZES = [12, 24, 48]
+
 const readSearchState = () => {
     const params = new URLSearchParams(typeof window === 'undefined' ? '' : window.location?.search || '')
     const branch = normalizeCampus(params.get('branch'))
+    const requestedPageSize = Number(params.get('pagesize'))
+    const cardSizeIndex = CARD_PAGE_SIZES.indexOf(requestedPageSize)
     return {
         branch: CAMPUS_OPTIONS.some(option => option.id === branch) ? branch : null,
         type: TYPE_OPTIONS.some(option => option.id === params.get('type')) ? params.get('type') : 'all',
@@ -48,7 +53,9 @@ const readSearchState = () => {
         category: params.get('category') || '', keyword: params.get('keyword') || '',
         oldcourse: params.get('oldcourse') === '1' ? 1 : 0,
         page: Math.max(1, Math.trunc(Number(params.get('page')) || 1)),
-        pagesize: [10, 20, 50].includes(Number(params.get('pagesize'))) ? Number(params.get('pagesize')) : 20
+        pageSizeIndex: cardSizeIndex >= 0 ? cardSizeIndex : LIST_PAGE_SIZES.indexOf(requestedPageSize),
+        requestedPageSize: cardSizeIndex >= 0 || LIST_PAGE_SIZES.includes(requestedPageSize) ? requestedPageSize : null,
+        viewMode: ['list', 'card'].includes(params.get('view')) ? params.get('view') : null
     }
 }
 
@@ -69,8 +76,14 @@ const Page = () => {
     const [attribute, setAttribute] = useState(savedSearch.category)
     const [keyword, setKeyword] = useState(savedSearch.keyword)
     const [oldcourse, setOldcourse] = useState(savedSearch.oldcourse === 1)
-    const [page, setPage] = useState(savedSearch.page)
-    const [pageSize, setPageSize] = useState(savedSearch.pagesize)
+    const [pageSizeIndex, setPageSizeIndex] = useState(savedSearch.pageSizeIndex >= 0 ? savedSearch.pageSizeIndex : 1)
+    const [selectedViewMode, setSelectedViewMode] = useState(savedSearch.viewMode)
+    const viewMode = selectedViewMode || (isDesktopLayout ? 'list' : 'card')
+    const pageSizeOptions = viewMode === 'card' ? CARD_PAGE_SIZES : LIST_PAGE_SIZES
+    const pageSize = pageSizeOptions[pageSizeIndex]
+    const [pageOffset, setPageOffset] = useState(() => (savedSearch.page - 1) * (savedSearch.requestedPageSize ?? pageSize))
+    const page = Math.floor(pageOffset / pageSize) + 1
+    const setPage = nextPage => setPageOffset((nextPage - 1) * pageSize)
     const [filters, setFilters] = useState({ branch: savedSearch.branch || defaultCampus, type: savedSearch.type, program: savedSearch.program, oldcourse: savedSearch.oldcourse, category: savedSearch.category, keyword: savedSearch.keyword })
     const [revision, setRevision] = useState(0)
     const [result, setResult] = useState({ status: 'loading', courses: [], total: 0 })
@@ -112,14 +125,15 @@ const Page = () => {
         setCampus(userCampus)
         setAttribute('')
         setFilters(current => ({ ...current, branch: userCampus, category: '' }))
-        setPage(1)
+        setPageOffset(0)
     }, [isVerified, userCampus, user.id, savedSearch])
     useEffect(() => {
         if (!isVerified || typeof window === 'undefined' || !window.history?.replaceState) return
         const url = new URL(window.location.href)
         Object.entries({ ...filters, page, pagesize: pageSize }).forEach(([key, value]) => url.searchParams.set(key, String(value)))
+        if (selectedViewMode) url.searchParams.set('view', selectedViewMode)
         window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`)
-    }, [isVerified, filters, page, pageSize])
+    }, [isVerified, filters, page, pageSize, selectedViewMode])
     useEffect(() => {
         if (!isVerified) {
             setResult({ status: 'idle', courses: [], total: 0 })
@@ -145,8 +159,6 @@ const Page = () => {
         })
         return () => controller.abort()
     }, [isVerified, filters, page, pageSize, revision, user.id, user.userkey, userCampus, expireSession])
-    const [selectedViewMode, setSelectedViewMode] = useState(null)
-    const viewMode = selectedViewMode || (isDesktopLayout ? 'list' : 'card')
     const isLoadingCourses = sessionStatus === 'checking' || (isVerified &&
         (result.owner !== user.id || result.status === 'loading' || result.status === 'idle'))
 
@@ -300,7 +312,10 @@ const Page = () => {
                     <ViewModeToggle
                         ariaLabel="課程顯示方式"
                         value={viewMode}
-                        onChange={setSelectedViewMode}
+                        onChange={mode => {
+                            setSelectedViewMode(mode)
+                            if (mode !== viewMode) setPage(1)
+                        }}
                     />
                 </div>
 
@@ -313,7 +328,8 @@ const Page = () => {
                     data={result.courses}
                     component={Results}
                     componentProps={{ viewMode }}
-                    pagination={{ page, pageSize, total: result.total, onPageChange: setPage, onPageSizeChange: size => { setPageSize(size); setPage(1) } }}
+                    pageSizeOptions={pageSizeOptions}
+                    pagination={{ page, pageSize, total: result.total, onPageChange: setPage, onPageSizeChange: size => { setPageSizeIndex(pageSizeOptions.indexOf(size)); setPage(1) } }}
                 />}
             </section>
             </div>

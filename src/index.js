@@ -4,6 +4,7 @@ import lazySizes from 'lazysizes'
 import { configureStore } from '@reduxjs/toolkit'
 import reducers from 'store/reducers'
 import Root from 'containers/Root'
+import { readTextSize } from 'lib/textSize'
 import 'lazysizes/plugins/attrchange/ls.attrchange'
 import '@fullcalendar/react/skeleton.css'
 import '@fullcalendar/react/themes/classic/theme.css'
@@ -11,6 +12,7 @@ import '@fullcalendar/react/themes/classic/palette.css'
 import '../styles/app.global.scss'
 import '../styles/tailwind.css'
 lazySizes.cfg.lazyClass = 'lazy'
+document.documentElement.dataset.textSize = readTextSize()
 
 const MOUNT_NODE = document.getElementById('root')
 const store = configureStore({

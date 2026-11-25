@@ -148,6 +148,22 @@ async function main() {
         assert.equal(refreshed.requests.at(-1).filters.page, 3)
         assert.equal(refreshed.requests.at(-1).filters.oldcourse, 1)
         assert.equal(refreshed.requests.at(-1).filters.branch, 'dl')
+
+        const listTree = refreshed.render()
+        find(listTree, node => typeof node.props.ariaLabel === 'string').props.onChange('card')
+        refreshed.render()
+        assert.equal(refreshed.requests.at(-1).filters.page, 1)
+        assert.equal(refreshed.requests.at(-1).filters.pagesize, 48)
+        refreshed.requests.at(-1).resolve({ branch: 'dl', total: 150, courses: [] }); await flush()
+        const cardList = find(refreshed.render(), node => node.props.pagination)
+        assert.deepEqual(cardList.props.pageSizeOptions, [12, 24, 48])
+        cardList.props.pagination.onPageSizeChange(24)
+        refreshed.render()
+        assert.equal(refreshed.requests.at(-1).filters.pagesize, 24)
+        const refreshedCard = mount()
+        refreshedCard.render()
+        assert.equal(refreshedCard.requests.at(-1).filters.pagesize, 24)
+        assert.equal(location.searchParams.get('view'), 'card')
     } finally { global.window = previousWindow }
     console.log('PASS: API campus defaults, query synchronization, refresh pagination/filter restoration, manual selection, clear/reset and stale response protection')
 }
