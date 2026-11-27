@@ -44,9 +44,7 @@ const FeaturedVideoSection = ({ videos, status }) => {
                 >
                     精選影片
                 </h2>
-                {status === 'loading' ? <Spinner block /> : status === 'error' ? (
-                    <p role="status" className="text-center text-secondary">精選影片暫時無法載入。</p>
-                ) : !videos.length ? <EmptyState /> : <div className="relative">
+                {status === 'loading' ? <Spinner block /> : status === 'error' || !videos.length ? <EmptyState /> : <div className="relative">
                     <Swiper
                         id={`${sectionId}-slider`}
                         className="!-m-2 !p-2"

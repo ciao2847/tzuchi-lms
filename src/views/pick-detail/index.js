@@ -134,9 +134,9 @@ export const RegistrationDetail = ({ course, userkey, confirmedRegistration, onR
         }
     }
     const cancelButton = className => canCancel && (
-        <button type="button" disabled={cancelling} onClick={cancelRegistration}
+        <button type="button" disabled={cancelling} aria-busy={cancelling} aria-label={cancelling ? '取消報名處理中' : undefined} onClick={cancelRegistration}
             className={`${className} h-11 rounded-[6px] bg-[#e6f5ef] text-[14px] font-bold text-[#247a56] transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-success disabled:opacity-60 md:h-12 md:text-[15px]`}>
-            {cancelling ? '取消報名處理中…' : '取消報名'}
+            {cancelling ? <Spinner color="#247a56" /> : '取消報名'}
         </button>
     )
 
@@ -396,7 +396,6 @@ const Page = () => {
     const { isLogin, user, expireSession } = useContext(LoginContext)
     const [result, setResult] = useState({ status: 'loading' })
     const [confirmation, setConfirmation] = useState(null)
-    const [revision, setRevision] = useState(0)
     useEffect(() => {
         if (!isLogin) return undefined
         const controller = new AbortController()
@@ -406,13 +405,13 @@ const Page = () => {
         }).catch(error => {
             if (controller.signal.aborted) return
             if (error.status === 401) expireSession()
-            setResult({ status: 'error', id, owner: user.id, message: error instanceof TypeError ? '無法連線至課程資訊服務。' : error.message })
+            setResult({ status: 'error', id, owner: user.id })
         })
         return () => controller.abort()
-    }, [id, isLogin, user.id, user.userkey, expireSession, revision])
+    }, [id, isLogin, user.id, user.userkey, expireSession])
     if (!isLogin) return <div className="pt-[var(--header-height)]"><DashboardStatus /></div>
     if (result.id !== id || result.owner !== user.id || result.status === 'loading') return <div className="flex flex-1 items-center justify-center pt-[var(--header-height)]"><Spinner block /></div>
-    if (result.status === 'error') return <div role="alert" className="min-h-[50vh] px-4 pt-[calc(var(--header-height)+24px)] text-primary"><p>{result.message}</p><button type="button" className="mt-3 underline" onClick={() => setRevision(value => value + 1)}>重新載入</button></div>
+    if (result.status === 'error') return <div role="status" className="min-h-[50vh] px-4 pt-[calc(var(--header-height)+24px)] text-primary"><p>暫無資料</p></div>
     return <RegistrationDetail key={id} course={result.course} userkey={user.userkey} onSessionExpired={expireSession}
         confirmedRegistration={confirmation?.id === id && confirmation?.owner === user.id}
         onCancelled={() => {

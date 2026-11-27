@@ -168,9 +168,6 @@ const CategoryVideoSection = ({ categories }) => {
                             {!categories && selectedId === ACADEMIC_CATEGORY_ID &&
                             academicStatus === 'loading'
                                 ? <Spinner block className="" />
-                                : !categories && selectedId === ACADEMIC_CATEGORY_ID &&
-                                  academicStatus === 'error'
-                                ? '學術演講資料暫時無法載入。'
                                 : '暫無資料'}
                         </p>
                     )}

@@ -20,14 +20,12 @@ const applyReadNotices = (data, read) => ({
     announcements: data.announcements.map(item => read.has(noticeKey(item)) ? { ...item, isUnread: false } : item)
 })
 export const DashboardContext = React.createContext({
-    data: EMPTY, status: 'idle', error: '', reload: () => undefined, markRead: () => undefined
+    data: EMPTY, status: 'idle', markRead: () => undefined
 })
 
 const DashboardProvider = ({ children }) => {
     const { isLogin, user, expireSession } = useContext(LoginContext)
-    const [result, setResult] = useState({ data: EMPTY, status: 'idle', error: '' })
-    const [revision, setRevision] = useState(0)
-    const reload = useCallback(() => setRevision((value) => value + 1), [])
+    const [result, setResult] = useState({ data: EMPTY, status: 'idle' })
     const markRead = useCallback(notice => {
         if (!isLogin || !user.id || !notice?.id || !['message', 'announcement'].includes(notice.type)) return
         const read = readNotices(user.id)
@@ -38,14 +36,14 @@ const DashboardProvider = ({ children }) => {
     }, [isLogin, user.id])
     useEffect(() => {
         if (!isLogin) {
-            setResult({ data: EMPTY, status: 'idle', error: '' })
+            setResult({ data: EMPTY, status: 'idle' })
             return undefined
         }
         const controller = new AbortController()
-        setResult({ data: EMPTY, status: 'loading', error: '' })
+        setResult({ data: EMPTY, status: 'loading' })
         getDashboard(controller.signal, user.userkey).then((data) => {
             if (!controller.signal.aborted) {
-                setResult({ data: applyReadNotices(data, readNotices(user.id)), status: 'success', error: '', owner: user.id })
+                setResult({ data: applyReadNotices(data, readNotices(user.id)), status: 'success', owner: user.id })
             }
         }).catch((error) => {
             if (controller.signal.aborted) return
@@ -53,16 +51,14 @@ const DashboardProvider = ({ children }) => {
                 expireSession()
                 return
             }
-            setResult({ data: EMPTY, status: 'error', owner: user.id,
-                error: error instanceof TypeError ? '無法連線至學習歷程服務，請確認網路後重試。' :
-                    error.data?.error?.message || error.message || '無法取得學習歷程。' })
+            setResult({ data: EMPTY, status: 'error', owner: user.id })
         })
         return () => controller.abort()
-    }, [isLogin, user.id, user.userkey, expireSession, revision])
+    }, [isLogin, user.id, user.userkey, expireSession])
 
-    const current = !isLogin ? { data: EMPTY, status: 'idle', error: '' } :
+    const current = !isLogin ? { data: EMPTY, status: 'idle' } :
         result.owner !== user.id && result.status !== 'loading' ?
-            { data: EMPTY, status: 'loading', error: '' } : result
-    return <DashboardContext.Provider value={{ ...current, reload, markRead }}>{children}</DashboardContext.Provider>
+            { data: EMPTY, status: 'loading' } : result
+    return <DashboardContext.Provider value={{ ...current, markRead }}>{children}</DashboardContext.Provider>
 }
 export default DashboardProvider

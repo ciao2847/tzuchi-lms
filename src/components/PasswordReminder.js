@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useId, useRef, useState } from 'react'
+import Spinner from 'components/Spinner'
 import { Link, useLocation } from 'react-router-dom'
 import { LoginContext } from 'contexts/LoginProvider'
 import { keepPassword } from 'api/auth'
@@ -60,9 +61,9 @@ const ReminderDialog = ({ user, retrySession, expireSession }) => {
                 <Link to="/change-password" className="rounded bg-main px-4 py-2 text-sm font-bold text-white">
                     修改密碼
                 </Link>
-                <button type="button" onClick={handleKeepPassword} disabled={submitting}
+                <button type="button" onClick={handleKeepPassword} disabled={submitting} aria-busy={submitting} aria-label={submitting ? '處理中' : undefined}
                     className="rounded border border-gray-300 px-4 py-2 text-sm font-bold disabled:opacity-60">
-                    {submitting ? '處理中…' : '使用舊密碼'}
+                    {submitting ? <Spinner /> : '使用舊密碼'}
                 </button>
             </div>
         </dialog>

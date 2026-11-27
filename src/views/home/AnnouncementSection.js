@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import Spinner from 'components/Spinner'
 import AutoSwitchLink from 'components/AutoSwitchLink'
 import ThumbFrame from 'components/ThumbFrame'
 
@@ -71,14 +72,7 @@ const AnnouncementSection = ({
                 />}
                 <div className="announcement-backdrop absolute inset-0 bg-gradient-to-r from-[#e7effb] via-[#e7effb]/90 to-transparent" />
                 <div className={`relative z-[1] flex min-h-[320px] flex-col items-start justify-center px-8 pt-12 lg:h-full lg:min-h-0 lg:px-10 ${showNavigation ? 'pb-0 md:pb-12' : 'pb-12'}`}>
-                    {loading ? <div aria-hidden="true" className="flex h-[224px] w-full animate-pulse flex-col justify-center motion-reduce:animate-none sm:max-w-[65%]">
-                        <div className="mb-5 h-6 w-20 rounded-full bg-primary/10" />
-                        <div className="mb-3 h-7 w-full rounded bg-primary/10" />
-                        <div className="mb-5 h-7 w-4/5 rounded bg-primary/10" />
-                        <div className="mb-2 h-4 w-full rounded bg-primary/10" />
-                        <div className="mb-5 h-4 w-3/4 rounded bg-primary/10" />
-                        <div className="h-10 w-36 rounded-[6px] bg-primary/10" />
-                    </div> : statusContent || (!announcementCount ? <p role="status" className="text-primary">暫無資料</p> : <div
+                    {loading ? <Spinner block className="h-[224px] w-full" /> : statusContent || (!announcementCount ? <p role="status" className="text-primary">暫無資料</p> : <div
                         className="grid w-full sm:max-w-[65%]"
                         aria-live="polite"
                         aria-atomic="true"

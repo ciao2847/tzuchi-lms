@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import Spinner from 'components/Spinner'
 import { useNavigate } from 'react-router-dom'
 import { registerCourse } from 'api/courseInfo'
 import MobilePhoneField from 'components/MobilePhoneField'
@@ -175,7 +176,7 @@ export const CourseRegistrationDialog = ({ kind, courseId, userkey, onSessionExp
                         {feedback && <p role={feedback.error ? 'alert' : 'status'} className={`mb-3 text-center text-[13px] font-bold ${feedback.error ? 'text-danger' : 'text-primary'}`}>{feedback.message}</p>}
                         <div className="grid grid-cols-2 gap-2">
                             <button type="button" onClick={close} disabled={submitting} className={`${actionClass} border border-solid border-[#b8c9df] bg-white hover:bg-[#f3f8ff]`}>取消</button>
-                            <button type="submit" disabled={submitting} className={`${actionClass} bg-main text-white hover:opacity-90 disabled:opacity-60`}>{submitting ? '報名處理中…' : preview ? '送出預覽' : '確認報名'}</button>
+                            <button type="submit" disabled={submitting} aria-busy={submitting} aria-label={submitting ? '報名處理中' : undefined} className={`${actionClass} bg-main text-white hover:opacity-90 disabled:opacity-60`}>{submitting ? <Spinner color="#fff" /> : preview ? '送出預覽' : '確認報名'}</button>
                         </div>
                     </footer>
                 </form>

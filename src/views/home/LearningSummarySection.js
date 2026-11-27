@@ -1,4 +1,5 @@
 import React, { useContext } from 'react'
+import Spinner from 'components/Spinner'
 import { DashboardContext } from 'contexts/DashboardProvider'
 import DashboardStatus from 'components/DashboardStatus'
 import I18N from 'components/I18N'
@@ -25,27 +26,7 @@ const LearningSummarySection = ({
     if (status === 'loading' || status === 'idle') return <section
         className={sectionClass} aria-label="我的學習摘要" aria-busy="true"
     >
-        <div aria-hidden="true" className="animate-pulse motion-reduce:animate-none">
-            <div className="mb-5 flex h-12 items-center gap-3">
-                <div className="h-12 w-12 shrink-0 rounded-full bg-slate-200" />
-                <div className="flex-1 space-y-2">
-                    <div className="h-3 w-24 rounded bg-slate-200" />
-                    <div className="h-5 w-3/4 rounded bg-slate-200" />
-                </div>
-            </div>
-            <div className="mb-4 grid h-[70px] grid-cols-3 gap-2">
-                {[0, 1, 2].map(index => <div key={index} className="rounded-[8px] bg-slate-200" />)}
-            </div>
-            <div className="mb-5 flex h-[128px] flex-col justify-center gap-3 rounded-[10px] bg-slate-100 p-4">
-                <div className="h-3 w-24 rounded bg-slate-200" />
-                <div className="h-4 w-full rounded bg-slate-200" />
-                <div className="h-3 w-2/3 rounded bg-slate-200" />
-            </div>
-            <div className={actionsClass}>
-                <div className="min-h-10 rounded-[6px] bg-slate-200" />
-                <div className="min-h-10 rounded-[6px] bg-slate-200" />
-            </div>
-        </div>
+        <Spinner block />
     </section>
 
     return (

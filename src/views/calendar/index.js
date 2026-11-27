@@ -465,15 +465,7 @@ export const NoticeCard = ({ items, onSelect, title, tone, emptyText, status }) 
                 <I18N>{title}</I18N>
             </h2>
         </header>
-        {status === 'loading' || status === 'idle' ? <div role="status" aria-busy="true" aria-label="讀取資料">
-            <div aria-hidden="true" className="h-[256px] animate-pulse px-5 py-2 motion-reduce:animate-none">
-                {[0, 1, 2, 3, 4].map(index => <div key={index} className="flex h-12 items-center gap-3">
-                    <div className="h-2 w-2 shrink-0 rounded-full bg-slate-200" />
-                    <div className={`h-3 flex-1 rounded bg-slate-200 ${index % 2 ? 'max-w-[60%]' : ''}`} />
-                    <div className="ml-auto h-3 w-12 shrink-0 rounded bg-slate-200" />
-                </div>)}
-            </div>
-        </div> : <ul className="max-h-[256px] overflow-y-auto overscroll-contain px-5 py-2">
+        {status === 'loading' || status === 'idle' ? <Spinner block className="h-[256px]" /> : <ul className="max-h-[256px] overflow-y-auto overscroll-contain px-5 py-2">
             {!items.length && <li role="status" className="py-3 text-[13px] text-[#8292a7]">暫無資料</li>}
             {items.map((item) => (
                 <li key={item.id}>
@@ -506,7 +498,6 @@ export const NoticeCard = ({ items, onSelect, title, tone, emptyText, status }) 
 export const ProgramDetails = ({ programId }) => {
     const { expireSession, user } = useContext(LoginContext)
     const [result, setResult] = useState({ status: 'loading' })
-    const [revision, setRevision] = useState(0)
     useEffect(() => {
         const controller = new AbortController()
         setResult({ status: 'loading', programId, owner: user.id })
@@ -519,20 +510,16 @@ export const ProgramDetails = ({ programId }) => {
                 expireSession()
                 return
             }
-            setResult({ status: 'error', programId, owner: user.id, error: error instanceof TypeError
-                ? '無法連線至學程服務，請確認網路後重試。' : error.message })
+            setResult({ status: 'error', programId, owner: user.id })
         })
         return () => controller.abort()
-    }, [programId, user.id, user.userkey, expireSession, revision])
+    }, [programId, user.id, user.userkey, expireSession])
     if (result.programId !== programId || result.owner !== user.id || result.status === 'loading') return (
-        <div role="status" aria-busy="true" className="flex h-[480px] items-center justify-center p-4 md:h-[640px]">
-            <span aria-hidden="true"><Spinner size={12} color="#093a7b" /></span>
-        </div>
+        <Spinner block className="h-[480px] p-4 md:h-[640px]" />
     )
     if (result.status === 'expired') return <p role="alert" className="min-h-[480px] p-4 md:min-h-[640px]"><AutoSwitchLink href="/#login">登入時效已過期或尚未登入，請重新登入。</AutoSwitchLink></p>
-    if (result.status === 'error') return <div role="alert" className="min-h-[480px] p-4 md:min-h-[640px]">
-        <p>{result.error}</p>
-        <button type="button" className="mt-2 text-secondary underline" onClick={() => setRevision(value => value + 1)}>重新載入</button>
+    if (result.status === 'error') return <div role="status" className="min-h-[480px] p-4 md:min-h-[640px]">
+        <p>暫無資料</p>
     </div>
     return <>
         <div className="flex flex-wrap gap-4 rounded border border-solid border-[#e0e8f2] bg-white p-4 text-[14px]">

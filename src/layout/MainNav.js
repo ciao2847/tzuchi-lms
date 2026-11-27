@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
+import Spinner from 'components/Spinner'
 import { useLocation } from 'react-router-dom'
 import I18N from 'components/I18N'
 import AutoSwitchLink from 'components/AutoSwitchLink'
@@ -234,10 +235,10 @@ const DesktopMemberMenu = ({ onLogout, isLoggingOut, user = {}, textSize, onCycl
                         role="menuitem"
                         onClick={handleLogout}
                         disabled={isLoggingOut}
-                        aria-busy={isLoggingOut}
+                        aria-busy={isLoggingOut} aria-label={isLoggingOut ? '登出中' : undefined}
                     >
                         <LogoutIcon />
-                        <I18N>{isLoggingOut ? '登出中…' : '登出'}</I18N>
+                        {isLoggingOut ? <Spinner /> : <I18N>登出</I18N>}
                     </button>
                 </div>
             )}
@@ -536,11 +537,11 @@ const MainNav = () => {
                                         className="flex min-h-[44px] w-full items-center gap-3 bg-white py-2 pl-8 pr-4 text-left text-[13px] font-medium text-primary transition-colors active:bg-[#fff5f5] focus-visible:bg-[#fff5f5] focus-visible:text-danger focus-visible:outline-none"
                                         onClick={handleLogout}
                                         disabled={isLoggingOut}
-                                        aria-busy={isLoggingOut}
+                                        aria-busy={isLoggingOut} aria-label={isLoggingOut ? '登出中' : undefined}
                                     >
                                         <LogoutIcon />
                                         <span className="min-w-0 flex-1">
-                                            <I18N>{isLoggingOut ? '登出中…' : '登出'}</I18N>
+                                            {isLoggingOut ? <Spinner /> : <I18N>登出</I18N>}
                                         </span>
                                     </button>
                                 </div>

@@ -1,4 +1,5 @@
 import AutoSwitchLink from 'components/AutoSwitchLink'
+import Spinner from 'components/Spinner'
 import React, { useContext, useId, useRef, useState } from 'react'
 import { forgetPassword } from 'api/auth'
 import { LoginContext } from 'contexts/LoginProvider'
@@ -79,9 +80,9 @@ const ForgotPassword = () => {
                     </div>
                     {error && <p id={`${sectionId}-error`} role="alert" className="text-[13px] text-danger">{error}</p>}
                     {sent && <p role="status" className="text-[14px] text-primary">已寄信，請至您登錄的信箱查看通知。</p>}
-                    <button type="submit" disabled={submitting} className="flex h-10 w-full items-center justify-center rounded bg-main text-[16px] font-bold text-white disabled:opacity-60">{submitting ? '寄送中…' : '寄送通知信'}</button>
-                </form> : <p role="status" className="text-[14px] leading-6 text-primary">
-                    {sessionStatus === 'checking' ? '正在確認登入狀態…' : '寄送通知信需要有效的登入狀態。若無法登入，請聯絡上方所列的院區教學部。'}
+                    <button type="submit" disabled={submitting} aria-busy={submitting} aria-label={submitting ? '寄送通知信' : undefined} className="flex h-10 w-full items-center justify-center rounded bg-main text-[16px] font-bold text-white disabled:opacity-60">{submitting ? <Spinner color="#fff" /> : '寄送通知信'}</button>
+                </form> : sessionStatus === 'checking' ? <Spinner block /> : <p role="status" className="text-[14px] leading-6 text-primary">
+                    寄送通知信需要有效的登入狀態。若無法登入，請聯絡上方所列的院區教學部。
                 </p>}
             </div>
         </section>

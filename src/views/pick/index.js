@@ -84,10 +84,8 @@ const Page = () => {
     const viewMode = selectedViewMode || (isDesktopLayout ? 'list' : 'card')
     const [page, setPage] = useState(savedSearch.page)
     const [filters, setFilters] = useState({ branch: savedSearch.branch || defaultCampus, type: savedSearch.type, program: savedSearch.program, oldcourse: savedSearch.oldcourse, category: savedSearch.category, keyword: savedSearch.keyword })
-    const [revision, setRevision] = useState(0)
     const [result, setResult] = useState({ status: 'loading', courses: [], total: 0 })
     const [categories, setCategories] = useState({ status: 'idle', items: [], owner: null })
-    const [categoryRevision, setCategoryRevision] = useState(0)
     const visibleCategories = categories.owner === user.id
         ? categories.items.filter(item => campus === 'all' || item.branch === campus) : []
     useEffect(() => {
@@ -102,11 +100,10 @@ const Page = () => {
         }).catch(error => {
             if (controller.signal.aborted) return
             if (error.status === 401) expireSession()
-            setCategories({ status: 'error', items: [], owner: user.id,
-                message: error instanceof TypeError ? '無法連線至課程屬性服務。' : error.message })
+            setCategories({ status: 'error', items: [], owner: user.id })
         })
         return () => controller.abort()
-    }, [isVerified, user.id, user.userkey, expireSession, categoryRevision])
+    }, [isVerified, user.id, user.userkey, expireSession])
     useEffect(() => {
         if (!isVerified) return
         if (searchOwner.current === null) {
@@ -154,10 +151,10 @@ const Page = () => {
         }).catch(error => {
             if (controller.signal.aborted) return
             if (error.status === 401) expireSession()
-            setResult({ status: 'error', owner: user.id, courses: [], total: 0, message: error.status === 401 ? '登入時效已過期，請重新登入。' : error instanceof TypeError ? '無法連線至快速選課服務，請稍後重試。' : error.message })
+            setResult({ status: 'error', owner: user.id, courses: [], total: 0 })
         })
         return () => controller.abort()
-    }, [isVerified, filters, page, pageSize, revision, user.id, user.userkey, userCampus, expireSession])
+    }, [isVerified, filters, page, pageSize, user.id, user.userkey, userCampus, expireSession])
     const isLoadingCourses = sessionStatus === 'checking' || (isVerified &&
         (result.owner !== user.id || result.status === 'loading' || result.status === 'idle'))
 
@@ -264,8 +261,9 @@ const Page = () => {
                                     <option value="">全部</option>
                                     {visibleCategories.map(item => <option key={`${item.branch}-${item.id}`} value={item.id}>{item.name}</option>)}
                                 </Select>
-                                {isVerified && categories.owner === user.id && categories.status === 'error' && <div role="alert" className="mt-2 text-[13px] text-primary">
-                                    {categories.message}<button type="button" className="ml-2 underline" onClick={() => setCategoryRevision(value => value + 1)}>重新載入</button>
+                                {isVerified && (categories.owner !== user.id || categories.status === 'loading') && <Spinner block className="py-2" />}
+                                {isVerified && categories.owner === user.id && categories.status === 'error' && <div role="status" className="mt-2 text-[13px] text-primary">
+                                    暫無資料
                                 </div>}
                             </div>
 
@@ -316,11 +314,8 @@ const Page = () => {
                 </div>
 
                 {!isVerified && sessionStatus !== 'checking' && <DashboardStatus />}
-                {isLoadingCourses && <div role="status" aria-busy="true" aria-label="讀取資料" className="flex items-center justify-center py-6">
-                    <span aria-hidden="true"><Spinner size={12} color="#093a7b" /></span>
-                </div>}
-                {isVerified && !isLoadingCourses && result.status === 'error' && <div role="alert" className="py-6 text-primary"><p>{result.message}</p><button type="button" className="mt-2 underline" onClick={() => setRevision(value => value + 1)}>重新載入</button></div>}
-                {isVerified && !isLoadingCourses && result.status === 'success' && <PaginatedList
+                {isLoadingCourses && <Spinner block />}
+                {isVerified && !isLoadingCourses && <PaginatedList
                     data={result.courses}
                     component={Results}
                     componentProps={{ viewMode }}

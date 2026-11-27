@@ -1,4 +1,5 @@
 import React, { useContext, useId, useState } from 'react'
+import Spinner from 'components/Spinner'
 import swal from 'sweetalert'
 import { LoginContext } from 'contexts/LoginProvider'
 import { changePassword } from 'api/auth'
@@ -23,6 +24,7 @@ const ChangePassword = () => {
     const sectionId = useId()
     const [error, setError] = useState('')
     const [confirming, setConfirming] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
     const [status, setStatus] = useState('')
     const handleSubmit = async event => {
         event.preventDefault()
@@ -44,8 +46,9 @@ const ChangePassword = () => {
             })
             if (confirmed) {
                 if (!user.id) throw new Error('缺少登入身分資料，請重新登入。')
-                setStatus('正在修改密碼…')
+                setSubmitting(true)
                 await changePassword({ uid: user.id, oldpwd: values.oldPassword, newpwd: values.newPassword, userkey: user.userkey })
+                setSubmitting(false)
                 setStatus('密碼已修改，下次登入請使用新密碼。')
                 markPasswordChanged?.(user.id)
                 form.reset()
@@ -55,7 +58,10 @@ const ChangePassword = () => {
             setStatus('')
             setError(error instanceof TypeError ? '無法連線，請稍後再試。' : error.message || '密碼修改失敗。')
             if (error.status === 401 || error.code === 'SESSION_EXPIRED') expireSession()
-        } finally { setConfirming(false) }
+        } finally {
+            setSubmitting(false)
+            setConfirming(false)
+        }
     }
     return <main className="bg-light pt-[var(--header-height)]">
         <section className="relative isolate flex min-h-[calc(100dvh-var(--header-height))] items-center justify-center px-4 py-10 md:px-6 xl:px-10" aria-labelledby={`${sectionId}-title`}>
@@ -82,7 +88,7 @@ const ChangePassword = () => {
                     </div>)}
                     {error && <p id={`${sectionId}-error`} role="alert" className="text-[13px] leading-5 text-danger">{error}</p>}
                     {status && <p role="status" className="text-[13px] leading-5 text-secondary">{status}</p>}
-                    <button type="submit" disabled={confirming} className="flex h-10 w-full items-center justify-center rounded bg-main text-[16px] font-bold leading-6 text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-main disabled:cursor-wait disabled:opacity-60">確認修改</button>
+                    <button type="submit" disabled={confirming} aria-busy={submitting} aria-label={submitting ? '修改密碼' : undefined} className="flex h-10 w-full items-center justify-center rounded bg-main text-[16px] font-bold leading-6 text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-main disabled:cursor-wait disabled:opacity-60">{submitting ? <Spinner color="#fff" /> : '確認修改'}</button>
                 </form>
             </div>
         </section>

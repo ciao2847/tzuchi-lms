@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useId, useState } from 'react'
+import Spinner from 'components/Spinner'
 import { LoginContext } from 'contexts/LoginProvider'
 import { adaptLoginUser } from 'adapters/authAdapter'
 import { login as requestLogin } from 'api/auth'
@@ -69,9 +70,6 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                     慈濟醫療學習平台
                 </p>
             </div>
-            {sessionStatus === 'checking' && (
-                <p role="status" className="mb-4 text-[13px] text-secondary">正在確認登入狀態…</p>
-            )}
             {sessionStatus === 'error' && <div role="alert" className="mb-4 text-[13px] text-danger">
                 <p>{sessionError}</p>
                 <button type="button" className="mt-1 text-secondary underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary" onClick={retrySession}>重新確認登入狀態</button>
@@ -190,9 +188,11 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                 <button
                     type="submit"
                     disabled={isSubmitting || sessionStatus === 'checking'}
+                    aria-busy={isSubmitting || sessionStatus === 'checking'}
+                    aria-label={isSubmitting || sessionStatus === 'checking' ? '確認登入狀態' : undefined}
                     className="flex h-10 w-full shrink-0 items-center justify-center rounded bg-main text-[16px] font-bold leading-6 text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-main disabled:cursor-wait disabled:opacity-60"
                 >
-                    {isSubmitting ? '登入中…' : '登入'}
+                    {isSubmitting || sessionStatus === 'checking' ? <Spinner color="#fff" /> : '登入'}
                 </button>
             </form>
         </div>
