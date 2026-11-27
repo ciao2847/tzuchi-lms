@@ -56,7 +56,9 @@ const HistoryTable = ({ data }) => {
 
 const HistoryMeta = ({ title, value }) => (
     <div className="flex min-w-0 items-start gap-2 text-[11px] leading-[17px] text-[#486785] md:text-[12px] xl:text-[14px] xl:leading-5">
-        <i className="icon icon-calendar mt-[2px] h-3 w-3 shrink-0 text-[11px] text-secondary" aria-hidden="true" />
+        <span className="flex h-[1lh] w-3 shrink-0 items-center justify-center" aria-hidden="true">
+            <i className="icon icon-calendar text-[11px] text-secondary" />
+        </span>
         <span className="min-w-0 break-words"><I18N>{title}</I18N>：{formatTime(value)}</span>
     </div>
 )

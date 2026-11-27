@@ -370,7 +370,7 @@ async function main() {
     assert.deepEqual(app.modurls, [])
     assert(!app.browser.document.cookie.includes('tzuchi_lms_session='))
 
-    // A logout storage event also invalidates an earlier pending restore.
+    // A storage-wide clear without a validated profile invalidates a pending restore.
     app = mount(true); app.render()
     app.browser.localStorage.removeItem('tzuchi-lms-login')
     app.emitStorage({ key: null, newValue: null })
@@ -379,6 +379,25 @@ async function main() {
     assert.equal(app.render().isLogin, false)
     assert.equal(app.browser.localStorage.getItem('tzuchi-lms-login'), null)
     assert.equal(app.logoutCalls, 0)
+
+    for (const expired of [false, true]) {
+        app = mount(true); app.render()
+        app.checks[0].resolve({ success: true, data: sessionData }); await flush()
+        assert.equal(app.render().isLogin, true)
+        app.browser.localStorage.removeItem('tzuchi-lms-login')
+        app.emitStorage({ key: null, newValue: null })
+        assert.equal(app.render().sessionStatus, 'checking')
+        assert.equal(app.checks.length, 2)
+        if (expired) app.checks[1].reject(Object.assign(new Error('Expired'), { status: 401 }))
+        else app.checks[1].resolve({ success: true, data: sessionData })
+        await flush()
+        assert.equal(app.render().isLogin, !expired)
+        assert.equal(app.render().sessionExpired, expired)
+        const profile = app.browser.localStorage.getItem('tzuchi-lms-login')
+        if (expired) assert.equal(profile, null)
+        else assert.equal(JSON.parse(profile).user.id, storedUser.id)
+        assert.equal(app.logoutCalls, 0)
+    }
 
     // A queued older logout event must not erase a newer shared login.
     app = mount(true); app.render()
@@ -405,7 +424,10 @@ async function main() {
         assert.equal(context.isLogin, false)
         assert.deepEqual(context.user, {})
         if (expired) app.checks[1].reject(Object.assign(new Error('Expired'), { status: 401 }))
-        else app.checks[1].resolve({ success: true, data: sessionData })
+        else app.checks[1].resolve({
+            success: true,
+            data: { ...sessionData, modurl: 'https://moodle.example/restore' }
+        })
         await flush()
         context = app.render()
         assert.equal(context.isLogin, !expired)
@@ -449,7 +471,7 @@ async function main() {
         assert.equal(restored.render().user.name, 'Restored user')
         assert.equal(restored.render().user.userkey, 'restored-key')
         assert(!restored.browser.localStorage.getItem('tzuchi-lms-login').includes('restored-key'))
-        assert.deepEqual(restored.modurls, ['https://moodle.example/restore'])
+        assert.deepEqual(restored.modurls, [], 'Session validation must not replay the Moodle login URL')
         restored.render().markPasswordChanged(storedUser.id)
         assert.equal(restored.render().user.changepassword, 'N')
         assert.equal(restored.render().user.userkey, 'restored-key')

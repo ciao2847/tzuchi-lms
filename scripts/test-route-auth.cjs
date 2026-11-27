@@ -77,6 +77,8 @@ const protectedLocations = [
     ['/change-password', 'change-password'],
     ['/change-password?embed=1', 'change-password'],
     ['/course', 'pick'], ['/course/85453', 'pick-detail'], ['/calendar', 'calendar'],
+    ['/course/registration/dependents', 'course-registration'],
+    ['/course/registration/uniform', 'course-registration'],
     ['/external-training-data', 'external-training'], ['/tree', 'menu-page'],
     ['/edu-service', 'menu-page'], ['/edu-service-country', 'menu-page'], ['/404', 'not-found'],
     ['/course?embed=1&keyword=test#courses', 'pick'], ['/tree?embed=1#external-training-form', 'menu-page']
@@ -144,6 +146,8 @@ const { ChangePasswordItem } = load('src/layout/MainNav.js', {
     'contexts/LoginProvider': { LoginContext },
     'hooks/useMedia': () => true,
     'hooks/useBodyScrollLock': () => {},
+    './SiteLogo': () => null,
+    'lib/textSize': load('src/lib/textSize.js'),
     constants: { MENU_CONFIG: [] },
     sweetalert: () => {}
 })

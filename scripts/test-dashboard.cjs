@@ -72,9 +72,9 @@ async function main() {
     assert.throws(() => adapter.adaptDashboard({}))
 
     const client = load('src/lib/apiClient.js')
-    const auth = load('src/constants/auth.js')
+    const auth = load('src/constants/index.js')
     const programAdapter = load('src/adapters/programAdapter.js')
-    const api = load('src/api/dashboard.js', { 'lib/apiClient': client, 'adapters/dashboardAdapter': adapter, 'adapters/programAdapter': programAdapter, 'constants/auth': auth })
+    const api = load('src/api/dashboard.js', { 'lib/apiClient': client, 'adapters/dashboardAdapter': adapter, 'adapters/programAdapter': programAdapter, 'constants': auth })
     global.fetch = async () => ({ ok: true, json: async () => ({ success: false, error: { code: 'SESSION_EXPIRED' } }) })
     await assert.rejects(api.getProgramInfo('3324', undefined, 'session-key'), error => error.status === 401)
     global.fetch = async (url, options) => {
@@ -126,7 +126,7 @@ async function main() {
     assert(!loadingSummary.includes('<header') && !loadingSummary.includes('<h2') && !loadingSummary.includes('<a'))
     assert(!loadingSummary.includes('載入中'))
     assert(!loadingSummary.includes('Upcoming course'))
-    const calendarConstants = load('src/constants/learningCalendar.js')
+    const calendarConstants = load('src/constants/index.js')
     assert.equal(calendarConstants.MESSAGE_LIST, undefined)
     assert.equal(calendarConstants.HAS_UNREAD_NOTICE, undefined)
     let calendarProps
@@ -183,7 +183,7 @@ async function main() {
         'components/Select': ({ children }) => React.createElement('select', null, children),
         'components/NotificationDetailDialog': () => null,
         'components/TitleBlk': () => null,
-        'constants/learningCalendar': calendarConstants
+        'constants': calendarConstants
     })
     const Calendar = calendarModule.default
     const { NoticeSection } = load('src/layout/MobileNotifications.js', {

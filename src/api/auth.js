@@ -1,5 +1,5 @@
 import { apiClient, requireApiSuccess, requireUserKey, ApiError } from 'lib/apiClient'
-import { AUTH_API_BASE, AUTH_API_KEY } from 'constants/auth'
+import { AUTH_API_BASE, AUTH_API_KEY } from 'constants'
 
 const passwordRequest = async (action, payload, signal, apiKey) => {
     try {

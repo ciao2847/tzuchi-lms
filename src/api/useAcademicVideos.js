@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { adaptAcademicVideos } from 'adapters/speechAdapter'
-import { SPEECH_REQUEST_URL } from 'constants/speech'
+import { SPEECH_REQUEST_URL } from 'constants'
 import { apiClient } from 'lib/apiClient'
 
 const useAcademicVideos = ({ enabled = true } = {}) => {

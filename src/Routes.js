@@ -9,6 +9,7 @@ const ForgotPassword = lazy(() => import('views/forgot-password'))
 const ChangePassword = lazy(() => import('views/change-password'))
 const NotFound = lazy(() => import('views/not-found'))
 const PickDetail = lazy(() => import('views/pick-detail'))
+const CourseRegistration = lazy(() => import('views/course-registration'))
 const Calendar = lazy(() => import('views/calendar'))
 const ExternalTraining = lazy(() => import('views/external-training'))
 const MenuPage = lazy(() => import('views/menu-page'))
@@ -57,6 +58,14 @@ const routes = [
                     {
                         path: '/course/:id',
                         element: <PickDetail />
+                    },
+                    {
+                        path: '/course/registration/dependents',
+                        element: <CourseRegistration kind="dependents" />
+                    },
+                    {
+                        path: '/course/registration/uniform',
+                        element: <CourseRegistration kind="uniform" />
                     },
                     {
                         path: '/pick',

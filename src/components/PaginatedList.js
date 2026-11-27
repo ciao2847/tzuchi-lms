@@ -3,7 +3,8 @@ import I18N from 'components/I18N'
 import Select from 'components/Select'
 
 const EMPTY_DATA = []
-const PAGE_SIZE_OPTIONS = [10, 20, 50]
+const PAGE_SIZE_OPTIONS = [12, 24, 48]
+const DEFAULT_PAGE_SIZE = 24
 
 const getPageButtons = (currentPage, pageCount) => {
     if (pageCount <= 7) {
@@ -42,7 +43,7 @@ const PaginatedList = ({
     pagination
 }) => {
     const pageSizeId = useId()
-    const [pageSize, setPageSize] = useState(20)
+    const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
     const normalizedData = Array.isArray(data) ? data : EMPTY_DATA
     const normalizedPageSize = Math.max(1, pagination?.pageSize || pageSize)
     const pageCount = Math.max(
@@ -114,7 +115,7 @@ const PaginatedList = ({
                                                 : undefined
                                         }
                                         onClick={() => changePage(pageItem)}
-                                        className={`inline-flex size-9 items-center justify-center rounded-[6px] border border-solid text-[13px] font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary md:size-10 md:text-[14px] ${
+                                        className={`inline-flex h-9 min-w-9 items-center justify-center whitespace-nowrap rounded-[6px] border border-solid px-1.5 text-[13px] font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary md:h-10 md:min-w-10 md:text-[14px] ${
                                             pageItem === currentPage
                                                 ? 'border-primary bg-primary text-white'
                                                 : 'border-[#d8e1ee] bg-white text-primary hover:border-secondary hover:text-secondary'

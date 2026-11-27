@@ -1,4 +1,4 @@
-import { SPEECH_PORTAL_URL } from 'constants/speech'
+import { SPEECH_PORTAL_URL } from 'constants'
 
 const FALLBACK_IMAGE = `${process.env.BASE_PATH}/images/index/video-lecture-placeholder.svg`
 

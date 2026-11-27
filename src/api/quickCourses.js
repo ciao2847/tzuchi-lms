@@ -1,5 +1,5 @@
 import { apiClient, ApiError, requireApiSuccess, requireUserKey } from 'lib/apiClient'
-import { AUTH_API_BASE } from 'constants/auth'
+import { AUTH_API_BASE } from 'constants'
 
 export const getCourseCategories = async (signal, userkey) => {
     const result = await apiClient(`${AUTH_API_BASE}/course/category`, {

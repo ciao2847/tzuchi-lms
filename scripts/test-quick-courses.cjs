@@ -15,8 +15,8 @@ function load(file, mocks = {}) {
     return mod.exports
 }
 const client = load('src/lib/apiClient.js')
-const constants = load('src/constants/auth.js')
-const api = load('src/api/quickCourses.js', { 'lib/apiClient': client, 'constants/auth': constants })
+const constants = load('src/constants/index.js')
+const api = load('src/api/quickCourses.js', { 'lib/apiClient': client, 'constants': constants })
 let request
 let response = { success: true, data: { branch: 'dl', total: 737, courselist: [{
     id: '85453', branchname: '大林', typename: '數位', coursename: '抗生素報告', teacher: '講師',

@@ -135,11 +135,13 @@ async function main() {
     try {
         const restored = mount()
         restored.render(); let restoredTree = restored.render()
-        assert.deepEqual(restored.requests.at(-1).filters, { branch: 'dl', oldcourse: 1, type: '1', program: 'my', category: '12', keyword: 'test', page: 2, pagesize: 50 })
+        assert.deepEqual(restored.requests.at(-1).filters, { branch: 'dl', oldcourse: 1, type: '1', program: 'my', category: '12', keyword: 'test', page: 2, pagesize: 48 })
         restored.requests.at(-1).resolve({ branch: 'dl', total: 150, courses: [] }); await flush()
         restoredTree = restored.render()
         assert.equal(find(restoredTree, node => node.props.id === 'campus-filter').props.value, 'dl')
-        find(restoredTree, node => node.props.pagination).props.pagination.onPageChange(3)
+        const listPagination = find(restoredTree, node => node.props.pagination)
+        assert.deepEqual(listPagination.props.pageSizeOptions, [12, 24, 48])
+        listPagination.props.pagination.onPageChange(3)
         restored.render()
         assert.equal(location.searchParams.get('page'), '3')
         assert.equal(location.hash, '#results')
@@ -150,9 +152,11 @@ async function main() {
         assert.equal(refreshed.requests.at(-1).filters.branch, 'dl')
 
         const listTree = refreshed.render()
+        const requestCount = refreshed.requests.length
         find(listTree, node => typeof node.props.ariaLabel === 'string').props.onChange('card')
         refreshed.render()
-        assert.equal(refreshed.requests.at(-1).filters.page, 1)
+        assert.equal(refreshed.requests.length, requestCount)
+        assert.equal(refreshed.requests.at(-1).filters.page, 3)
         assert.equal(refreshed.requests.at(-1).filters.pagesize, 48)
         refreshed.requests.at(-1).resolve({ branch: 'dl', total: 150, courses: [] }); await flush()
         const cardList = find(refreshed.render(), node => node.props.pagination)

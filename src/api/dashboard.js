@@ -1,6 +1,6 @@
 import { apiClient, requireApiSuccess, requireUserKey } from 'lib/apiClient'
 import { adaptDashboard } from 'adapters/dashboardAdapter'
-import { AUTH_API_BASE } from 'constants/auth'
+import { AUTH_API_BASE } from 'constants'
 import { ApiError } from 'lib/apiClient'
 import { adaptProgramInfo } from 'adapters/programAdapter'
 

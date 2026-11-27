@@ -14,7 +14,7 @@ const MoreOptionsSelector = ({ options, value, onChange, ariaLabel, moreLabel, e
                 onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus() } }}>
                 <summary title={selectedMore?.label || moreLabel} className={`${buttonClass(Boolean(selectedMore))} cursor-pointer list-none [&::-webkit-details-marker]:hidden`}>
                     <span className="truncate">{selectedMore ? `更多：${selectedMore.label}` : '更多'}</span>
-                    <i className="icon icon-arrow-down shrink-0 text-[9px]" aria-hidden="true" />
+                    <i className="icon icon-arrow-down shrink-0 text-[18px]" aria-hidden="true" />
                 </summary>
                 <div className="absolute right-0 top-full z-20 mt-2 max-h-60 w-[min(320px,calc(100vw-3rem))] overflow-y-auto overscroll-contain rounded-[8px] border border-solid border-[#d8e1ee] bg-white py-1 shadow-lg" role="group" aria-label={moreLabel}>
                     {more.length ? more.map(option => <button key={option.value} type="button" aria-pressed={option.value === value}

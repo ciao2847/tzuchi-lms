@@ -15,7 +15,7 @@ function load(file, mocks = {}) {
 async function main() {
     const client = load('src/lib/apiClient.js')
     const api = load('src/api/externalHistory.js', {
-        'lib/apiClient': client, 'constants/auth': { AUTH_API_BASE: '/api', AUTH_API_KEY: 'test-key' }
+        'lib/apiClient': client, 'constants': { AUTH_API_BASE: '/api', AUTH_API_KEY: 'test-key' }
     })
     const record = { id: '3433', source: 'lms', coursename: '外訓測試', cost: '0', pubCost: '自主外訓', status: '通過',
         startTime: '2026年07月14日', endTime: '2026年07月14日', resource: { status: '不需', time: '1970年01月01日' },

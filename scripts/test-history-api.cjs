@@ -12,7 +12,7 @@ function load(file, mocks = {}) {
 }
 const client = load('src/lib/apiClient.js')
 const { getLearningHistory } = load('src/api/learningHistory.js', {
-    'lib/apiClient': client, 'constants/auth': { AUTH_API_BASE: '/api', AUTH_API_KEY: 'test-key' }
+    'lib/apiClient': client, 'constants': { AUTH_API_BASE: '/api', AUTH_API_KEY: 'test-key' }
 })
 async function main() {
     let request

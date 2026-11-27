@@ -9,6 +9,10 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
     const [showPassword, setShowPassword] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [errorMessage, setErrorMessage] = useState('')
+    const accountDescription = [
+        sessionExpired && `${sectionId}-session-expired`,
+        errorMessage && `${sectionId}-login-error`
+    ].filter(Boolean).join(' ') || undefined
 
     useEffect(() => {
         if (window.location.hash !== '#login') return undefined
@@ -65,7 +69,6 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                     慈濟醫療學習平台
                 </p>
             </div>
-            {sessionExpired && <p role="alert" className="mb-4 text-[13px] text-danger">登入時效已過期，請重新登入。</p>}
             {sessionStatus === 'checking' && (
                 <p role="status" className="mb-4 text-[13px] text-secondary">正在確認登入狀態…</p>
             )}
@@ -80,12 +83,16 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                 onSubmit={handleSubmit}
             >
                 <div>
-                    <label
-                        htmlFor={`${sectionId}-account`}
-                        className="mb-2 block text-[16px] font-medium leading-5 text-primary"
-                    >
-                        帳號
-                    </label>
+                    <div className="mb-2 flex items-baseline gap-2">
+                        <label htmlFor={`${sectionId}-account`} className="shrink-0 text-[16px] font-medium leading-5 text-primary">
+                            帳號
+                        </label>
+                        <span id={`${sectionId}-session-expired`} role={sessionExpired ? 'alert' : undefined}
+                            aria-hidden={sessionExpired ? undefined : true}
+                            className={`min-w-0 text-[13px] leading-5 text-danger ${sessionExpired ? '' : 'invisible'}`}>
+                            登入時效已過期，請重新登入。
+                        </span>
+                    </div>
                     <div className="relative">
                         <i
                             className="icon icon-avatar pointer-events-none absolute inset-y-0 left-3 text-[16px] leading-6 text-gray-400"
@@ -98,11 +105,7 @@ const LoginSection = ({ onLogin, onForgotPassword, className = '' }) => {
                             autoComplete="username"
                             placeholder="請輸入帳號"
                             aria-invalid={Boolean(errorMessage)}
-                            aria-describedby={
-                                errorMessage
-                                    ? `${sectionId}-login-error`
-                                    : undefined
-                            }
+                            aria-describedby={accountDescription}
                             required
                             className="block h-10 w-full min-w-0 rounded border border-gray-200 bg-transparent py-2 pl-9 pr-3 text-[14px] leading-5 text-primary outline-none placeholder:text-gray-400 focus:border-secondary focus:ring-2 focus:ring-secondary/20"
                         />

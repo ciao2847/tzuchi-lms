@@ -12,8 +12,8 @@ function load(file, mocks = {}) {
     return mod.exports
 }
 const client = load('src/lib/apiClient.js')
-const constants = load('src/constants/auth.js')
-const mocks = { 'lib/apiClient': client, 'constants/auth': constants }
+const constants = load('src/constants/index.js')
+const mocks = { 'lib/apiClient': client, 'constants': constants }
 const auth = load('src/api/auth.js', mocks)
 const dashboard = load('src/api/dashboard.js', { ...mocks,
     'adapters/dashboardAdapter': load('src/adapters/dashboardAdapter.js'),

@@ -4,11 +4,11 @@ import { getExternalHistory } from 'api/externalHistory'
 import AnnualLearningHistory from './AnnualLearningHistory'
 
 export const displayDate = value => !value || String(value).startsWith('1970') ? '—' : String(value)
-const actionClass = 'mt-1 block text-secondary underline underline-offset-2 transition-colors hover:text-main focus-visible:text-main focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary'
-const Status = ({ value }) => <span className={`inline-flex rounded-full px-2 py-0.5 text-[12px] font-bold ${value === '通過' || value === '完成' ? 'bg-[#e7f5df] text-[#329500]' : 'bg-[#f0f2f5] text-[#556273]'}`}>{value || '—'}</span>
+const actionClass = compact => `${compact ? 'inline-block shrink-0 ![min-block-size:0]' : 'mt-1 block'} text-secondary underline underline-offset-2 transition-colors hover:text-main focus-visible:text-main focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary`
+const Status = ({ value, compact }) => <span className={`inline-flex rounded-full px-2 py-0.5 font-bold ${compact ? 'text-[11px] leading-4' : 'text-[12px]'} ${value === '通過' || value === '完成' ? 'bg-[#e7f5df] text-[#329500]' : 'bg-[#f0f2f5] text-[#556273]'}`}>{value || '—'}</span>
 
-const FeedbackDetails = ({ feedback, course }) => <>
-    <button type="button" className={actionClass} aria-label={`檢視滿意度：${course}`} onClick={event => event.currentTarget.nextElementSibling.showModal()}>檢視</button>
+const FeedbackDetails = ({ feedback, course, compact }) => <>
+    <button type="button" className={actionClass(compact)} aria-label={`檢視滿意度：${course}`} onClick={event => event.currentTarget.nextElementSibling.showModal()}>檢視</button>
     <dialog aria-label={`滿意度檢視：${course}`} className="m-auto max-h-[85vh] w-[min(92vw,560px)] overflow-auto rounded-[10px] bg-white p-5 text-primary shadow-xl backdrop:bg-black/40">
         <h3 className="mb-2 text-[18px] font-bold">滿意度檢視</h3>
         <p className="mb-4 break-words">{course}</p>
@@ -20,16 +20,16 @@ const FeedbackDetails = ({ feedback, course }) => <>
     </dialog>
 </>
 
-const Progress = ({ value, title, course }) => {
+const Progress = ({ value, title, course, compact }) => {
     const { status, time, artical, feedbackInfo, grade } = value || {}
     const article = typeof artical === 'string' ? artical : ''
     const feedback = Array.isArray(feedbackInfo) ? feedbackInfo.filter(item => item && typeof item === 'object') : []
     const content = title === '滿意度' ? feedback.map(item => `${item.title || ''}：${item.feedbackText || '—'}`).join('\n') : article
     if (title === '滿意度' || title === '心得') {
         if (status !== '完成' || !content.trim()) return <span>{status || '—'}</span>
-        return <div>
-            <time className="block text-[12px] text-[#486785]">{displayDate(time)}</time>
-            {title === '滿意度' ? <FeedbackDetails feedback={feedback} course={course} /> : <button type="button" className={actionClass} aria-label={`檢視${title}：${course}`} onClick={() => window.alert(`${course}\n${title}\n\n${content}`)}>檢視</button>}
+        return <div className={compact ? 'flex flex-wrap items-baseline gap-x-2' : undefined}>
+            <time className={compact ? 'min-w-0' : 'block text-[12px] text-[#486785]'}>{displayDate(time)}</time>
+            {title === '滿意度' ? <FeedbackDetails feedback={feedback} course={course} compact={compact} /> : <button type="button" className={actionClass(compact)} aria-label={`檢視${title}：${course}`} onClick={() => window.alert(`${course}\n${title}\n\n${content}`)}>檢視</button>}
         </div>
     }
     return <div>
@@ -57,11 +57,13 @@ const Attachments = ({ files }) => {
 }
 const columns = [
     ['課程名稱', record => record.coursename], ['假別', record => record.pubCost || '—'],
-    ['開始時間', record => displayDate(record.startTime)], ['結束時間', record => displayDate(record.endTime)],
-    ['時數', record => record.cost ?? '—'], ['狀態', record => <Status value={record.status} />],
-    ...[['上課', 'resource'], ['測驗', 'quiz'], ['滿意度', 'feedback'], ['心得', 'haslearned'], ['工作計畫', 'plan'], ['轉訓', 'transfer']].map(([title, key]) => [title, record => <Progress value={record[key]} title={title} course={record.coursename} />]),
-    ['附件', record => <Attachments files={record.file} />]
+    ['開始時間', record => displayDate(record.startTime), 'icon-calendar'],
+    ['結束時間', record => displayDate(record.endTime), 'icon-calendar'],
+    ['時數', record => record.cost ?? '—', 'icon-time'], ['狀態', record => <Status value={record.status} />],
+    ...[['上課', 'resource', 'icon-doc'], ['測驗', 'quiz', 'icon-doc'], ['滿意度', 'feedback', 'icon-calendar'], ['心得', 'haslearned', 'icon-calendar'], ['工作計畫', 'plan', 'icon-doc'], ['轉訓', 'transfer', 'icon-doc']].map(([title, key, icon]) => [title, (record, compact) => <Progress value={record[key]} title={title} course={record.coursename} compact={compact} />, icon]),
+    ['附件', record => <Attachments files={record.file} />, 'icon-doc']
 ]
+const cardFields = columns.filter(([, , icon]) => icon)
 
 export const ExternalHistoryResults = ({ data, viewMode }) => viewMode === 'list' ?
     <div role="region" aria-label="外訓紀錄列表，可左右捲動查看完整欄位" tabIndex={0} className="overflow-x-auto rounded-[10px] border border-solid border-[#dce5f0] bg-white text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary">
@@ -71,10 +73,16 @@ export const ExternalHistoryResults = ({ data, viewMode }) => viewMode === 'list
             <tbody>{data.map(record => <tr key={`${record.source}-${record.id}`} className="border-t border-solid border-[#e5ebf3] hover:bg-[#eaf3ff]">{columns.map(([title, render]) => <td key={title} className={`px-3 py-3 align-top ${title === '課程名稱' ? 'min-w-[220px] break-words font-semibold' : 'min-w-[90px]'}`}>{render(record)}</td>)}</tr>)}</tbody>
         </table>
     </div> :
-    <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">{data.map(record => <li key={`${record.source}-${record.id}`} className="rounded-[10px] border border-solid border-[#dce5f0] bg-white p-4 text-primary">
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2"><span className="rounded-full bg-[#eaf3ff] px-2 py-1 text-[12px] text-secondary">{record.pubCost || '外訓'}</span><Status value={record.status} /></div>
-        <h3 className="mb-3 break-words text-[15px] font-bold">{record.coursename}</h3>
-        <dl className="space-y-2 text-[12px] leading-5">{columns.slice(2).filter(([title]) => title !== '狀態').map(([title, render]) => <div key={title} className="grid grid-cols-[64px_1fr] gap-2"><dt className="text-[#486785]">{title}</dt><dd className="min-w-0 break-words">{render(record)}</dd></div>)}</dl>
+    <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">{data.map(record => <li key={`${record.source}-${record.id}`} className="rounded-[7px] border border-solid border-[#dce5f0] bg-white px-4 py-3 text-primary">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2"><span className="rounded-full bg-[#eaf3ff] px-2 py-0.5 text-[11px] leading-4 text-secondary">{record.pubCost || '外訓'}</span><Status value={record.status} compact /></div>
+        <h3 className="mb-2 break-words text-[15px] font-bold leading-5">{record.coursename}</h3>
+        <dl className="space-y-1 text-[12px] leading-[18px] text-[#486785]">{cardFields.map(([title, render, icon]) => <div key={title} className="flex items-start gap-1">
+            <dt className="flex shrink-0 items-start gap-1.5 !whitespace-nowrap">
+                <span className="flex h-[1lh] w-3 shrink-0 items-center justify-center" aria-hidden="true"><i className={`icon ${icon} text-[11px] text-secondary`} /></span>
+                <span>{title}：</span>
+            </dt>
+            <dd className="min-w-0 break-words">{render(record, true)}</dd>
+        </div>)}</dl>
     </li>)}</ul>
 
 const ExternalHistory = () => <AnnualLearningHistory fetchHistory={getExternalHistory} label="外訓紀錄" resultsComponent={ExternalHistoryResults} />

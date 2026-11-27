@@ -38,23 +38,26 @@ const PROGRAM_OPTIONS = [
 
 const normalizeCampus = branch => typeof branch === 'string' ? branch.trim().toLowerCase() : ''
 
-const LIST_PAGE_SIZES = [10, 20, 50]
-const CARD_PAGE_SIZES = [12, 24, 48]
+const PAGE_SIZES = [12, 24, 48]
+const LEGACY_PAGE_SIZES = { 10: 12, 20: 24, 50: 48 }
+const DEFAULT_PAGE_SIZE = 24
 
 const readSearchState = () => {
     const params = new URLSearchParams(typeof window === 'undefined' ? '' : window.location?.search || '')
     const branch = normalizeCampus(params.get('branch'))
     const requestedPageSize = Number(params.get('pagesize'))
-    const cardSizeIndex = CARD_PAGE_SIZES.indexOf(requestedPageSize)
+    const legacyPageSize = LEGACY_PAGE_SIZES[requestedPageSize]
+    const pageSize = PAGE_SIZES.includes(requestedPageSize)
+        ? requestedPageSize : legacyPageSize ?? DEFAULT_PAGE_SIZE
+    const page = Math.max(1, Math.trunc(Number(params.get('page')) || 1))
     return {
         branch: CAMPUS_OPTIONS.some(option => option.id === branch) ? branch : null,
         type: TYPE_OPTIONS.some(option => option.id === params.get('type')) ? params.get('type') : 'all',
         program: params.get('program') === 'my' ? 'my' : 'all',
         category: params.get('category') || '', keyword: params.get('keyword') || '',
         oldcourse: params.get('oldcourse') === '1' ? 1 : 0,
-        page: Math.max(1, Math.trunc(Number(params.get('page')) || 1)),
-        pageSizeIndex: cardSizeIndex >= 0 ? cardSizeIndex : LIST_PAGE_SIZES.indexOf(requestedPageSize),
-        requestedPageSize: cardSizeIndex >= 0 || LIST_PAGE_SIZES.includes(requestedPageSize) ? requestedPageSize : null,
+        page: legacyPageSize ? Math.floor((page - 1) * requestedPageSize / pageSize) + 1 : page,
+        pageSize,
         viewMode: ['list', 'card'].includes(params.get('view')) ? params.get('view') : null
     }
 }
@@ -76,14 +79,10 @@ const Page = () => {
     const [attribute, setAttribute] = useState(savedSearch.category)
     const [keyword, setKeyword] = useState(savedSearch.keyword)
     const [oldcourse, setOldcourse] = useState(savedSearch.oldcourse === 1)
-    const [pageSizeIndex, setPageSizeIndex] = useState(savedSearch.pageSizeIndex >= 0 ? savedSearch.pageSizeIndex : 1)
+    const [pageSize, setPageSize] = useState(savedSearch.pageSize)
     const [selectedViewMode, setSelectedViewMode] = useState(savedSearch.viewMode)
     const viewMode = selectedViewMode || (isDesktopLayout ? 'list' : 'card')
-    const pageSizeOptions = viewMode === 'card' ? CARD_PAGE_SIZES : LIST_PAGE_SIZES
-    const pageSize = pageSizeOptions[pageSizeIndex]
-    const [pageOffset, setPageOffset] = useState(() => (savedSearch.page - 1) * (savedSearch.requestedPageSize ?? pageSize))
-    const page = Math.floor(pageOffset / pageSize) + 1
-    const setPage = nextPage => setPageOffset((nextPage - 1) * pageSize)
+    const [page, setPage] = useState(savedSearch.page)
     const [filters, setFilters] = useState({ branch: savedSearch.branch || defaultCampus, type: savedSearch.type, program: savedSearch.program, oldcourse: savedSearch.oldcourse, category: savedSearch.category, keyword: savedSearch.keyword })
     const [revision, setRevision] = useState(0)
     const [result, setResult] = useState({ status: 'loading', courses: [], total: 0 })
@@ -125,7 +124,7 @@ const Page = () => {
         setCampus(userCampus)
         setAttribute('')
         setFilters(current => ({ ...current, branch: userCampus, category: '' }))
-        setPageOffset(0)
+        setPage(1)
     }, [isVerified, userCampus, user.id, savedSearch])
     useEffect(() => {
         if (!isVerified || typeof window === 'undefined' || !window.history?.replaceState) return
@@ -312,10 +311,7 @@ const Page = () => {
                     <ViewModeToggle
                         ariaLabel="課程顯示方式"
                         value={viewMode}
-                        onChange={mode => {
-                            setSelectedViewMode(mode)
-                            if (mode !== viewMode) setPage(1)
-                        }}
+                        onChange={setSelectedViewMode}
                     />
                 </div>
 
@@ -328,8 +324,8 @@ const Page = () => {
                     data={result.courses}
                     component={Results}
                     componentProps={{ viewMode }}
-                    pageSizeOptions={pageSizeOptions}
-                    pagination={{ page, pageSize, total: result.total, onPageChange: setPage, onPageSizeChange: size => { setPageSizeIndex(pageSizeOptions.indexOf(size)); setPage(1) } }}
+                    pageSizeOptions={PAGE_SIZES}
+                    pagination={{ page, pageSize, total: result.total, onPageChange: setPage, onPageSizeChange: size => { setPageSize(size); setPage(1) } }}
                 />}
             </section>
             </div>

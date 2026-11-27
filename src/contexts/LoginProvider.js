@@ -101,9 +101,10 @@ const LoginProvider = ({ children }) => {
     const [isLoggingOut, setIsLoggingOut] = useState(false)
     const logoutRequest = useRef(null)
 
-    const retrySession = useCallback(async () => {
+    const validateSession = useCallback(async (fallbackLogin) => {
         cancelSessionCheck()
-        const storedLogin = getInitialLoginState()
+        const cachedLogin = getInitialLoginState()
+        const storedLogin = cachedLogin.isLogin ? cachedLogin : fallbackLogin || LOGGED_OUT_STATE
         if (!storedLogin.isLogin) {
             setLoginState(LOGGED_OUT_STATE)
             setSessionStatus('idle')
@@ -136,7 +137,6 @@ const LoginProvider = ({ children }) => {
             setLoginState(nextState)
             setSessionExpired(false)
             setSessionStatus('success')
-            void requestModLogin(data?.modurl)
         } catch (error) {
             if (controller.signal.aborted || version !== sessionVersion.current) return
             if (error.status === 401) { expireSession(); return }
@@ -148,6 +148,8 @@ const LoginProvider = ({ children }) => {
             if (version === sessionVersion.current) sessionRequest.current = null
         }
     }, [cancelSessionCheck, expireSession])
+
+    const retrySession = useCallback(() => validateSession(), [validateSession])
 
     useEffect(() => {
         void retrySession()
@@ -170,6 +172,11 @@ const LoginProvider = ({ children }) => {
             if (event.key !== null && event.key !== LOGIN_STORAGE_KEY) return
             authVersion.current += 1
             if (window.localStorage.getItem(LOGIN_STORAGE_KEY) === null) {
+                // A same-origin page can clear all storage without ending the LMS session.
+                if (event.key === null && loginState.isLogin && sessionStatus === 'success') {
+                    void validateSession(loginState)
+                    return
+                }
                 cancelSessionCheck()
                 clearLoginState()
                 setLoginState(LOGGED_OUT_STATE)
@@ -182,7 +189,7 @@ const LoginProvider = ({ children }) => {
         }
         window.addEventListener('storage', handleStorage)
         return () => window.removeEventListener('storage', handleStorage)
-    }, [cancelSessionCheck, retrySession])
+    }, [cancelSessionCheck, loginState, retrySession, sessionStatus, validateSession])
 
     const toggleLogin = (nextValue) => {
         const nextIsLogin = typeof nextValue === 'function'

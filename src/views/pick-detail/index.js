@@ -3,11 +3,12 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import I18N from 'components/I18N'
 import TitleBlk from 'components/TitleBlk'
-import { getCourseInfo } from 'api/courseInfo'
+import { cancelCourseRegistration, getCourseInfo } from 'api/courseInfo'
 import { LoginContext } from 'contexts/LoginProvider'
 import Spinner from 'components/Spinner'
 import DashboardStatus from 'components/DashboardStatus'
 import CourseHtml from 'components/CourseHtml'
+import { CourseRegistrationDialog } from 'views/course-registration'
 
 const DetailBlock = ({ title, children, className = '' }) => (
     <section
@@ -37,8 +38,8 @@ const CourseInfoItem = ({ icon, title, children }) => (
     </div>
 )
 
-const RegisterButton = ({ className = '', href, label }) => {
-    const buttonClass = `${className} inline-flex h-11 w-full items-center justify-center rounded-[6px] bg-main px-6 text-[14px] font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:h-12 md:text-[15px] xl:text-[17px]`
+const RegisterButton = ({ className = '', href, label, onClick, registered }) => {
+    const buttonClass = `${className} inline-flex h-11 w-full items-center justify-center rounded-[6px] px-6 text-[14px] font-bold md:h-12 md:text-[15px] xl:text-[17px] ${registered ? 'cursor-not-allowed bg-gray-200 text-gray-500' : 'bg-main text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'}`
 
     return href ? (
         <AutoSwitchLink
@@ -51,14 +52,25 @@ const RegisterButton = ({ className = '', href, label }) => {
             <I18N>{label}</I18N>
         </AutoSwitchLink>
     ) : (
-        <button type="button" disabled className={buttonClass}>
+        <button type="button" disabled={!onClick} onClick={onClick} className={buttonClass}>
             <I18N>{label}</I18N>
         </button>
     )
 }
 
-export const RegistrationDetail = ({ course }) => {
+const RegistrationSummary = ({ family, suit, className }) => (
+    <>
+        {family && <p className={className}>{family}</p>}
+        {suit && <p className={className}>{suit}</p>}
+    </>
+)
+
+export const RegistrationDetail = ({ course, userkey, confirmedRegistration, onRegistered, onCancelled, onSessionExpired }) => {
     const fixedRegisterBarRef = useRef(null)
+    const cancellationRef = useRef(null)
+    const [registrationOpen, setRegistrationOpen] = useState(false)
+    const [cancelling, setCancelling] = useState(false)
+    useEffect(() => () => cancellationRef.current?.abort(), [course.id, userkey])
     const {
         moodle_courseid: moodleCourseId, coursename: title, category, program, teacher, student, length,
         startdate, starthh, startmm, enddate, endhh, endmm, classroom,
@@ -76,19 +88,68 @@ export const RegistrationDetail = ({ course }) => {
     const rule = Array.isArray(completion) ? completion.join('、') || '—' : '—'
     const contact = contacter || '—'
     const check = signUpCheck || {}
-    const canRegister = check.enterCourse === true || check.canRegister === true
-    const actionLabel = check.enterCourse === true ? '進入課程' : '我要報名'
+    const registered = confirmedRegistration || check.typeMes?.registered === true
+    const canCancel = Boolean(onCancelled) && String(type) === '2' && registered
+    const showRegistered = registered && check.enterCourse !== true
+    const familySummary = registered && typeof check.typeMes?.familyString === 'string'
+        ? check.typeMes.familyString.trim()
+        : ''
+    const suitSummary = registered && typeof check.typeMes?.suitString === 'string'
+        ? check.typeMes.suitString.replace(/<br\s*\/?>/gi, '\n').replace(/&nbsp;/gi, '\u00a0').trim()
+        : ''
+    const canRegister = check.enterCourse === true || check.canRegister === true || showRegistered
+    const actionLabel = check.enterCourse === true ? '進入課程' : showRegistered ? '您已報名' : '我要報名'
     const moodleUrl = typeof check.typeMes?.moodleUrl === 'string' ? check.typeMes.moodleUrl.trim() : ''
     const courseId = String(moodleCourseId ?? '').trim()
     const registerUrl = check.enterCourse === true
         ? (/^[1-9][0-9]*$/.test(courseId) ? `http://10.2.10.236:8064/tzuchi/lms2/course/view.php?id=${courseId}` : null)
         : check.canRegister === true && /^https?:\/\//i.test(moodleUrl) ? moodleUrl : null
     const registrationMessage = typeof check.message?.register === 'string' ? check.message.register : ''
+    const registrationKind = !showRegistered && check.enterCourse !== true && check.canRegister === true
+        ? check.setFamily === true && check.setSuit === true ? 'both'
+            : check.setFamily === true ? 'dependents'
+            : check.setSuit === true ? 'uniform'
+            : String(type) === '2' ? 'standard' : null
+        : null
+    const registerAction = showRegistered ? { registered: true } : registrationKind
+        ? { onClick: () => setRegistrationOpen(true) }
+        : { href: registerUrl }
+    const cancelRegistration = async () => {
+        if (cancellationRef.current || !window.confirm('確定要取消報名嗎？取消後，眷屬報名與制服申請資料也會一併刪除。')) return
+        const controller = new AbortController()
+        cancellationRef.current = controller
+        setCancelling(true)
+        try {
+            const { message } = await cancelCourseRegistration(course.id, controller.signal, userkey)
+            if (controller.signal.aborted) return
+            window.alert(message)
+            onCancelled()
+        } catch (error) {
+            if (controller.signal.aborted) return
+            if (error.status === 401) onSessionExpired?.()
+            window.alert(error instanceof TypeError ? '無法連線至報名服務，請重新查看課程報名狀態。' : error.message)
+        } finally {
+            cancellationRef.current = null
+            if (!controller.signal.aborted) setCancelling(false)
+        }
+    }
+    const cancelButton = className => canCancel && (
+        <button type="button" disabled={cancelling} onClick={cancelRegistration}
+            className={`${className} h-11 rounded-[6px] bg-[#e6f5ef] text-[14px] font-bold text-[#247a56] transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-success disabled:opacity-60 md:h-12 md:text-[15px]`}>
+            {cancelling ? '取消報名處理中…' : '取消報名'}
+        </button>
+    )
 
     useEffect(() => {
         if (!canRegister) return undefined
 
         let animationFrameId
+        const registerBar = fixedRegisterBarRef.current
+        const resizeObserver = new ResizeObserver(() => {
+            const height = registerBar.offsetHeight
+            if (height > 0) registerBar.parentElement.style.setProperty('--register-bar-height', `${height}px`)
+        })
+        resizeObserver.observe(registerBar)
 
         const updateFooterOffset = () => {
             window.cancelAnimationFrame(animationFrameId)
@@ -115,6 +176,7 @@ export const RegistrationDetail = ({ course }) => {
         window.addEventListener('resize', updateFooterOffset)
 
         return () => {
+            resizeObserver.disconnect()
             window.cancelAnimationFrame(animationFrameId)
             window.removeEventListener('scroll', updateFooterOffset)
             window.removeEventListener('resize', updateFooterOffset)
@@ -124,7 +186,7 @@ export const RegistrationDetail = ({ course }) => {
     return (
         <div
             className={`min-h-[calc(100dvh-48px)] bg-light pt-[var(--header-height)] ${
-                canRegister ? 'pb-[76px] xl:pb-0' : ''
+                canRegister ? 'pb-[var(--register-bar-height,76px)] xl:pb-0' : ''
             }`}
         >
             <TitleBlk
@@ -252,7 +314,7 @@ export const RegistrationDetail = ({ course }) => {
                             </CourseInfoItem>
                             {check.typeMes && <CourseInfoItem icon="doc" title="報名人數">
                                 {check.typeMes.currentRegistrations ?? '—'} / {check.typeMes.maxRegistrations ?? limit ?? '—'}
-                                {check.typeMes.registered === true && '（已報名）'}
+                                {registered && '（已報名）'}
                                 {check.typeMes.waiting === true && '（候補）'}
                             </CourseInfoItem>}
                         </section>
@@ -277,8 +339,21 @@ export const RegistrationDetail = ({ course }) => {
                             </div>
                         </section>
 
+                        {(familySummary || suitSummary) && (
+                            <div className="space-y-2 rounded-[8px] border border-solid border-[#dfe7f1] bg-white p-4 [box-shadow:0_2px_9px_rgba(9,58,123,0.04)] xl:hidden">
+                                <RegistrationSummary family={familySummary} suit={suitSummary}
+                                    className="whitespace-pre-wrap break-words text-[13px] not-italic text-[#486785]" />
+                            </div>
+                        )}
                         {registrationMessage && <p role="status" className="text-[14px] text-primary">{registrationMessage}</p>}
-                        {canRegister ? <RegisterButton className="hidden xl:inline-flex" href={registerUrl} label={actionLabel} /> :
+                        {canRegister ? (
+                            <div className="hidden xl:block">
+                                <RegisterButton {...registerAction} label={actionLabel} />
+                                {cancelButton('mt-2 w-full')}
+                                <RegistrationSummary family={familySummary} suit={suitSummary}
+                                    className="mt-2 whitespace-pre-wrap break-words text-[14px] not-italic text-[#486785]" />
+                            </div>
+                        ) :
                             <button type="button" disabled className="h-11 w-full rounded-[6px] bg-gray-200 text-[14px] text-gray-500">{registrationMessage || '目前不開放報名或進入課程'}</button>}
 
                     </aside>
@@ -292,8 +367,25 @@ export const RegistrationDetail = ({ course }) => {
                     ref={fixedRegisterBarRef}
                     className="fixed inset-x-0 bottom-0 z-40 border-t border-solid border-[#e0e8f1] bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2 backdrop-blur xl:hidden"
                 >
-                    <RegisterButton href={registerUrl} label={actionLabel} />
+                    {canCancel && showRegistered ? (
+                        <div className="grid w-full grid-cols-2 items-center gap-3">
+                            <span className="text-center text-[14px] font-bold text-primary md:text-[15px]"><I18N>您已報名</I18N></span>
+                            {cancelButton('w-full px-2')}
+                        </div>
+                    ) : (
+                        <>
+                            <RegisterButton {...registerAction} label={actionLabel} />
+                            {cancelButton('mt-2 w-full')}
+                        </>
+                    )}
                 </div>
+            )}
+            {registrationOpen && registrationKind && (
+                <CourseRegistrationDialog kind={registrationKind} courseId={course.id} userkey={userkey} onSessionExpired={onSessionExpired}
+                    onClose={registered => {
+                        setRegistrationOpen(false)
+                        if (registered) onRegistered?.()
+                    }} />
             )}
         </div>
     )
@@ -303,6 +395,7 @@ const Page = () => {
     const { id } = useParams()
     const { isLogin, user, expireSession } = useContext(LoginContext)
     const [result, setResult] = useState({ status: 'loading' })
+    const [confirmation, setConfirmation] = useState(null)
     const [revision, setRevision] = useState(0)
     useEffect(() => {
         if (!isLogin) return undefined
@@ -320,7 +413,16 @@ const Page = () => {
     if (!isLogin) return <div className="pt-[var(--header-height)]"><DashboardStatus /></div>
     if (result.id !== id || result.owner !== user.id || result.status === 'loading') return <div className="flex flex-1 items-center justify-center pt-[var(--header-height)]"><Spinner block /></div>
     if (result.status === 'error') return <div role="alert" className="min-h-[50vh] px-4 pt-[calc(var(--header-height)+24px)] text-primary"><p>{result.message}</p><button type="button" className="mt-3 underline" onClick={() => setRevision(value => value + 1)}>重新載入</button></div>
-    return <RegistrationDetail key={id} course={result.course} />
+    return <RegistrationDetail key={id} course={result.course} userkey={user.userkey} onSessionExpired={expireSession}
+        confirmedRegistration={confirmation?.id === id && confirmation?.owner === user.id}
+        onCancelled={() => {
+            setConfirmation(null)
+            setRevision(value => value + 1)
+        }}
+        onRegistered={() => {
+            setConfirmation({ id, owner: user.id })
+            setRevision(value => value + 1)
+        }} />
 }
 
 export default React.memo(Page)

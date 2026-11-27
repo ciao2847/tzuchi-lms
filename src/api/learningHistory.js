@@ -1,5 +1,5 @@
 import { apiClient, ApiError, requireApiSuccess, requireUserKey } from 'lib/apiClient'
-import { AUTH_API_BASE } from 'constants/auth'
+import { AUTH_API_BASE } from 'constants'
 
 export const getLearningHistory = async (year, signal, userkey) => {
     if (!Number.isInteger(year) || year < 1 || year > 9999) throw new Error('請選擇有效的西元年份。')

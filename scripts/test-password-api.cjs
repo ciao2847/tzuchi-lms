@@ -13,7 +13,7 @@ function load(file, mocks = {}) {
 async function main() {
     const api = load('src/api/auth.js', {
         'lib/apiClient': load('src/lib/apiClient.js'),
-        'constants/auth': { AUTH_API_BASE: '/api', AUTH_API_KEY: 'test-key' }
+        'constants': { AUTH_API_BASE: '/api', AUTH_API_KEY: 'test-key' }
     })
     const requests = []
     let response = { success: true, data: [{ meaage: 'OK' }] }, status = 200
